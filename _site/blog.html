@@ -5,6 +5,36 @@
   <title>Blog | William E. Mahaney</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/assets/css/style.css">
+  
+  <!-- MathJax configuration -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      macros: {
+        // Define any custom macros here
+        RR: '{\\mathbb{R}}',
+        CC: '{\\mathbb{C}}',
+        ZZ: '{\\mathbb{Z}}',
+        QQ: '{\\mathbb{Q}}',
+        NN: '{\\mathbb{N}}',
+        f: ['{ \\mathfrak{#1} }', 1]
+        // Add more macros as needed
+      }
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+  };
+</script>
+
+<!-- Load MathJax -->
+<script id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+  
 </head>
 <body>
 
@@ -21,6 +51,16 @@
     <h1 id="blog">Blog</h1>
 
 <ul>
+  
+    <li>
+      <a href="/2025/09/06/cool_nullstellensatz_proof.html">A Cool Nullstellensatz Proof</a>
+      <span>— September 06, 2025</span>
+    </li>
+  
+    <li>
+      <a href="/2025/08/13/math_test.html">Testing Math</a>
+      <span>— August 13, 2025</span>
+    </li>
   
     <li>
       <a href="/2025/08/13/first_post.html">First</a>

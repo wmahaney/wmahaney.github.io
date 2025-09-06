@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Testing Math | William E. Mahaney</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  
+  <!-- MathJax configuration -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      macros: {
+        // Define any custom macros here
+        RR: '{\\mathbb{R}}',
+        CC: '{\\mathbb{C}}',
+        ZZ: '{\\mathbb{Z}}',
+        QQ: '{\\mathbb{Q}}',
+        NN: '{\\mathbb{N}}',
+        f: ['{ \\mathfrak{#1} }', 1]
+        // Add more macros as needed
+      }
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+  };
+</script>
+
+<!-- Load MathJax -->
+<script id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+  
+</head>
+<body>
+
+  <header>
+    <h1><a href="/">William E. Mahaney</a></h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/blog.html">Blog</a>
+    </nav>
+    <hr>
+  </header>
+
+  <main>
+    <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Testing Math</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2025-08-13T00:00:00-04:00" itemprop="datePublished">Aug 13, 2025
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>I am a mathemetician, so it is befitting I speak on it. My primary area is Number Theory, specifically supersingular elliptic curves and Post-Quantum Cryptography. I also integrate Probability Theory with Number Theory and study random properties of arithmetic.</p>
+
+<p>I also get to use this as an opportunity to test out MathJax integration in Jekyll for making my website. For the programmers, I added the block</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c">&lt;!-- MathJax configuration --&gt;</span>
+<span class="nt">&lt;script&gt;</span>
+  <span class="nb">window</span><span class="p">.</span><span class="nx">MathJax</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">tex</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">inlineMath</span><span class="p">:</span> <span class="p">[[</span><span class="dl">'</span><span class="se">\\</span><span class="s1">(</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="se">\\</span><span class="s1">)</span><span class="dl">'</span><span class="p">],</span> <span class="p">[</span><span class="dl">'</span><span class="s1">$</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">$</span><span class="dl">'</span><span class="p">]],</span>
+      <span class="na">displayMath</span><span class="p">:</span> <span class="p">[[</span><span class="dl">'</span><span class="se">\\</span><span class="s1">[</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="se">\\</span><span class="s1">]</span><span class="dl">'</span><span class="p">],</span> <span class="p">[</span><span class="dl">'</span><span class="s1">$$</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">$$</span><span class="dl">'</span><span class="p">]]</span>
+    <span class="p">},</span>
+    <span class="na">options</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">skipHtmlTags</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">script</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">noscript</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">style</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">textarea</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">pre</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">code</span><span class="dl">'</span><span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">};</span>
+<span class="nt">&lt;/script&gt;</span>
+</code></pre></div></div>
+
+<p>to my _site/index.html file in my website repo.</p>
+
+<p>Now I will present a fun fact.</p>
+
+<h1 id="number-theory">Number Theory</h1>
+
+<p><strong>Fact</strong>: A prime $p \ge 3$ can be written as a sum of two squares if and only if $p \equiv 1 \pmod{4}$.</p>
+
+<p>Proof:
+$(\rightarrow)$ Suppose $p=x^2+y^2$. Computation mod 4 reveals $z^2 \equiv 0, 1 \pmod{4}$ for all integers $z$. Then $p \pmod{4} \equiv x^2 + y^2 \pmod{4}$ is equal to 0, 1, or 2 mod 4. As $p$ is an odd prime $p$ must be 1 mod 4.</p>
+
+<p>$(\leftarrow)$ Suppose $p \equiv 1 \pmod{4}$ is prime. As $p$ is an odd prime $p$ is not ramified in the Gaussian integers $\mathbb{Z}[i]$. As $p \equiv 1 \pmod{4}$ the prime $p$ splits in $\mathbb{Z}[i]$ so we can factor $p = (a+ib)(a-ib)$ and consequently $p = a^2 + b^2$.
+$\square$</p>
+
+  </div><a class="u-url" href="/2025/08/13/math_test.html" hidden></a>
+</article>
+
+  </main>
+
+  <footer>
+    <hr>
+    <p>&copy; 2025 William E. Mahaney — Powered by Jekyll</p>
+  </footer>
+
+</body>
+</html>

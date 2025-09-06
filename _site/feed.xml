@@ -1,5 +1,72 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2025-08-13T17:20:33-04:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">William E. Mahaney</title><subtitle>Personal website for William E. Mahaney. </subtitle><entry><title type="html">First</title><link href="http://localhost:4000/2025/08/13/first_post.html" rel="alternate" type="text/html" title="First" /><published>2025-08-13T00:00:00-04:00</published><updated>2025-08-13T00:00:00-04:00</updated><id>http://localhost:4000/2025/08/13/first_post</id><content type="html" xml:base="http://localhost:4000/2025/08/13/first_post.html"><![CDATA[<p>My name is William E. Mahaney, but I go by Will and sign WEM for short. I am a Mathematics graduate student at Virginia Tech (Virginia Polytechnic Institute and State University) in Blacskburg, Virginia in the United States.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2025-09-06T02:20:10-04:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">William E. Mahaney</title><subtitle>Personal website for William E. Mahaney. </subtitle><entry><title type="html">A Cool Nullstellensatz Proof</title><link href="http://localhost:4000/2025/09/06/cool_nullstellensatz_proof.html" rel="alternate" type="text/html" title="A Cool Nullstellensatz Proof" /><published>2025-09-06T00:00:00-04:00</published><updated>2025-09-06T00:00:00-04:00</updated><id>http://localhost:4000/2025/09/06/cool_nullstellensatz_proof</id><content type="html" xml:base="http://localhost:4000/2025/09/06/cool_nullstellensatz_proof.html"><![CDATA[<p>Today I was sitting in my Algebraic Geometry class and we were discussing Hilbert’s Nullstellensatz. I have seen proofs of it before using Noether normalization, but today we saw a slick proof of it I thought was particularly satisfying. I wanted to share it here. I thank Leonardo Constantin Mihalcea for the proof.</p>
+
+<h2 id="weak-nullstellensatz">Weak Nullstellensatz</h2>
+
+<p>Let $k$ be an algebraically closed field. Then</p>
+
+<p>1) All maximal ideals of $k[x_1, \ldots, x_n]$ are of the form $(x_1 - a_1, \ldots, x_n - a_n)$ for some $a_i \in k$.</p>
+
+<p>2) For all proper ideals $\f{a} \subset k[x_1, \ldots, x_n]$, the variety $V(\f{a})$ is non-empty.</p>
+
+<p>Proof:</p>
+
+<p>1) If $\f{m}$ is a maximal ideal then $k[x_1, \ldots, x_n]/\f{m}$ is an algebraic field extension of $k$. As $k$ is algebraically closed this field extension is trivial so $k[x_1, \ldots, x_n]/\f{m} \cong k$. Then $\f{m}$ is the kernel of the surjective map $k[x_1, \ldots, x_n] \to k$ sending $x_i \mapsto a_i$ for some $a_i \in k$. Thus $\f{m} = (x_1 - a_1, \ldots, x_n - a_n)$.</p>
+
+<p>2) If $\f{a}$ is a proper ideal then $I$ is contained in some maximal ideal $\f{m}$. By part 1 we have $\f{m} = (x_1 - a_1, \ldots, x_n - a_n)$ for some $a_i \in k$. By the order reversing nature of the $V(\cdot)$ map we have
+ \[
+ { (a_1, \ldots, a_m)} = V(\f{m}) \subset V(\f{a})
+ \]
+ which gives the desired conclusion. $\square$</p>
+
+<h2 id="strong-nullstellensatz">Strong Nullstellensatz</h2>
+
+<p>Thm: (Hilbert’s Nullstellensatz) Let $k$ be an algebraically closed field and $\f{a} \subset k[x_1, \ldots, x_n]$ be an ideal. Then $I(V(\f{a})) = \sqrt{\f{a}}$.</p>
+
+<p>Proof: If $\f{a} = k[x_1, \ldots, x_n]$ then $V(\f{a}) = \emptyset$ and $I(V(\f{a})) = k[x_1, \ldots, x_n] = \sqrt{\f{a}}$. So assume $\f{a}$ is a proper ideal.</p>
+
+<p>We know already that $\sqrt{\f{a}} \subset I(V(\f{a}))$ so we need to show the reverse inclusion. By the weak Nullstellensatz we know $V(\f{a})$ is non-empty so $I(V(\f{a}))$ is a proper ideal. Let $f \in I(V(\f{a}))$.</p>
+
+<p>By Hilbert’s Basis Theorem $\f{a}$ is finitely generated, say $\f{a} = (f_1, \ldots, f_n)$. Consider the ideal $\f{b} = (f_1, \ldots, f_n, 1 - yf) \subset k[x_1, \ldots, x_n, y]$. If $\f{b}$ were a proper ideal then by the weak Nullstellensatz there would be some $(a_1, \ldots, a_n, b) \in k^{n+1}$ such that $f_i(a_1, \ldots, a_n) = 0$ for all $i$ and $1 - b f(a_1, \ldots, a_n) = 0 \Rightarrow 1 = b f(a_1, \ldots, a_n)$, but as $f \in I(V(\f{a}))$ we have $f(a_1, \ldots, a_n) = 0$ so $1 - b \cdot 0 = 1 \neq 0$. So $\f{b}$ must be the unit ideal. Thus there are polynomials $g_1, \ldots, g_n, h \in k[x_1, \ldots, x_n, y]$ such that
+\[
+1=f_1 g_1 + \cdots + f_n g_n + (1 - yf)h.
+\]</p>
+
+<p>Localizing away from $f$ and specializing $y = 1/f$ gives
+\[
+1=f_1 g_1(x_1, \ldots, x_n, 1/f) + \cdots + f_n g_n(x_1, \ldots, x_n, 1/f) + (1-f/f)h(x_1, \ldots, x_n, 1/f) = f_1 g_1(x_1, \ldots, x_n, 1/f) + \cdots + f_n g_n(x_1, \ldots, x_n, 1/f).
+\]
+Multiplying by a sufficiently high power of $f$ gives $f^m = f_1 h_1 + \cdots + f_n h_n$ for some $h_i \in k[x_1, \ldots, x_n]$. Thus $f^m \in \f{a}$ so $f \in \sqrt{\f{a}}$. $\square$</p>]]></content><author><name></name></author><summary type="html"><![CDATA[Today I was sitting in my Algebraic Geometry class and we were discussing Hilbert’s Nullstellensatz. I have seen proofs of it before using Noether normalization, but today we saw a slick proof of it I thought was particularly satisfying. I wanted to share it here. I thank Leonardo Constantin Mihalcea for the proof.]]></summary></entry><entry><title type="html">First</title><link href="http://localhost:4000/2025/08/13/first_post.html" rel="alternate" type="text/html" title="First" /><published>2025-08-13T00:00:00-04:00</published><updated>2025-08-13T00:00:00-04:00</updated><id>http://localhost:4000/2025/08/13/first_post</id><content type="html" xml:base="http://localhost:4000/2025/08/13/first_post.html"><![CDATA[<p>My name is William E. Mahaney, but I go by Will and sign WEM for short. I am a Mathematics graduate student at Virginia Tech (Virginia Polytechnic Institute and State University) in Blacskburg, Virginia in the United States.</p>
 
 <p>In this blog I hope to record my thoughts and opinions on the mathematical and cyber worlds. I am also actively building my website and learning more about web design, database management, blog hosting etc. and this blog can serve as “patch notes” for this process. Maybe one day someone reads this blog and can avoid a mistake I made.</p>
 
-<p>WEM</p>]]></content><author><name></name></author><summary type="html"><![CDATA[My name is William E. Mahaney, but I go by Will and sign WEM for short. I am a Mathematics graduate student at Virginia Tech (Virginia Polytechnic Institute and State University) in Blacskburg, Virginia in the United States.]]></summary></entry></feed>
+<p>WEM</p>]]></content><author><name></name></author><summary type="html"><![CDATA[My name is William E. Mahaney, but I go by Will and sign WEM for short. I am a Mathematics graduate student at Virginia Tech (Virginia Polytechnic Institute and State University) in Blacskburg, Virginia in the United States.]]></summary></entry><entry><title type="html">Testing Math</title><link href="http://localhost:4000/2025/08/13/math_test.html" rel="alternate" type="text/html" title="Testing Math" /><published>2025-08-13T00:00:00-04:00</published><updated>2025-08-13T00:00:00-04:00</updated><id>http://localhost:4000/2025/08/13/math_test</id><content type="html" xml:base="http://localhost:4000/2025/08/13/math_test.html"><![CDATA[<p>I am a mathemetician, so it is befitting I speak on it. My primary area is Number Theory, specifically supersingular elliptic curves and Post-Quantum Cryptography. I also integrate Probability Theory with Number Theory and study random properties of arithmetic.</p>
+
+<p>I also get to use this as an opportunity to test out MathJax integration in Jekyll for making my website. For the programmers, I added the block</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c">&lt;!-- MathJax configuration --&gt;</span>
+<span class="nt">&lt;script&gt;</span>
+  <span class="nb">window</span><span class="p">.</span><span class="nx">MathJax</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">tex</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">inlineMath</span><span class="p">:</span> <span class="p">[[</span><span class="dl">'</span><span class="se">\\</span><span class="s1">(</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="se">\\</span><span class="s1">)</span><span class="dl">'</span><span class="p">],</span> <span class="p">[</span><span class="dl">'</span><span class="s1">$</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">$</span><span class="dl">'</span><span class="p">]],</span>
+      <span class="na">displayMath</span><span class="p">:</span> <span class="p">[[</span><span class="dl">'</span><span class="se">\\</span><span class="s1">[</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="se">\\</span><span class="s1">]</span><span class="dl">'</span><span class="p">],</span> <span class="p">[</span><span class="dl">'</span><span class="s1">$$</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">$$</span><span class="dl">'</span><span class="p">]]</span>
+    <span class="p">},</span>
+    <span class="na">options</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">skipHtmlTags</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">script</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">noscript</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">style</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">textarea</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">pre</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">code</span><span class="dl">'</span><span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">};</span>
+<span class="nt">&lt;/script&gt;</span>
+</code></pre></div></div>
+
+<p>to my _site/index.html file in my website repo.</p>
+
+<p>Now I will present a fun fact.</p>
+
+<h1 id="number-theory">Number Theory</h1>
+
+<p><strong>Fact</strong>: A prime $p \ge 3$ can be written as a sum of two squares if and only if $p \equiv 1 \pmod{4}$.</p>
+
+<p>Proof:
+$(\rightarrow)$ Suppose $p=x^2+y^2$. Computation mod 4 reveals $z^2 \equiv 0, 1 \pmod{4}$ for all integers $z$. Then $p \pmod{4} \equiv x^2 + y^2 \pmod{4}$ is equal to 0, 1, or 2 mod 4. As $p$ is an odd prime $p$ must be 1 mod 4.</p>
+
+<p>$(\leftarrow)$ Suppose $p \equiv 1 \pmod{4}$ is prime. As $p$ is an odd prime $p$ is not ramified in the Gaussian integers $\mathbb{Z}[i]$. As $p \equiv 1 \pmod{4}$ the prime $p$ splits in $\mathbb{Z}[i]$ so we can factor $p = (a+ib)(a-ib)$ and consequently $p = a^2 + b^2$.
+$\square$</p>]]></content><author><name></name></author><summary type="html"><![CDATA[I am a mathemetician, so it is befitting I speak on it. My primary area is Number Theory, specifically supersingular elliptic curves and Post-Quantum Cryptography. I also integrate Probability Theory with Number Theory and study random properties of arithmetic.]]></summary></entry></feed>
