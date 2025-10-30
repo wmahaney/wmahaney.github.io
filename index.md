@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Home
+permalink: /
 ---
-
-# William E. Mahaney
-My website.
+<h1>Welcome to My Website</h1>
