@@ -1,7 +1,30 @@
 title: "William E. Mahaney"
-description: "Personal website for William E. Mahaney. "
+author: "William E. Mahaney"
+email: "mahaney1@vt.edu"
+github_username: wmahaney
+description: "Mathematics PhD student at Virginia Tech working on supersingular isogeny graphs, number theory, and post-quantum cryptography."
+url: "https://wmahaney.github.io"
+baseurl: ""
+
 theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  math_engine: mathjax
+
 header_pages:
-  - index.md
   - about_me.md
-  - cv_and_statements.md
+  - research.md
+  - publications.md
+  - teaching.md
+  - cv.md
+  - blog.md
+
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock

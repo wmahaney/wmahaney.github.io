@@ -1,0 +1,8 @@
+# Jekyll build output (GitHub Pages builds its own copy)
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+vendor/
+.bundle/
+.DS_Store

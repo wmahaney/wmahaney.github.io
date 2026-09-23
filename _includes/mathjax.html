@@ -1,0 +1,19 @@
+<!-- MathJax 3. In Markdown, write math as $$...$$ (kramdown turns inline
+     $$...$$ into \(...\) and a $$...$$ paragraph into \[...\]). Single $...$
+     also works but Markdown can mangle _ and \{ inside it. -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      macros: {
+        f: ['\\mathfrak{#1}', 1]
+      }
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
