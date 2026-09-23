@@ -2,23 +2,27 @@
 layout: page
 title: Research
 permalink: /research/
+redirect_from:
+  - /publications/
 ---
 
-<!-- DRAFT: check wording and emphasis before publishing. -->
+I work on supersingular isogeny graphs: their spectra, the quaternion orders behind them via the Deuring correspondence, and their role in post-quantum cryptography.
 
-My research is in number theory and arithmetic geometry, with applications to post-quantum cryptography. Much of it concerns **supersingular isogeny graphs**: graphs whose vertices are supersingular elliptic curves over a finite field of characteristic $$p$$ and whose edges are isogenies of prescribed degrees.
+## Papers
 
-## Themes
+- *Computing Isogenies at Singular Points of the Modular Polynomial* (with Travis Morrison). Preprint, 2024. [arXiv:2402.02038](https://arxiv.org/abs/2402.02038) · [code](https://github.com/wmahaney/ModularMultipoints)
 
-**Spectral theory of isogeny graphs.** I study the spectra of the supersingular isogeny graphs $$G_p(L)$$ built from a set $$L$$ of isogeny degrees, using tools such as Brandt matrices, non-backtracking operators, and Benjamini–Schramm (local) limits of graph sequences.
+<!-- Uncomment and fill in once public:
+- *Generating Sets for Maximal Orders in Quaternion Algebras* (with K. Eisenträger, E. Z. Goren, A. Iezzi, H. Kir, E. Kirimli, J. Love, J. Park, M. Sabitova). [arXiv:XXXX.XXXXX](https://arxiv.org/abs/XXXX.XXXXX) · [code](https://github.com/wmahaney/generating_sets_for_maximal_quaternion_orders)
+- *Asymptotic Spectral Approximation for L-Isogeny Graphs*. In revision.
+-->
 
-**Computing with isogenies.** With Travis Morrison, I developed a method for computing isogenies at singular points of the modular polynomial, where the classical Elkies approach breaks down. See [Publications]({{ '/publications/' | relative_url }}).
+## Talks
 
-**Quaternion orders.** Through the Deuring correspondence, supersingular curves correspond to maximal orders in a quaternion algebra. I work on generating sets for these orders.
+- MASON VII, University of Maryland, 2025
+- AMS Southeast Sectional, Tulane University, 2025
+- AMS Eastern Sectional, Howard University, 2025
+- AMS Central Sectional, University of Wisconsin–Milwaukee, 2024
+- PANTS XXXVII, Wake Forest University, 2024
 
-**Post-quantum cryptography.** I am interested in the security of isogeny-based and multivariate cryptosystems, and in algebraic methods for solving the polynomial systems that arise in their cryptanalysis.
-
-## Code
-
-- [ModularMultipoints](https://github.com/wmahaney/ModularMultipoints): SageMath implementation of isogeny computation at singular points of the modular polynomial.
-- More on [GitHub](https://github.com/wmahaney).
+All on computing isogenies at singular points of the modular polynomial.

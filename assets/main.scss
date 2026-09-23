@@ -1,0 +1,42 @@
+---
+# Front matter (the dashes above) tells Jekyll to compile this file.
+---
+
+// Minima 2.5.1 variables: set before the import to override defaults.
+$base-font-family: Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif;
+$base-font-size:   17px;
+$text-color:       #222;
+$brand-color:      #1a4f8b;   // links: the only accent color
+$content-width:    720px;
+
+@import "minima";
+
+// Header
+.site-title,
+.site-title:visited { font-weight: 400; }
+
+// Footer: a single line
+.site-footer { padding: 20px 0; }
+.footer-line { margin: 0; font-size: 15px; color: $grey-color; }
+.footer-line a,
+.footer-line a:visited { color: $grey-color; }
+
+// Home: photo slot + name
+.home-intro {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+.home-photo {
+  flex: none;
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+}
+.home-name { margin: 0; font-size: 32px; }
+.home-position { margin: 4px 0 0; color: $grey-color-dark; }
+
+@include media-query($on-palm) {
+  .home-intro { flex-direction: column; align-items: flex-start; }
+}

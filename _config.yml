@@ -10,6 +10,15 @@ theme: minima
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
+  - jekyll-redirect-from
+
+# Blog posts load MathJax; any other page can opt in with `math: true`.
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      math: true
 
 markdown: kramdown
 kramdown:
@@ -17,9 +26,7 @@ kramdown:
   math_engine: mathjax
 
 header_pages:
-  - about_me.md
   - research.md
-  - publications.md
   - teaching.md
   - cv.md
   - blog.md

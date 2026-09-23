@@ -14,5 +14,3 @@ permalink: /blog/
   </li>
   {%- endfor -%}
 </ul>
-
-<p class="rss-subscribe">Subscribe <a href="{{ '/feed.xml' | relative_url }}">via RSS</a></p>
