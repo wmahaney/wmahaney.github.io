@@ -4,8 +4,14 @@ description-meta: "Curriculum vitae of William E. Mahaney."
 ---
 
 ::: {.wm-actions}
-[Download my CV (PDF)](../cv_william_mahaney.pdf){.wm-btn .wm-btn-fill}
+[Download PDF](../cv_william_mahaney.pdf){.wm-btn .wm-btn-fill download="cv_william_mahaney.pdf"}
 :::
+
+```{=html}
+<object class="wm-pdf" data="../cv_william_mahaney.pdf#view=FitH" type="application/pdf" aria-label="Curriculum vitae of William E. Mahaney (PDF)">
+  <p>Your browser can't display the PDF on this page. <a href="../cv_william_mahaney.pdf">Open the CV</a> or use the download button above.</p>
+</object>
+```
 
 <!-- Uncomment each line once the PDF is uploaded to the folder files/cv/ :
 

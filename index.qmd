@@ -71,8 +71,13 @@ I work in number theory and arithmetic geometry, mainly on supersingular isogeny
 ```
 
 ::: {.wm-box}
-[Outside of math]{.wm-box-label}\
-Bouldering, Magic: The Gathering, video games, and spending time with animals.
+[About me]{.wm-box-label}
+
+I am a PhD student in Mathematics at Virginia Tech in Blacksburg, Virginia.
+
+<!-- ADD MORE ABOUT YOURSELF HERE: a few sentences between the line above and the hobbies line below. -->
+
+Outside of math I enjoy bouldering, Magic: The Gathering, video games, and spending time with animals.
 :::
 
 :::
