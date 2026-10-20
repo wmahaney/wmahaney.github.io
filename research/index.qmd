@@ -1,0 +1,78 @@
+---
+title: "Research"
+description-meta: "Research of William E. Mahaney: supersingular isogeny graphs, quaternion orders, and post-quantum cryptography."
+aliases:
+  - /publications/index.html
+---
+
+I work on supersingular isogeny graphs: their spectra, the quaternion orders behind them via the Deuring correspondence, and their role in post-quantum cryptography.
+
+## Papers
+
+<!--
+HOW TO ADD A PAPER
+1. Copy one of the blocks below (from "::: {.wm-paper}" down to its closing ":::").
+2. Paste it at the top of this list (newest first) and edit the text.
+3. Put the PDF in the folder files/papers/ and link it as:
+   [PDF](../files/papers/your-file.pdf){.wm-chip}
+Delete any link chip you don't need.
+-->
+
+::: {.wm-paper}
+::: {.wm-paper-meta}
+Preprint · 2024
+:::
+::: {.wm-paper-title}
+*Computing Isogenies at Singular Points of the Modular Polynomial*
+:::
+::: {.wm-paper-authors}
+with Travis Morrison
+:::
+::: {.wm-paper-links}
+[arXiv:2402.02038](https://arxiv.org/abs/2402.02038){.wm-chip}
+[Code](https://github.com/wmahaney/ModularMultipoints){.wm-chip}
+:::
+:::
+
+<!-- Uncomment and fill in once public (moved here from the old site):
+
+::: {.wm-paper}
+::: {.wm-paper-meta}
+Preprint · YEAR
+:::
+::: {.wm-paper-title}
+*Generating Sets for Maximal Orders in Quaternion Algebras*
+:::
+::: {.wm-paper-authors}
+with K. Eisenträger, E. Z. Goren, A. Iezzi, H. Kir, E. Kirimli, J. Love, J. Park, M. Sabitova
+:::
+::: {.wm-paper-links}
+[arXiv:XXXX.XXXXX](https://arxiv.org/abs/XXXX.XXXXX){.wm-chip}
+[Code](https://github.com/wmahaney/generating_sets_for_maximal_quaternion_orders){.wm-chip}
+:::
+:::
+
+::: {.wm-paper}
+::: {.wm-paper-meta}
+In revision
+:::
+::: {.wm-paper-title}
+*Asymptotic Spectral Approximation for L-Isogeny Graphs*
+:::
+:::
+-->
+
+## Talks
+
+::: {.wm-box}
+- MASON VII, University of Maryland, 2025
+- AMS Southeast Sectional, Tulane University, 2025
+- AMS Eastern Sectional, Howard University, 2025
+- AMS Central Sectional, University of Wisconsin–Milwaukee, 2024
+- PANTS XXXVII, Wake Forest University, 2024
+
+All on computing isogenies at singular points of the modular polynomial.
+:::
+
+<!-- To link slides, put the PDF in files/talks/ and add e.g.
+     ([slides](../files/talks/mason-vii-2025.pdf)) after the talk. -->

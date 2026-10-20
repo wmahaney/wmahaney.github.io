@@ -1,0 +1,68 @@
+---
+title: "A Cool Nullstellensatz Proof"
+description: "A short proof of Hilbert's Nullstellensatz from Zariski's lemma, using the Rabinowitsch trick."
+date: 2025-09-06
+categories: [algebraic geometry, commutative algebra]
+aliases:
+  - /2025/09/06/cool_nullstellensatz_proof.html
+---
+
+Today I was sitting in my Algebraic Geometry class and we were discussing Hilbert's Nullstellensatz. I have seen proofs of it before using Noether normalization, but today we saw a slick proof of it I thought was particularly satisfying. I wanted to share it here. I thank Leonardo Constantin Mihalcea for the proof.
+
+The one piece of input we take as given is **Zariski's lemma**. This is where the real depth of the Nullstellensatz lives; the argument below shows how quickly everything else follows from it.
+
+::: {#lem-zariski}
+## Zariski's lemma
+
+If a field $K$ is finitely generated as an algebra over a field $k$, then $K$ is a finite (hence algebraic) extension of $k$.
+:::
+
+## Weak Nullstellensatz
+
+::: {#thm-weak}
+Let $k$ be an algebraically closed field. Then
+
+1) All maximal ideals of $k[x_1, \ldots, x_n]$ are of the form $(x_1 - a_1, \ldots, x_n - a_n)$ for some $a_i \in k$.
+
+2) For all proper ideals $\mathfrak{a} \subset k[x_1, \ldots, x_n]$, the variety $V(\mathfrak{a})$ is non-empty.
+:::
+
+::: {.proof}
+1) If $\mathfrak{m}$ is a maximal ideal then $k[x_1, \ldots, x_n]/\mathfrak{m}$ is a field that is finitely generated as a $k$-algebra, so by Zariski's lemma (@lem-zariski) it is an algebraic field extension of $k$. As $k$ is algebraically closed this field extension is trivial, so $k[x_1, \ldots, x_n]/\mathfrak{m} \cong k$. Then $\mathfrak{m}$ is the kernel of the surjective map $k[x_1, \ldots, x_n] \to k$ sending $x_i \mapsto a_i$ for some $a_i \in k$. Thus $\mathfrak{m} = (x_1 - a_1, \ldots, x_n - a_n)$.
+
+2) If $\mathfrak{a}$ is a proper ideal then $\mathfrak{a}$ is contained in some maximal ideal $\mathfrak{m}$. By part 1 we have $\mathfrak{m} = (x_1 - a_1, \ldots, x_n - a_n)$ for some $a_i \in k$. By the order reversing nature of the $V(\cdot)$ map we have
+
+$$
+\{ (a_1, \ldots, a_n)\} = V(\mathfrak{m}) \subset V(\mathfrak{a}),
+$$
+
+which gives the desired conclusion. $\square$
+:::
+
+## Strong Nullstellensatz
+
+::: {#thm-strong}
+## Hilbert's Nullstellensatz
+
+Let $k$ be an algebraically closed field and $\mathfrak{a} \subset k[x_1, \ldots, x_n]$ be an ideal. Then $I(V(\mathfrak{a})) = \sqrt{\mathfrak{a}}$.
+:::
+
+::: {.proof}
+If $\mathfrak{a} = k[x_1, \ldots, x_n]$ then $V(\mathfrak{a}) = \emptyset$ and $I(V(\mathfrak{a})) = k[x_1, \ldots, x_n] = \sqrt{\mathfrak{a}}$. So assume $\mathfrak{a}$ is a proper ideal.
+
+We know already that $\sqrt{\mathfrak{a}} \subset I(V(\mathfrak{a}))$, so we need to show the reverse inclusion. Let $f \in I(V(\mathfrak{a}))$. If $f = 0$ then $f \in \sqrt{\mathfrak{a}}$ trivially, so assume $f \neq 0$.
+
+By Hilbert's Basis Theorem $\mathfrak{a}$ is finitely generated, say $\mathfrak{a} = (f_1, \ldots, f_r)$. The slick step, known as the **Rabinowitsch trick**, is to add a new variable $y$ and consider the ideal $\mathfrak{b} = (f_1, \ldots, f_r, 1 - yf) \subset k[x_1, \ldots, x_n, y]$. If $\mathfrak{b}$ were a proper ideal then by the weak Nullstellensatz (@thm-weak) there would be some $(a_1, \ldots, a_n, b) \in k^{n+1}$ such that $f_i(a_1, \ldots, a_n) = 0$ for all $i$ and $1 - b f(a_1, \ldots, a_n) = 0$. But $(a_1, \ldots, a_n) \in V(\mathfrak{a})$ and $f \in I(V(\mathfrak{a}))$, so $f(a_1, \ldots, a_n) = 0$ and hence $1 - b \cdot 0 = 1 \neq 0$, a contradiction. So $\mathfrak{b}$ must be the unit ideal. Thus there are polynomials $g_1, \ldots, g_r, h \in k[x_1, \ldots, x_n, y]$ such that
+
+$$
+1=f_1 g_1 + \cdots + f_r g_r + (1 - yf)h.
+$$
+
+Applying the ring homomorphism $k[x_1, \ldots, x_n, y] \to k(x_1, \ldots, x_n)$ that fixes each $x_i$ and sends $y \mapsto 1/f$ gives
+
+$$
+1 = f_1 g_1(x_1, \ldots, x_n, 1/f) + \cdots + f_r g_r(x_1, \ldots, x_n, 1/f),
+$$
+
+since the last term becomes $(1 - f/f)\,h(x_1, \ldots, x_n, 1/f) = 0$. Multiplying by a sufficiently high power $f^m$ to clear denominators gives $f^m = f_1 h_1 + \cdots + f_r h_r$ for some $h_i \in k[x_1, \ldots, x_n]$. Thus $f^m \in \mathfrak{a}$, so $f \in \sqrt{\mathfrak{a}}$. $\square$
+:::

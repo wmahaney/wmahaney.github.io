@@ -1,0 +1,36 @@
+/*-- scss:defaults --*/
+
+// ---- DARK THEME: same structure as theme-light.scss, darker colors ----
+
+$body-bg: #15171C;
+$body-color: #F2EDE0;
+$link-color: #9DB3F7;
+$primary: #9DB3F7;
+
+$font-family-base: Georgia, "Times New Roman", Times, serif;
+$headings-font-family: Georgia, "Times New Roman", Times, serif;
+$font-family-sans-serif: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-size-root: 18px;
+$line-height-base: 1.65;
+
+$navbar-bg: #15171C;
+$navbar-fg: #B3B8C5;
+$navbar-hl: #F2EDE0;
+$footer-bg: #1E2128;
+$footer-fg: #B3B8C5;
+
+$code-bg: #262A33;
+
+/*-- scss:rules --*/
+
+:root {
+  --wm-bg: #15171C;
+  --wm-surface: #1E2128;
+  --wm-tint: #262A33;
+  --wm-ink: #F2EDE0;
+  --wm-muted: #B3B8C5;
+  --wm-line: #343947;
+  --wm-accent: #9DB3F7;
+  --wm-accent-ink: #15171C;
+  --wm-accent2: #F0B84A;
+}

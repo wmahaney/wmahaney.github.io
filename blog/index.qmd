@@ -1,0 +1,18 @@
+---
+title: "Blog"
+description: "Shorter, informal posts."
+aliases:
+  # The old "Testing Math" post lived here; it is now an unpublished draft.
+  - /2025/08/13/math_test.html
+listing:
+  contents: posts
+  type: grid
+  grid-columns: 2
+  sort: "date desc"
+  categories: true
+  feed: true
+  fields: [title, description, date, categories, reading-time]
+  date-format: "MMMM D, YYYY"
+  sort-ui: false
+  filter-ui: false
+---

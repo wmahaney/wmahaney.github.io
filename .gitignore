@@ -1,8 +1,8 @@
-# Jekyll build output (GitHub Pages builds its own copy)
+# Quarto build output and cache (the site is built by GitHub Actions)
 _site/
-.sass-cache/
-.jekyll-cache/
-.jekyll-metadata
-vendor/
-.bundle/
+.quarto/
+/.luarc.json
+*_files/
+
+# macOS
 .DS_Store

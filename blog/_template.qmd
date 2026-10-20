@@ -1,0 +1,21 @@
+---
+# NEW BLOG POST: how to use this template
+#   1. Make a new folder:  blog/posts/<short-name>/   (lowercase, dashes)
+#   2. Copy this file into it and rename the copy to  index.qmd
+#   3. Edit the header below and write the post. Push to GitHub; the card appears
+#      automatically on the Blog page.
+# (This template file itself is never published, because its name starts with "_".)
+
+title: "Title of the post"
+description: "One sentence that appears on the card."
+date: 2026-01-01
+categories: [meta]
+---
+
+Write the post here. Math works as in the notes: $x^2$ inline, or
+
+$$
+x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
+$$
+
+displayed. To keep a half-written post private, add the line `draft: true` to the header.

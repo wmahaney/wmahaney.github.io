@@ -1,0 +1,78 @@
+---
+pagetitle: "William E. Mahaney"
+page-layout: custom
+title-block-style: none
+aliases:
+  - /about_me/index.html
+---
+
+::: {.wm-wrap}
+
+::: {.wm-hero}
+
+::: {.wm-hero-text}
+
+```{=html}
+<p class="wm-eyebrow">Number theory · Arithmetic geometry · Cryptography</p>
+<h1 class="wm-name">William E. Mahaney</h1>
+<div class="wm-bar"></div>
+<p class="wm-position">PhD student in Mathematics, Virginia Tech</p>
+```
+
+::: {.wm-bio}
+I work in number theory and arithmetic geometry, mainly on supersingular isogeny graphs and post-quantum cryptography.
+:::
+
+::: {.wm-actions}
+[Curriculum vitae](cv_william_mahaney.pdf){.wm-btn .wm-btn-fill}
+[Email](mailto:mahaney1@vt.edu){.wm-btn .wm-btn-outline}
+[GitHub](https://github.com/wmahaney){.wm-btn .wm-btn-outline}
+:::
+
+:::
+
+::: {.wm-photo}
+<!-- PROFILE PHOTO: upload a file named profile.jpg to the folder images/profile/
+     and it appears here automatically. Until then this is an empty frame. -->
+
+```{=html}
+<div class="wm-photo-frame">
+  <span class="wm-photo-placeholder"><i class="bi bi-person"></i><span>Profile photo</span></span>
+  <img src="images/profile/profile.jpg" alt="Photo of William E. Mahaney" onerror="this.remove()">
+</div>
+```
+:::
+
+:::
+
+<!-- No "recent posts" section yet (by request). -->
+
+```{=html}
+<section class="wm-cards" aria-label="Sections of this site">
+  <a class="wm-card" href="research/index.html">
+    <span class="wm-card-icon"><i class="bi bi-diagram-3"></i></span>
+    <h2 class="wm-card-title">Research</h2>
+    <p class="wm-card-text">Papers, preprints, and talks.</p>
+    <span class="wm-card-cta">Browse research →</span>
+  </a>
+  <a class="wm-card" href="notes/index.html">
+    <span class="wm-card-icon"><i class="bi bi-journal-text"></i></span>
+    <h2 class="wm-card-title">Expository Notes</h2>
+    <p class="wm-card-text">Longer mathematical write-ups, revised over time.</p>
+    <span class="wm-card-cta">Read the notes →</span>
+  </a>
+  <a class="wm-card" href="blog/index.html">
+    <span class="wm-card-icon"><i class="bi bi-pencil-square"></i></span>
+    <h2 class="wm-card-title">Blog</h2>
+    <p class="wm-card-text">Shorter, informal posts.</p>
+    <span class="wm-card-cta">Visit the blog →</span>
+  </a>
+</section>
+```
+
+::: {.wm-box}
+[Outside of math]{.wm-box-label}\
+Bouldering, Magic: The Gathering, video games, and spending time with animals.
+:::
+
+:::

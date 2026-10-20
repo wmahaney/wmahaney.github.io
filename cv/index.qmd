@@ -1,0 +1,15 @@
+---
+title: "CV"
+description-meta: "Curriculum vitae of William E. Mahaney."
+---
+
+::: {.wm-actions}
+[Download my CV (PDF)](../cv_william_mahaney.pdf){.wm-btn .wm-btn-fill}
+:::
+
+<!-- Uncomment each line once the PDF is uploaded to the folder files/cv/ :
+
+- [Research statement](../files/cv/research_statement_william_mahaney.pdf)
+- [Teaching statement](../files/cv/teaching_statement_william_mahaney.pdf)
+- [Personal statement](../files/cv/personal_statement_william_mahaney.pdf)
+-->
