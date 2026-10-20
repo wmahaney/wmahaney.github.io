@@ -1,0 +1,39 @@
+/*-- scss:defaults --*/
+
+// ---- LIGHT THEME: cream background, cobalt links, amber accent ----
+// To change the look of the whole site, edit the colors here and in
+// theme-dark.scss (the --wm-* values under "scss:rules" feed assets/styles.css).
+
+$body-bg: #FBF5E6;
+$body-color: #1E2430;
+$link-color: #2B4FB8;
+$primary: #2B4FB8;
+
+// Georgia for reading text and headings; a sans-serif for menus (see styles.css).
+$font-family-base: Georgia, "Times New Roman", Times, serif;
+$headings-font-family: Georgia, "Times New Roman", Times, serif;
+$font-family-sans-serif: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-size-root: 18px;
+$line-height-base: 1.65;
+
+$navbar-bg: #FBF5E6;
+$navbar-fg: #4A5160;
+$navbar-hl: #1E2430;
+$footer-bg: #F2E9CF;
+$footer-fg: #4A5160;
+
+$code-bg: #F2E9CF;
+
+/*-- scss:rules --*/
+
+:root {
+  --wm-bg: #FBF5E6;
+  --wm-surface: #FFFDF7;
+  --wm-tint: #F2E9CF;
+  --wm-ink: #1E2430;
+  --wm-muted: #4A5160;
+  --wm-line: #E3D8BA;
+  --wm-accent: #2B4FB8;
+  --wm-accent-ink: #FFFFFF;
+  --wm-accent2: #E5A11C;
+}

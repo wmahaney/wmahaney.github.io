@@ -1,0 +1,34 @@
+---
+# NEW EXPOSITORY NOTE: how to use this template
+#   1. Make a new folder:  notes/articles/<short-name>/   (lowercase, dashes)
+#   2. Copy this file into it and rename the copy to  index.qmd
+#   3. Edit the header below and write the note. Push to GitHub; the card appears
+#      automatically on the Expository Notes page.
+# (This template file itself is never published, because its name starts with "_".)
+
+title: "Title of the note"
+description: "One sentence that appears on the card."
+date: 2026-01-01
+categories: [number theory]
+---
+
+Introduction. Math works the usual way: inline $a^2 + b^2 = c^2$, or displayed:
+
+$$
+\sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6}.
+$$
+
+## Theorem boxes (numbered, cross-referenceable)
+
+::: {#thm-example}
+## Name of the theorem (optional)
+
+Statement of the theorem.
+:::
+
+::: {.proof}
+Proof goes here. $\square$
+:::
+
+Refer back to it with @thm-example. Other box types use these ids: `#lem-` (lemma),
+`#prp-` (proposition), `#cor-` (corollary), `#def-` (definition), `#exm-` (example).

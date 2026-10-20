@@ -1,0 +1,65 @@
+project:
+  type: website
+  output-dir: _site
+  # Files copied to the published site as-is (PDFs, images, slides, ...).
+  # Anything you drop into files/ or images/ is published automatically.
+  resources:
+    - cv_william_mahaney.pdf
+    - "files/**"
+    - "images/**"
+    - "!**/_UPLOAD_HERE.md"
+
+lang: en
+
+website:
+  title: "William E. Mahaney"
+  site-url: "https://wmahaney.github.io"
+  description: "Mathematics PhD student at Virginia Tech working on supersingular isogeny graphs, number theory, and post-quantum cryptography."
+  favicon: images/favicon.svg
+  open-graph: true
+  twitter-card: true
+  back-to-top-navigation: true
+  navbar:
+    title: "William E. Mahaney"
+    left:
+      - href: index.qmd
+        text: Home
+      - href: research/index.qmd
+        text: Research
+      - href: notes/index.qmd
+        text: Expository Notes
+      - href: blog/index.qmd
+        text: Blog
+      - href: teaching/index.qmd
+        text: Teaching
+      - href: cv/index.qmd
+        text: CV
+    tools:
+      - icon: envelope
+        href: "mailto:mahaney1@vt.edu"
+        text: Email
+      - icon: github
+        href: "https://github.com/wmahaney"
+        text: GitHub
+  page-footer:
+    left: "William E. Mahaney · Virginia Tech"
+    right: "mahaney1@vt.edu"
+
+format:
+  html:
+    # Light theme first; Quarto adds the light/dark toggle to the navbar
+    # automatically because both are defined.
+    theme:
+      light: [default, assets/theme-light.scss]
+      dark: [default, assets/theme-dark.scss]
+    css: assets/styles.css
+    include-in-header: assets/head.html
+    html-math-method: mathjax
+    smooth-scroll: true
+    link-external-newwindow: true
+    link-external-icon: false
+    toc-depth: 3
+    grid:
+      body-width: 820px
+      margin-width: 250px
+      gutter-width: 2rem

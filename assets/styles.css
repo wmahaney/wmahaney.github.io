@@ -1,0 +1,430 @@
+/* ==========================================================================
+   Site styles. Colors come from the --wm-* variables defined in
+   assets/theme-light.scss and assets/theme-dark.scss, so everything here
+   works in both light and dark mode.
+   ========================================================================== */
+
+:root {
+  --wm-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --wm-serif: Georgia, "Times New Roman", Times, serif;
+}
+
+body {
+  font-family: var(--wm-serif);
+  color: var(--wm-ink);
+  background-color: var(--wm-bg);
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: var(--wm-serif);
+  font-weight: 700;
+  color: var(--wm-ink);
+}
+
+/* ---- Page titles: amber bar under the title -------------------------- */
+#title-block-header .quarto-title h1.title {
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  line-height: 1.15;
+}
+#title-block-header .quarto-title h1.title::after {
+  content: "";
+  display: block;
+  width: 64px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--wm-accent2);
+  margin-top: 0.75rem;
+}
+
+/* ---- Navbar and footer (sans-serif) ---------------------------------- */
+.navbar {
+  font-family: var(--wm-sans);
+  border-bottom: 1px solid var(--wm-line);
+}
+.navbar .navbar-title {
+  font-family: var(--wm-serif);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--wm-ink);
+}
+.navbar .nav-link {
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+}
+.navbar .nav-link:hover {
+  border-bottom-color: var(--wm-accent2);
+}
+.navbar .nav-link.active {
+  color: var(--wm-ink);
+  border-bottom-color: var(--wm-accent);
+}
+.nav-footer {
+  font-family: var(--wm-sans);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--wm-line);
+}
+
+/* ---- Buttons and chips ------------------------------------------------ */
+.wm-btn {
+  font-family: var(--wm-sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  padding: 0.7rem 1.3rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--wm-accent);
+}
+.wm-btn-fill {
+  background: var(--wm-accent);
+  color: var(--wm-accent-ink) !important;
+}
+.wm-btn-outline {
+  background: transparent;
+  color: var(--wm-accent) !important;
+}
+.wm-btn:hover {
+  filter: brightness(0.92);
+}
+.wm-chip {
+  font-family: var(--wm-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  background: var(--wm-tint);
+  color: var(--wm-ink) !important;
+}
+.wm-chip:hover {
+  background: var(--wm-accent);
+  color: var(--wm-accent-ink) !important;
+}
+
+/* ---- Home page --------------------------------------------------------- */
+.wm-wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 3.5rem clamp(16px, 5vw, 64px) 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3.5rem;
+}
+.wm-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2.5rem 4rem;
+}
+.wm-hero-text {
+  flex: 1 1 26rem;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+.wm-eyebrow {
+  margin: 0;
+  font-family: var(--wm-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--wm-accent);
+}
+.wm-name {
+  margin: 0;
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  line-height: 1.1;
+}
+.wm-bar {
+  width: 64px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--wm-accent2);
+}
+.wm-position {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--wm-muted);
+}
+.wm-bio p {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.65;
+}
+.wm-actions p {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* Profile photo: a reserved, empty frame until images/profile/profile.jpg exists */
+.wm-photo {
+  flex: 0 0 auto;
+  width: 300px;
+  max-width: 100%;
+}
+.wm-photo-frame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 28px;
+  background: var(--wm-tint);
+  border: 2px dashed var(--wm-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wm-photo-frame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.wm-photo-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--wm-muted);
+  font-family: var(--wm-sans);
+  font-size: 0.9rem;
+}
+.wm-photo-placeholder .bi {
+  font-size: 3.5rem;
+}
+
+/* Section cards on the home page */
+.wm-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+.wm-card {
+  position: relative;
+  flex: 1 1 16rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 1.75rem;
+  background: var(--wm-surface);
+  border: 1.5px solid var(--wm-line);
+  border-radius: 1.25rem;
+  color: var(--wm-ink);
+  text-decoration: none;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.wm-card:hover {
+  border-color: var(--wm-accent);
+  color: var(--wm-ink);
+  transform: translateY(-2px);
+}
+.wm-card-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.9rem;
+  background: var(--wm-tint);
+  color: var(--wm-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+.wm-card-title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+.wm-card-text {
+  margin: 0;
+  color: var(--wm-muted);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+.wm-card-cta {
+  margin-top: auto;
+  font-family: var(--wm-sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--wm-accent);
+}
+
+/* Lightly tinted box (used on the home page and for talk lists) */
+.wm-box {
+  background: var(--wm-tint);
+  border-radius: 1.25rem;
+  padding: 1.25rem 1.75rem;
+}
+.wm-box p:last-child,
+.wm-box ul:last-child {
+  margin-bottom: 0;
+}
+.wm-box-label {
+  font-family: var(--wm-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--wm-accent);
+}
+
+/* ---- Research: paper cards, teaching: course cards ------------------- */
+.wm-paper,
+.wm-course {
+  background: var(--wm-surface);
+  border: 1.5px solid var(--wm-line);
+  border-radius: 1.25rem;
+  padding: 1.4rem 1.6rem;
+  margin: 1.25rem 0;
+}
+.wm-paper > div > p,
+.wm-course > div > p {
+  margin: 0;
+}
+.wm-paper-meta,
+.wm-course-meta {
+  font-family: var(--wm-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--wm-accent);
+}
+.wm-paper-title,
+.wm-course-title {
+  margin: 0.35rem 0 !important;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.wm-paper-authors {
+  color: var(--wm-muted);
+}
+.wm-paper-links > p {
+  margin-top: 0.9rem !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* ---- Listing pages (Expository Notes, Blog): cards -------------------- */
+.quarto-grid-item.card {
+  background: var(--wm-surface);
+  border: 1.5px solid var(--wm-line);
+  border-radius: 1.25rem;
+  box-shadow: none;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+a.quarto-grid-link:hover .quarto-grid-item.card {
+  border-color: var(--wm-accent);
+  transform: translateY(-2px);
+}
+.quarto-grid-item .listing-title {
+  font-family: var(--wm-serif);
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+.quarto-grid-item .listing-date,
+.quarto-grid-item .listing-reading-time,
+.quarto-grid-item .listing-categories,
+.quarto-listing-category,
+.quarto-listing-category .category {
+  font-family: var(--wm-sans);
+}
+.quarto-grid-item .listing-description {
+  color: var(--wm-muted);
+}
+.quarto-grid-item .listing-category {
+  background: var(--wm-tint);
+  color: var(--wm-ink);
+  border: 0;
+  border-radius: 999px;
+  padding: 0.15rem 0.7rem;
+  font-size: 0.75rem;
+}
+
+/* ---- Theorem, lemma, definition, ... : lightly tinted boxes ---------- */
+.theorem,
+.lemma,
+.proposition,
+.corollary,
+.conjecture,
+.definition,
+.example,
+.exercise,
+.remark {
+  background: var(--wm-tint);
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+}
+.theorem > :last-child,
+.lemma > :last-child,
+.proposition > :last-child,
+.corollary > :last-child,
+.conjecture > :last-child,
+.definition > :last-child,
+.example > :last-child,
+.exercise > :last-child,
+.remark > :last-child {
+  margin-bottom: 0;
+}
+.theorem-title,
+.proof-title {
+  font-family: var(--wm-sans);
+}
+.proof {
+  margin: 1.25rem 0;
+}
+
+/* ---- Small screens ------------------------------------------------------ */
+@media (max-width: 576px) {
+  .wm-wrap {
+    padding-top: 2rem;
+    gap: 2.5rem;
+  }
+}
+
+/* ---- Research: empty "(in progress)" slots ------------------------------ */
+.wm-paper-empty {
+  background: transparent;
+  border-style: dashed;
+  min-height: 5.5rem;
+}
+.wm-paper-empty .wm-paper-meta {
+  color: var(--wm-muted);
+}
+
+/* ---- CV page: embedded PDF ------------------------------------------------ */
+.wm-pdf {
+  display: block;
+  width: 100%;
+  height: 85vh;
+  min-height: 560px;
+  margin-top: 1.25rem;
+  border: 1.5px solid var(--wm-line);
+  border-radius: 1rem;
+  background: var(--wm-surface);
+}
+.wm-pdf p {
+  padding: 1.25rem;
+}
+
+/* ---- Dark-mode toggle: moon (click for dark) / sun (click for light) ------ */
+.quarto-color-scheme-toggle .bi::before {
+  background-image: none !important;
+  background-color: currentColor;
+  width: 1.15rem;
+  height: 1.15rem;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+body.quarto-dark .quarto-color-scheme-toggle .bi::before,
+.quarto-color-scheme-toggle.alternate .bi::before {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='5'/%3E%3Cpath d='M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='5'/%3E%3Cpath d='M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42'/%3E%3C/svg%3E") center / contain no-repeat;
+}

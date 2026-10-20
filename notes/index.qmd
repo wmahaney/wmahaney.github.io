@@ -1,0 +1,14 @@
+---
+title: "Expository Notes"
+description: "Longer mathematical write-ups, revised over time."
+listing:
+  contents: articles
+  type: grid
+  grid-columns: 2
+  sort: "date desc"
+  categories: true
+  fields: [title, description, date, categories, reading-time]
+  date-format: "MMMM D, YYYY"
+  sort-ui: false
+  filter-ui: false
+---

@@ -1,0 +1,57 @@
+name: Build and publish site
+
+# - Every push to any branch builds the site (so a broken page is caught early).
+# - Only pushes to `main` publish it to https://wmahaney.github.io.
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Install Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Render the site
+        run: quarto render
+
+      - name: Upload the built site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      # PREVIEW: on branches other than main, also attach the built site as a plain
+      # download (Actions run page -> Artifacts -> "site-preview"). Unzip it and open
+      # index.html to look at the site before merging.
+      - name: Upload a downloadable preview copy (branches only)
+        if: github.ref != 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-preview
+          path: _site
+          retention-days: 14
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
