@@ -13,14 +13,14 @@ aliases:
 ::: {.wm-hero-text}
 
 ```{=html}
-<p class="wm-eyebrow">Number Theory · Cryptography · Probability Theory</p>
+<p class="wm-eyebrow">Number Theory · Cryptography · Probability</p>
 <h1 class="wm-name">William E. Mahaney</h1>
 <div class="wm-bar"></div>
 <p class="wm-position">PhD student in Mathematics, Virginia Tech</p>
 ```
 
 ::: {.wm-bio}
-I work in number theory and arithmetic geometry, mainly on supersingular isogeny graphs and post-quantum cryptography.
+I study probabilistic issues in Number Theory and Cryptography, particularly related to supersingular elliptic curves and quaternion algebras.
 :::
 
 ::: {.wm-actions}

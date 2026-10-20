@@ -20,25 +20,20 @@ HOW TO ADD A PAPER
 Delete any link chip you don't need.
 -->
 
-<!-- TODO: add the arXiv number, year, and PDF/code links for the paper below once it is public
-     (see the commented chips in the block). Check that this is the paper you meant by
-     "endomorphism rings". -->
 ::: {.wm-paper}
 ::: {.wm-paper-meta}
-Advance review copy on request
+Preprint · 2026
 :::
 ::: {.wm-paper-title}
-*Generating Sets for Maximal Orders in Quaternion Algebras*
+*Generating Sets for Maximal Orders in Rational Quaternion Algebras*
 :::
 ::: {.wm-paper-authors}
-with K. Eisenträger, E. Z. Goren, A. Iezzi, H. Kir, E. Kirimli, J. Love, J. Park, M. Sabitova
+with K. Eisenträger, E. Z. Goren, A. Iezzi, H. Kir, E. Kırımlı, J. Love, J. Park, M. Sabitova
 :::
-<!--
 ::: {.wm-paper-links}
-[arXiv:XXXX.XXXXX](https://arxiv.org/abs/XXXX.XXXXX){.wm-chip}
+[arXiv:2610.10139](https://arxiv.org/abs/2610.10139){.wm-chip}
 [Code](https://github.com/wmahaney/generating_sets_for_maximal_quaternion_orders){.wm-chip}
 :::
--->
 :::
 
 ::: {.wm-paper}
