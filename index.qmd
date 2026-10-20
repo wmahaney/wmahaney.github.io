@@ -13,7 +13,7 @@ aliases:
 ::: {.wm-hero-text}
 
 ```{=html}
-<p class="wm-eyebrow">Number theory · Arithmetic geometry · Cryptography</p>
+<p class="wm-eyebrow">Number Theory · Cryptography · Probability Theory</p>
 <h1 class="wm-name">William E. Mahaney</h1>
 <div class="wm-bar"></div>
 <p class="wm-position">PhD student in Mathematics, Virginia Tech</p>
