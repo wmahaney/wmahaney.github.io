@@ -7,7 +7,7 @@ Put statement PDFs here, named:
 - `ai_statement_william_mahaney.pdf`
 - `culture_statement_william_mahaney.pdf`
 
-Then un-hide the "Download PDF" button near the top of the matching page,
+Then add the "Download PDF" line given in the comment at the top of the matching page,
 `statements/<name>/index.qmd`.
 
 (This note file is not published on the website.)

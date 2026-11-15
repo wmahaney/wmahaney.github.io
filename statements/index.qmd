@@ -15,5 +15,4 @@ listing:
   filter-ui: false
 ---
 
-<!-- One or two sentences that introduce the statements, e.g. who they are written for
-     and when they were last revised. Optional. -->
+<!-- Optional introduction, in your own words. -->

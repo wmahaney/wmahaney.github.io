@@ -21,12 +21,10 @@ SKELETON FOR THIS PAGE
 1. A short introduction: how AI fits into your work.
 2. STATEMENT: a link to the AI statement (it lives under Statements, so there is one copy).
 3. PROJECTS: one card per project, listed automatically from ai/projects/.
-4. HOW I USE AI: a short, concrete disclosure.
+The website's own AI disclosure is at /ai-disclosure/ and is linked from the home page.
 -->
 
-<!-- 1. TO FILL IN, then delete this comment line and the "END" line.
-Two or three sentences on how AI fits into your research and teaching.
-END -->
+<!-- 1. Your introduction goes here. -->
 
 <!-- 2. Un-hide once the AI statement is published: delete this comment line and the "END" line.
      The sentence describing the statement is yours to write.
@@ -44,13 +42,3 @@ END -->
 
 ::: {#ai-projects}
 :::
-
-<!-- 4. TO FILL IN, then delete this comment line and the "END" line.
-## How I use AI
-
-- **Research:** what you use it for, and what you check by hand.
-- **Writing:** e.g. revision and proofreading; the mathematics and the claims are yours.
-- **Code:** how AI-written code is reviewed and tested; where authorship is recorded.
-- **Teaching:** your course policy in a sentence, with a link to the full policy.
-- **This website:** which parts were built with AI assistance.
-END -->

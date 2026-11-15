@@ -13,9 +13,9 @@ published with GitHub Pages. Live site: <https://wmahaney.github.io>
 | `notes/articles/<name>/index.qmd` | Expository notes, one folder per note | Copy `notes/_template.qmd` |
 | `blog/posts/<name>/index.qmd` | Blog posts, one folder per post | Copy `blog/_template.qmd` |
 | `teaching/index.qmd` | Teaching page | Fill in the hidden skeleton (instructions inside the file) |
-| `statements/<name>/index.qmd` | **Statements**: research, teaching, AI, culture | Write over the outline; see "Statements and AI pages" |
+| `statements/<name>/index.qmd` | **Statements**: research, teaching, AI, culture | Empty pages for your own text; see "Statements and AI pages" |
 | `ai/index.qmd`, `ai/projects/<name>/index.qmd` | **AI** page and one folder per AI project | Copy `ai/projects/_template.qmd` |
-| `cv/index.qmd` | CV page | Edit text |
+| `cv/index.qmd` | CV page, written out in HTML | Edit entries (templates inside the file); keep the PDF in step |
 | `cv_william_mahaney.pdf` | The CV PDF (top-level, so the old link keeps working) | Replace with a file of the same name |
 | `images/profile/` | **Upload your profile photo here** as `profile.jpg` | Upload |
 | `images/notes/`, `images/blog/` | **Upload figures** for notes and posts | Upload |
@@ -61,7 +61,7 @@ These pages are in the repository but hidden. A page whose header contains the l
 `draft: true` is not published, is left out of listings, and its menu entry does not appear.
 To publish a page, delete that line and push. Suggested order:
 
-1. Write a statement over its outline in `statements/<name>/index.qmd`, then delete its `draft: true`.
+1. Write a statement in `statements/<name>/index.qmd` (each page is empty), then delete its `draft: true`.
 2. Delete `draft: true` in `statements/index.qmd`. "Statements" now appears in the menu.
 3. Same for `ai/index.qmd` once it has an introduction or a project.
 4. Un-hide the matching cards on the home page (`index.qmd`) and the line on the CV page.

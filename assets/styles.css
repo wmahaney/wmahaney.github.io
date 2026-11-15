@@ -642,3 +642,60 @@ body.quarto-dark .quarto-color-scheme-toggle .bi::before,
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='5'/%3E%3Cpath d='M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='5'/%3E%3Cpath d='M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42'/%3E%3C/svg%3E") center / contain no-repeat;
 }
+
+/* ---- CV page --------------------------------------------------------------- */
+/* Each entry: date on the left, details on the right. */
+.wm-cv-item {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr);
+  column-gap: 1.5rem;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--wm-line);
+}
+.wm-cv-item > :first-child {
+  grid-column: 1;
+  grid-row: 1 / span 20;
+  margin: 0;
+}
+.wm-cv-item > :not(:first-child) {
+  grid-column: 2;
+  margin: 0 0 0.35rem;
+}
+.wm-cv-item > :last-child { margin-bottom: 0; }
+.wm-cv-item ul { padding-left: 1.1rem; }
+.wm-cv-when {
+  font-family: var(--wm-sans);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--wm-accent);
+  line-height: 1.9;
+}
+
+@media (max-width: 576px) {
+  .wm-cv-item { grid-template-columns: minmax(0, 1fr); }
+  .wm-cv-item > :first-child,
+  .wm-cv-item > :not(:first-child) { grid-column: 1; grid-row: auto; }
+}
+
+/* ---- Home page: AI footnote -------------------------------------------------- */
+.wm-footnote {
+  font-family: var(--wm-sans);
+  font-size: 0.8rem;
+  color: var(--wm-muted);
+  text-align: center;
+  margin: -1rem 0 0;
+}
+.wm-footnote p { margin: 0; }
+
+/* ---- Printing (e.g. the CV): drop the site chrome ----------------------------- */
+.wm-print-only { display: none; }
+@media print {
+  .wm-print-only { display: block; margin-bottom: 1rem; }
+  #quarto-header,
+  .nav-footer,
+  #quarto-margin-sidebar,
+  .wm-actions,
+  #quarto-back-to-top { display: none !important; }
+  body { background: #fff !important; }
+  .wm-cv-item { break-inside: avoid; }
+}

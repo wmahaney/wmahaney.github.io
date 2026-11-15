@@ -1,0 +1,28 @@
+---
+title: "AI Disclosure"
+description: "How AI was used in building this website."
+date-modified: last-modified
+---
+
+<!-- DRAFTED BY CLAUDE for William to review and edit. Remove this comment once reviewed. -->
+
+Claude, an AI model made by Anthropic, was used while designing and building this website.
+
+## What Claude was used for
+
+- The site's design: layout, colours, typography, and the templates behind each page.
+- The interactive isogeny graphs on the home page: the script that computes them and the code that draws them.
+- Page skeletons and the editing instructions inside the source files.
+- Converting my CV from PDF into the HTML version on the [CV](../cv/index.qmd) page.
+
+## What is mine
+
+The mathematics, the research described here, and the information about my papers, talks and teaching are my own. Every change Claude made was proposed as a pull request, which I reviewed before merging.
+
+## Checking
+
+The isogeny graph data is computed by a script that checks its own output against known results (the number of supersingular curves, the modular polynomials, the mass formula, and the Ramanujan bound) and stops if any check fails.
+
+## Record
+
+Changes made with Claude are marked "Co-Authored-By: Claude" in the [history of this site's repository](https://github.com/wmahaney/wmahaney.github.io/commits/main).

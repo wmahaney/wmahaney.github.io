@@ -13,9 +13,10 @@ I work on supersingular isogeny graphs: their spectra, the quaternion orders beh
 HOW TO ADD A PAPER
 1. Copy the block under "PAPER TEMPLATE" just below (from "::: {.wm-paper}" down to its
    closing ":::"), paste it at the top of the list (newest first), and edit the text.
-2. Put the PDF in the folder files/papers/ and link it as
-   [PDF](../files/papers/your-file.pdf){.wm-chip}   (or link the arXiv PDF).
-3. Delete any part you don't need: the summary, a link chip, or a fold-out section.
+2. List ALL authors, including yourself, in alphabetical order by surname.
+3. Link the posted paper (arXiv or ePrint). For a PDF hosted here, put it in files/papers/
+   and link it as [PDF](../files/papers/your-file.pdf){.wm-chip}
+4. Delete any part you don't need: the summary, a link chip, or the abstract.
 
 PAPER TEMPLATE
 
@@ -27,7 +28,7 @@ Preprint · 2027
 *Title of the Paper*
 :::
 ::: {.wm-paper-authors}
-with A. Coauthor, B. Coauthor
+A. Coauthor, W. E. Mahaney, B. Coauthor
 :::
 ::: {.wm-paper-summary}
 One sentence, in plain language, saying what the paper proves and why it matters.
@@ -45,16 +46,6 @@ Paste the abstract here. Math works as usual: $\ell$-isogenies, $\Phi_\ell(X, Y)
 
 </details>
 
-<details class="wm-fold">
-<summary>BibTeX</summary>
-
-```bibtex
-@misc{key,
-  title = {...},
-}
-```
-
-</details>
 :::
 -->
 
@@ -66,7 +57,7 @@ Preprint · 2026
 *Generating Sets for Maximal Orders in Rational Quaternion Algebras*
 :::
 ::: {.wm-paper-authors}
-with K. Eisenträger, E. Z. Goren, A. Iezzi, H. Kir, E. Kırımlı, J. Love, J. Park, M. Sabitova
+K. Eisenträger, E. Z. Goren, A. Iezzi, H. Kir, E. Kırımlı, J. Love, W. E. Mahaney, J. Park, M. Sabitova
 :::
 
 <!-- TO FILL IN: one plain-language sentence about the result. Delete this comment line and
@@ -91,23 +82,6 @@ Abstract goes here.
 </details>
 END -->
 
-<details class="wm-fold">
-<summary>BibTeX</summary>
-
-```bibtex
-@misc{EGIKKLMPS2026generating,
-  title         = {Generating Sets for Maximal Orders in Rational Quaternion Algebras},
-  author        = {Eisentr{\"a}ger, K. and Goren, E. Z. and Iezzi, A. and Kir, H. and
-                   K{\i}r{\i}ml{\i}, E. and Love, J. and Mahaney, W. E. and Park, J. and
-                   Sabitova, M.},
-  year          = {2026},
-  eprint        = {2610.10139},
-  archivePrefix = {arXiv},
-  note          = {Preprint}
-}
-```
-
-</details>
 :::
 
 ::: {.wm-paper}
@@ -118,13 +92,13 @@ Preprint · 2024
 *Computing Isogenies at Singular Points of the Modular Polynomial*
 :::
 ::: {.wm-paper-authors}
-with Travis Morrison
+W. E. Mahaney, T. Morrison
 :::
 
-<!-- TO FILL IN: one plain-language sentence about the result. A suggested draft is below;
-     edit it, then delete this comment line and the matching "END" comment line to show it.
+<!-- TO FILL IN: one plain-language sentence about the result. Delete this comment line and
+     the matching "END" comment line below to show it.
 ::: {.wm-paper-summary}
-The standard way to compute an $\ell$-isogeny from the modular polynomial fails when the pair of $j$-invariants is a singular point of $\Phi_\ell$; we give an algorithm that works there.
+One sentence, in plain language, saying what the paper proves and why it matters.
 :::
 END -->
 
@@ -143,22 +117,6 @@ Abstract goes here.
 </details>
 END -->
 
-<details class="wm-fold">
-<summary>BibTeX</summary>
-
-```bibtex
-@misc{MahaneyMorrison2024singular,
-  title         = {Computing Isogenies at Singular Points of the Modular Polynomial},
-  author        = {Mahaney, William E. and Morrison, Travis},
-  year          = {2024},
-  eprint        = {2402.02038},
-  archivePrefix = {arXiv},
-  primaryClass  = {math.NT},
-  doi           = {10.48550/arXiv.2402.02038}
-}
-```
-
-</details>
 :::
 
 ::: {.wm-note}

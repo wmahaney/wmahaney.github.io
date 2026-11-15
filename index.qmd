@@ -148,4 +148,10 @@ Outside of math I enjoy bouldering, Magic: The Gathering, video games, and spend
 
 :::
 
+<!-- AI FOOTNOTE: links to the AI disclosure page (ai-disclosure/index.qmd). -->
+
+::: {.wm-footnote}
+Claude was used while designing this website. [AI disclosure](ai-disclosure/index.qmd)
+:::
+
 :::
