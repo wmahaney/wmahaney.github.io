@@ -13,6 +13,8 @@ published with GitHub Pages. Live site: <https://wmahaney.github.io>
 | `notes/articles/<name>/index.qmd` | Expository notes, one folder per note | Copy `notes/_template.qmd` |
 | `blog/posts/<name>/index.qmd` | Blog posts, one folder per post | Copy `blog/_template.qmd` |
 | `teaching/index.qmd` | Teaching page | Fill in the hidden skeleton (instructions inside the file) |
+| `statements/<name>/index.qmd` | **Statements**: research, teaching, AI, culture | Write over the outline; see "Statements and AI pages" |
+| `ai/index.qmd`, `ai/projects/<name>/index.qmd` | **AI** page and one folder per AI project | Copy `ai/projects/_template.qmd` |
 | `cv/index.qmd` | CV page | Edit text |
 | `cv_william_mahaney.pdf` | The CV PDF (top-level, so the old link keeps working) | Replace with a file of the same name |
 | `images/profile/` | **Upload your profile photo here** as `profile.jpg` | Upload |
@@ -20,7 +22,7 @@ published with GitHub Pages. Live site: <https://wmahaney.github.io>
 | `files/papers/` | **Upload paper PDFs** | Upload |
 | `files/talks/` | **Upload slides** | Upload |
 | `files/teaching/` | **Upload syllabi and handouts** | Upload |
-| `files/cv/` | **Upload research / teaching / personal statements** | Upload |
+| `files/statements/` | **Upload statement PDFs** | Upload |
 | `assets/` | Colors, fonts, and page styling | Rarely needed |
 | `assets/js/`, `assets/data/` | Script and data for the home-page isogeny graphs | See below |
 | `_scripts/isogeny_graphs.py` | Computes the isogeny graph data | Run to change the primes |
@@ -52,6 +54,19 @@ END -->
 ```
 
 Edit the piece, then delete the first line (`<!-- TO FILL IN ...`) and the last line (`END -->`).
+
+## Statements and AI pages
+
+These pages are in the repository but hidden. A page whose header contains the line
+`draft: true` is not published, is left out of listings, and its menu entry does not appear.
+To publish a page, delete that line and push. Suggested order:
+
+1. Write a statement over its outline in `statements/<name>/index.qmd`, then delete its `draft: true`.
+2. Delete `draft: true` in `statements/index.qmd`. "Statements" now appears in the menu.
+3. Same for `ai/index.qmd` once it has an introduction or a project.
+4. Un-hide the matching cards on the home page (`index.qmd`) and the line on the CV page.
+
+`quarto preview` on your own computer shows draft pages, so you can read them before publishing.
 
 ## The isogeny graphs on the home page
 

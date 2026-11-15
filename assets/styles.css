@@ -422,6 +422,11 @@ h1, h2, h3, h4, h5, h6,
   border-radius: 1.25rem;
   padding: 1.25rem 1.75rem;
 }
+/* On ordinary pages (not the home page, which spaces its blocks itself). */
+main.content > .wm-box,
+main.content > .wm-actions {
+  margin: 1.5rem 0 2rem;
+}
 .wm-box p:last-child,
 .wm-box ul:last-child {
   margin-bottom: 0;

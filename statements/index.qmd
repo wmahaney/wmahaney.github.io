@@ -1,0 +1,19 @@
+---
+title: "Statements"
+description: "Statements on research, teaching, AI, and culture."
+# HIDDEN UNTIL READY. While the next line says "draft: true" this page is not published
+# and its menu entry does not appear. Delete the line once at least one statement below
+# is published.
+draft: true
+listing:
+  contents: "*/index.qmd"
+  type: grid
+  grid-columns: 2
+  sort: "order"
+  fields: [title, description]
+  sort-ui: false
+  filter-ui: false
+---
+
+<!-- One or two sentences that introduce the statements, e.g. who they are written for
+     and when they were last revised. Optional. -->

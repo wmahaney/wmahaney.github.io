@@ -1,0 +1,65 @@
+---
+title: "Research Statement"
+description: "What I work on, what I have proved, and where it is going."
+order: 1
+date-modified: last-modified
+# HIDDEN UNTIL READY. Delete the next line to publish this statement.
+draft: true
+---
+
+<!--
+HOW THIS PAGE WORKS
+- The "description" above is the text on this statement's card on the Statements page.
+- The box below is a two- or three-sentence summary for readers who stop there.
+- For a PDF copy, put it in files/statements/ and un-hide the download button.
+- The headings are a suggested outline. The comment under each one says what belongs
+  there; replace the comments with your text and rename or delete headings freely.
+-->
+
+::: {.wm-box}
+[In brief]{.wm-box-label}
+
+Two or three sentences that state the whole position. Write this last.
+:::
+
+<!-- TO FILL IN: put the PDF in files/statements/, then delete this comment line and the "END" line.
+::: {.wm-actions}
+[Download PDF](../../files/statements/research_statement_william_mahaney.pdf){.wm-btn .wm-btn-outline}
+:::
+END -->
+
+## Overview
+
+<!-- One paragraph a mathematician outside number theory can follow: the objects
+     (supersingular isogeny graphs), the kind of question (spectral and probabilistic),
+     and why it matters (post-quantum cryptography). -->
+
+## Background
+
+<!-- The minimum a reader needs: supersingular elliptic curves, isogeny graphs, the
+     Deuring correspondence with quaternion orders. One figure helps; the home-page
+     graphs can be reused. -->
+
+## Results
+
+<!-- One subsection per paper or theme. For each: the question, the theorem in one
+     displayed statement, and what is new about the method. Link to the Research page. -->
+
+## Work in progress
+
+<!-- Projects close to completion. State each as a result you expect, not a topic. -->
+
+## Future directions
+
+<!-- Two or three problems for the next three to five years. For each: why it is
+     reachable from your current work, and what a first result would look like. -->
+
+## Connections to cryptography
+
+<!-- What your results say about the security or cost of isogeny-based schemes, stated
+     so a cryptographer can use it. -->
+
+## Working with students
+
+<!-- Problems from your programme that suit undergraduate or early graduate projects
+     (the Directed Reading Program is evidence here). -->

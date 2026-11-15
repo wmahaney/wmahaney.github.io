@@ -1,0 +1,47 @@
+---
+title: "Culture Statement"
+description: "The kind of mathematical community I want to work in and what I do to build it."
+order: 4
+date-modified: last-modified
+# HIDDEN UNTIL READY. Delete the next line to publish this statement.
+draft: true
+---
+
+<!--
+HOW THIS PAGE WORKS
+- The "description" above is the text on this statement's card on the Statements page.
+- The box below is a two- or three-sentence summary for readers who stop there.
+- For a PDF copy, put it in files/statements/ and un-hide the download button.
+- The headings are a suggested outline. The comment under each one says what belongs
+  there; replace the comments with your text and rename or delete headings freely.
+-->
+
+::: {.wm-box}
+[In brief]{.wm-box-label}
+
+Two or three sentences that state the whole position. Write this last.
+:::
+
+<!-- TO FILL IN: put the PDF in files/statements/, then delete this comment line and the "END" line.
+::: {.wm-actions}
+[Download PDF](../../files/statements/culture_statement_william_mahaney.pdf){.wm-btn .wm-btn-outline}
+:::
+END -->
+
+## What I value
+
+<!-- The working culture you want in a department, group, or team, in concrete terms. -->
+
+## What I have done
+
+<!-- Actions with your role and the outcome, e.g. founding the organizational committee
+     of the Directed Reading Program at Virginia Tech (2024 to present). -->
+
+## How I work with people
+
+<!-- Collaboration habits: how you share credit, give feedback, and handle disagreement;
+     how you support students and newer colleagues. -->
+
+## What I would contribute
+
+<!-- Specific things you would start or strengthen in a new place. -->

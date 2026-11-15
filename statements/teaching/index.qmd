@@ -1,0 +1,60 @@
+---
+title: "Teaching Statement"
+description: "How I teach, what my classes look like, and what I want students to leave with."
+order: 2
+date-modified: last-modified
+# HIDDEN UNTIL READY. Delete the next line to publish this statement.
+draft: true
+---
+
+<!--
+HOW THIS PAGE WORKS
+- The "description" above is the text on this statement's card on the Statements page.
+- The box below is a two- or three-sentence summary for readers who stop there.
+- For a PDF copy, put it in files/statements/ and un-hide the download button.
+- The headings are a suggested outline. The comment under each one says what belongs
+  there; replace the comments with your text and rename or delete headings freely.
+-->
+
+::: {.wm-box}
+[In brief]{.wm-box-label}
+
+Two or three sentences that state the whole position. Write this last.
+:::
+
+<!-- TO FILL IN: put the PDF in files/statements/, then delete this comment line and the "END" line.
+::: {.wm-actions}
+[Download PDF](../../files/statements/teaching_statement_william_mahaney.pdf){.wm-btn .wm-btn-outline}
+:::
+END -->
+
+## What I want students to leave with
+
+<!-- The one or two things you care most about, stated concretely. -->
+
+## What a class looks like
+
+<!-- One specific example from a course you have taught (e.g. a day of MATH 1214):
+     what you did, what students did, and why you set it up that way. -->
+
+## Assessment and feedback
+
+<!-- How you find out what students understand, and what you change when they do not. -->
+
+## Access and inclusion
+
+<!-- Concrete practices, e.g. accessible course documents, flexible routes to
+     demonstrating mastery, how you handle varied preparation. -->
+
+## Mentoring beyond the classroom
+
+<!-- The Directed Reading Program: your role, what mentees did, what you learned. -->
+
+## Evidence and growth
+
+<!-- Evaluations, observations, training, and one thing you changed because of feedback. -->
+
+## Courses I can teach
+
+<!-- Service courses, the undergraduate core, and electives or graduate courses you
+     would like to develop. -->
