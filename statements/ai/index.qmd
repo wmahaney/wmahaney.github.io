@@ -1,0 +1,21 @@
+---
+title: "AI Statement"
+# Text for this statement's card on the Statements page. Left empty on purpose: write it yourself.
+description: ""
+order: 3
+date-modified: last-modified
+# HIDDEN UNTIL READY. Delete the next line to publish this statement.
+draft: true
+---
+
+<!--
+THIS PAGE IS LEFT EMPTY ON PURPOSE.
+
+Your AI statement (files/AI_statements/generic_statement.md on the branch
+wmahaney-ai_statement) says that no AI was used in any part of writing it. So this page has
+no outline, no suggested headings and no suggested wording, and your text has not been
+copied or edited here. Paste your own text below this comment when it is ready.
+
+The header above only sets the title, the position among the statements, and the
+"last modified" date shown under the title.
+-->

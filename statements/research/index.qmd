@@ -1,0 +1,16 @@
+---
+title: "Research Statement"
+# Text for this statement's card on the Statements page. Left empty: yours to write.
+description: ""
+order: 1
+date-modified: last-modified
+# HIDDEN UNTIL READY. Delete the next line to publish this statement.
+draft: true
+---
+
+<!--
+THIS PAGE IS LEFT EMPTY FOR YOUR OWN TEXT. Write the statement below this comment.
+
+Optional: for a PDF copy, put it in files/statements/ and add this line under your text:
+[Download PDF](../../files/statements/research_statement_william_mahaney.pdf){.wm-btn .wm-btn-outline}
+-->

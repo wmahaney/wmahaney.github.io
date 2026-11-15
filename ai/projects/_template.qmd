@@ -1,0 +1,36 @@
+---
+# NEW AI PROJECT: how to use this template
+#   1. Make a new folder:  ai/projects/<short-name>/   (lowercase, dashes)
+#   2. Copy this file into it and rename the copy to  index.qmd
+#   3. Edit the header below and write the page. Push to GitHub; the card appears
+#      automatically on the AI page.
+# (This template file itself is never published, because its name starts with "_".)
+
+title: "Name of the project"
+description: "One sentence that appears on the card: what it does and for whom."
+date: 2026-01-01
+categories: [tool]
+# Delete the next line when the page is ready to publish.
+draft: true
+---
+
+::: {.wm-actions}
+[Code](https://github.com/wmahaney/REPO){.wm-btn .wm-btn-fill}
+:::
+
+## What it does
+
+Two or three sentences. Say what problem it solves before saying how.
+
+## How it works
+
+The design in a short paragraph or a diagram: the pieces, and what the AI model does
+and does not do.
+
+## Status
+
+What works today, what is planned, and the version.
+
+## AI disclosure
+
+Which parts were written with AI assistance and how they were reviewed.

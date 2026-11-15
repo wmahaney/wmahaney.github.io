@@ -36,6 +36,11 @@ website:
         text: Writing
       - href: teaching/index.qmd
         text: Teaching
+      # Statements and AI stay out of the menu while their pages say "draft: true".
+      - href: statements/index.qmd
+        text: Statements
+      - href: ai/index.qmd
+        text: AI
       - href: cv/index.qmd
         text: CV
     tools:

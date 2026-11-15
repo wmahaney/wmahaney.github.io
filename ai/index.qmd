@@ -1,0 +1,44 @@
+---
+title: "AI"
+description: "AI-related projects and statements of William E. Mahaney."
+# HIDDEN UNTIL READY. While the next line says "draft: true" this page is not published
+# and its menu entry does not appear. Delete the line once the page has content.
+draft: true
+listing:
+  id: ai-projects
+  contents: "projects/*/index.qmd"
+  type: grid
+  grid-columns: 2
+  sort: "date desc"
+  categories: true
+  fields: [title, description, categories]
+  sort-ui: false
+  filter-ui: false
+---
+
+<!--
+SKELETON FOR THIS PAGE
+1. A short introduction: how AI fits into your work.
+2. STATEMENT: a link to the AI statement (it lives under Statements, so there is one copy).
+3. PROJECTS: one card per project, listed automatically from ai/projects/.
+The website's own AI disclosure is at /ai-disclosure/ and is linked from the home page.
+-->
+
+<!-- 1. Your introduction goes here. -->
+
+<!-- 2. Un-hide once the AI statement is published: delete this comment line and the "END" line.
+     The sentence describing the statement is yours to write.
+::: {.wm-box}
+[Statement]{.wm-box-label}
+
+[Read my AI statement](../statements/ai/index.qmd).
+:::
+END -->
+
+## Projects
+
+<!-- Cards appear here automatically: one for each folder in ai/projects/ whose index.qmd
+     is not marked "draft: true". To add a project, copy ai/projects/_template.qmd. -->
+
+::: {#ai-projects}
+:::
