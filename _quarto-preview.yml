@@ -1,0 +1,7 @@
+# PRIVATE PREVIEW PROFILE
+# Used for branch builds (the "site-preview" download on GitHub Actions) and available
+# locally with:   quarto render --profile preview
+# It shows draft pages (the statements, the AI tab) so you can read them before
+# publishing. The public site (main branch) never uses this profile.
+website:
+  draft-mode: visible

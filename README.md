@@ -9,7 +9,8 @@ published with GitHub Pages. Live site: <https://wmahaney.github.io>
 |---|---|---|
 | `index.qmd` | Home page: intro, isogeny graphs, news, about | Edit text, links, news items |
 | `research/index.qmd` | Research page: papers and talks | Add papers and talks (templates inside the file) |
-| `writing/index.qmd` | **Writing** page: lists every note and post | Leave alone |
+| `writing/index.qmd` | **Writing** page: lists every note and post together | Leave alone |
+| `blog/index.qmd`, `notes/index.qmd` | The Blog and Expository Notes pages in the Writing menu | Leave alone |
 | `notes/articles/<name>/index.qmd` | Expository notes, one folder per note | Copy `notes/_template.qmd` |
 | `blog/posts/<name>/index.qmd` | Blog posts, one folder per post | Copy `blog/_template.qmd` |
 | `teaching/index.qmd` | Teaching page | Fill in the hidden skeleton (instructions inside the file) |
@@ -57,16 +58,18 @@ Edit the piece, then delete the first line (`<!-- TO FILL IN ...`) and the last 
 
 ## Statements and AI pages
 
-These pages are in the repository but hidden. A page whose header contains the line
-`draft: true` is not published, is left out of listings, and its menu entry does not appear.
-To publish a page, delete that line and push. Suggested order:
+The **Statements** menu drops down to Research, Teaching, Culture and AI. Each links to
+`statements/<name>/index.qmd`, which is empty and marked `draft: true`.
 
-1. Write a statement in `statements/<name>/index.qmd` (each page is empty), then delete its `draft: true`.
-2. Delete `draft: true` in `statements/index.qmd`. "Statements" now appears in the menu.
-3. Same for `ai/index.qmd` once it has an introduction or a project.
-4. Un-hide the matching cards on the home page (`index.qmd`) and the line on the CV page.
+- **Public site:** a draft is not published. Its menu link opens a blank page.
+- **Private view:** drafts are shown in full when you run `quarto preview` on your own
+  computer, and in the "site-preview" download from any branch build on GitHub Actions
+  (Actions → the run for your branch → Artifacts → site-preview).
+- **To publish a statement:** write it, then delete its `draft: true` line and push to `main`.
 
-`quarto preview` on your own computer shows draft pages, so you can read them before publishing.
+The AI tab (`ai/index.qmd`) and the Statements overview page (`statements/index.qmd`) are
+drafts too, and work the same way. Once published, un-hide their cards on the home page
+(`index.qmd`) and the line on the CV page.
 
 ## The isogeny graphs on the home page
 

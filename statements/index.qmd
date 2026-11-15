@@ -1,9 +1,8 @@
 ---
 title: "Statements"
 description: "Statements on research, teaching, AI, and culture."
-# HIDDEN UNTIL READY. While the next line says "draft: true" this page is not published
-# and its menu entry does not appear. Delete the line once at least one statement below
-# is published.
+# The menu's Statements dropdown links straight to each statement, so this overview
+# page is hidden for now. Delete the next line to publish it.
 draft: true
 listing:
   contents: "*/index.qmd"

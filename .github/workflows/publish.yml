@@ -25,8 +25,10 @@ jobs:
       - name: Install Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
+      # On main, drafts are left out of the public site. On other branches the
+      # "preview" profile (_quarto-preview.yml) shows them, for the private preview.
       - name: Render the site
-        run: quarto render
+        run: quarto render ${{ github.ref != 'refs/heads/main' && '--profile preview' || '' }}
 
       - name: Upload the built site
         uses: actions/upload-pages-artifact@v3

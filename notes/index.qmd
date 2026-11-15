@@ -1,0 +1,15 @@
+---
+title: "Expository Notes"
+description: "Longer mathematical write-ups, revised over time."
+listing:
+  contents: "articles/*/index.qmd"
+  type: grid
+  grid-columns: 2
+  sort: "date desc"
+  categories: false
+  feed: true
+  fields: [title, description, date, reading-time]
+  date-format: "MMMM D, YYYY"
+  sort-ui: false
+  filter-ui: false
+---

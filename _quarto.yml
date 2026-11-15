@@ -32,13 +32,28 @@ website:
       # The name at the left of the menu links to the home page.
       - href: research/index.qmd
         text: Research
-      - href: writing/index.qmd
-        text: Writing
+      - text: Writing
+        menu:
+          - href: blog/index.qmd
+            text: Blog
+          - href: notes/index.qmd
+            text: Expository Notes
+      # The four statements are drafts. On the public site these links open blank
+      # pages; your text shows only in private previews (see _quarto-preview.yml).
+      # A statement goes public when you delete "draft: true" in its file.
+      - text: Statements
+        menu:
+          - href: statements/research/index.qmd
+            text: Research
+          - href: statements/teaching/index.qmd
+            text: Teaching
+          - href: statements/culture/index.qmd
+            text: Culture
+          - href: statements/ai/index.qmd
+            text: AI
       - href: teaching/index.qmd
         text: Teaching
-      # Statements and AI stay out of the menu while their pages say "draft: true".
-      - href: statements/index.qmd
-        text: Statements
+      # The AI tab stays out of the menu while ai/index.qmd says "draft: true".
       - href: ai/index.qmd
         text: AI
       - href: cv/index.qmd

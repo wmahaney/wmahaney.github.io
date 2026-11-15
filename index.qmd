@@ -64,7 +64,7 @@ I study probabilistic issues in Number Theory and Cryptography, particularly rel
       <span class="wm-graph-legend-fp"><i class="wm-key wm-key-fp"></i><span>defined over F<sub>p</sub></span></span>
       <span><i class="wm-key wm-key-2"></i>2-isogeny</span>
       <span class="wm-graph-legend-3" hidden><i class="wm-key wm-key-3"></i>3-isogeny</span>
-      <span><i class="wm-key wm-key-walk"></i>random walk</span>
+      <span><i class="wm-key wm-key-walk"></i><i class="wm-key wm-key-trail"></i>random walk, last 10 steps</span>
     </span>
     <span class="wm-graph-field"></span>
     <span class="wm-graph-hint">Hover or tap a vertex for its j-invariant; drag to rearrange.</span>
