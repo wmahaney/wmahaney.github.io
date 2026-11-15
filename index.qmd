@@ -107,24 +107,6 @@ I study probabilistic issues in Number Theory and Cryptography, particularly rel
     <p class="wm-card-text">Courses, materials, and outreach.</p>
     <span class="wm-card-cta">See teaching →</span>
   </a>
-  <!-- STATEMENTS AND AI CARDS: hidden until those pages are published. To show a card,
-       delete the two lines around it that start "HIDDEN:" and "END HIDDEN". -->
-  <!-- HIDDEN: Statements card
-  <a class="wm-card" href="statements/index.html">
-    <span class="wm-card-icon"><i class="bi bi-file-earmark-text"></i></span>
-    <h2 class="wm-card-title">Statements</h2>
-    <p class="wm-card-text">Research, teaching, AI, and culture.</p>
-    <span class="wm-card-cta">Read the statements →</span>
-  </a>
-  END HIDDEN -->
-  <!-- HIDDEN: AI card
-  <a class="wm-card" href="ai/index.html">
-    <span class="wm-card-icon"><i class="bi bi-cpu"></i></span>
-    <h2 class="wm-card-title">AI</h2>
-    <p class="wm-card-text">Projects and how I use AI in my work.</p>
-    <span class="wm-card-cta">See AI work →</span>
-  </a>
-  END HIDDEN -->
 </section>
 ```
 

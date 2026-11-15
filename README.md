@@ -56,20 +56,32 @@ END -->
 
 Edit the piece, then delete the first line (`<!-- TO FILL IN ...`) and the last line (`END -->`).
 
-## Statements and AI pages
+## Statements and AI pages; the private branch
 
-The **Statements** menu drops down to Research, Teaching, Culture and AI. Each links to
-`statements/<name>/index.qmd`, which is empty and marked `draft: true`.
+The four statements (`statements/<name>/index.qmd`: research, teaching, culture, AI) are empty
+and marked `draft: true`. The public site leaves them out, and its menu has no Statements tab.
 
-- **Public site:** a draft is not published. Its menu link opens a blank page.
-- **Private view:** drafts are shown in full when you run `quarto preview` on your own
-  computer, and in the "site-preview" download from any branch build on GitHub Actions
-  (Actions → the run for your branch → Artifacts → site-preview).
-- **To publish a statement:** write it, then delete its `draft: true` line and push to `main`.
+The site has two build profiles:
 
-The AI tab (`ai/index.qmd`) and the Statements overview page (`statements/index.qmd`) are
-drafts too, and work the same way. Once published, un-hide their cards on the home page
-(`index.qmd`) and the line on the CV page.
+| Profile | File | Used for | Drafts | Statements menu |
+|---|---|---|---|---|
+| public (default) | `_quarto-public.yml` | `main` → https://wmahaney.github.io | hidden | hidden |
+| private | `_quarto-private.yml` | the `private` branch; `quarto preview --profile private` | shown | shown |
+
+**Test-deploying sensitive updates.** Work on the `private` branch. Every push builds the
+site with the private profile and attaches it as **site-private** (Actions → the run →
+Artifacts). Unzip it and open `index.html`. The `private` branch is never deployed.
+
+**This repository is public.** Anything pushed to any branch, including `private` (the
+`.qmd` source and the site-private download), can be read by anyone on GitHub. "Private"
+here means "not on the live site", not "confidential". Keep confidential text out of this
+repository; use `quarto preview --profile private` on your own computer, or a private repository.
+
+**Publishing a statement:** delete its `draft: true`, then copy the "Statements" menu entry
+from `_quarto-private.yml` into `_quarto-public.yml` (listing only the statements that are
+published), and merge into `main`. The AI tab (`ai/index.qmd`) and the Statements overview
+page (`statements/index.qmd`) are drafts too, and work the same way. A home-page card for
+either can be added to the card row in `index.qmd` once it is public.
 
 ## The isogeny graphs on the home page
 
