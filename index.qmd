@@ -29,23 +29,63 @@ I study probabilistic issues in Number Theory and Cryptography, particularly rel
 [GitHub](https://github.com/wmahaney){.wm-btn .wm-btn-outline}
 :::
 
+<!-- MORE PROFILE LINKS: uncomment a line and put in your own ID.
+[arXiv](https://arxiv.org/a/YOUR_ARXIV_AUTHOR_ID){.wm-btn .wm-btn-outline}
+[Google Scholar](https://scholar.google.com/citations?user=YOUR_ID){.wm-btn .wm-btn-outline}
+[ORCID](https://orcid.org/0000-0000-0000-0000){.wm-btn .wm-btn-outline}
+-->
+
 :::
 
-::: {.wm-photo}
-<!-- PROFILE PHOTO: upload a file named profile.jpg to the folder images/profile/
-     and it appears here automatically. Until then this is an empty frame. -->
+<!-- ISOGENY GRAPHS. The picture is drawn by assets/js/isogeny-hero.js from the data in
+     assets/data/isogeny-graphs.json. To change the primes on offer, run
+         python3 _scripts/isogeny_graphs.py 101 431 1009
+     (any list of primes) and commit the new JSON file. -->
 
 ```{=html}
-<div class="wm-photo-frame">
-  <span class="wm-photo-placeholder"><i class="bi bi-person"></i><span>Profile photo</span></span>
-  <img src="images/profile/profile.jpg" alt="Photo of William E. Mahaney" onerror="this.remove()">
-</div>
+<figure class="wm-graph" id="wm-graph" data-src="assets/data/isogeny-graphs.json">
+  <div class="wm-graph-controls">
+    <div class="wm-seg" role="group" aria-label="Which isogeny graph to draw">
+      <button type="button" data-kind="2" aria-pressed="true">ℓ = 2</button>
+      <button type="button" data-kind="23" aria-pressed="false">ℓ = 2, 3</button>
+      <button type="button" data-kind="2b3" aria-pressed="false">ℓ = 2, level 3</button>
+    </div>
+    <label class="wm-graph-prime">p = <select aria-label="Characteristic p"></select></label>
+  </div>
+  <div class="wm-graph-stage">
+    <svg class="wm-graph-svg" role="img" aria-labelledby="wm-graph-caption"></svg>
+    <div class="wm-graph-tip" hidden></div>
+  </div>
+  <figcaption>
+    <span class="wm-graph-caption" id="wm-graph-caption">Supersingular isogeny graphs: the objects I study.</span>
+    <span class="wm-graph-stats"></span>
+    <span class="wm-graph-legend">
+      <span><i class="wm-key wm-key-node"></i>supersingular curve</span>
+      <span class="wm-graph-legend-fp"><i class="wm-key wm-key-fp"></i><span>defined over F<sub>p</sub></span></span>
+      <span><i class="wm-key wm-key-2"></i>2-isogeny</span>
+      <span class="wm-graph-legend-3" hidden><i class="wm-key wm-key-3"></i>3-isogeny</span>
+      <span><i class="wm-key wm-key-walk"></i>random walk</span>
+    </span>
+    <span class="wm-graph-field"></span>
+    <span class="wm-graph-hint">Hover or tap a vertex for its j-invariant; drag to rearrange.</span>
+  </figcaption>
+</figure>
+<script type="module" src="assets/js/isogeny-hero.js"></script>
 ```
-:::
 
 :::
 
-<!-- No "recent posts" section yet (by request). -->
+<!-- NEWS. Newest first; keep it to the last three or four items. Each item is
+     "- [date]{.wm-news-date} text". Delete the whole block (from "::: {.wm-news}" to its
+     ":::") to hide it. -->
+
+::: {.wm-news}
+[News]{.wm-box-label}
+
+- [Oct 2026]{.wm-news-date} New preprint: [*Generating Sets for Maximal Orders in Rational Quaternion Algebras*](https://arxiv.org/abs/2610.10139).
+- [Fall 2026]{.wm-news-date} Teaching MATH 1214: Preparation for Calculus at Virginia Tech.
+- [2025]{.wm-news-date} Talks at MASON VII and at the AMS Southeast and Eastern Sectional Meetings. See [Research](research/index.qmd#talks).
+:::
 
 ```{=html}
 <section class="wm-cards" aria-label="Sections of this site">
@@ -55,22 +95,30 @@ I study probabilistic issues in Number Theory and Cryptography, particularly rel
     <p class="wm-card-text">Papers, preprints, and talks.</p>
     <span class="wm-card-cta">Browse research →</span>
   </a>
-  <a class="wm-card" href="notes/index.html">
+  <a class="wm-card" href="writing/index.html">
     <span class="wm-card-icon"><i class="bi bi-journal-text"></i></span>
-    <h2 class="wm-card-title">Expository Notes</h2>
-    <p class="wm-card-text">Longer mathematical write-ups, revised over time.</p>
-    <span class="wm-card-cta">Read the notes →</span>
+    <h2 class="wm-card-title">Writing</h2>
+    <p class="wm-card-text">Expository notes and shorter, informal posts.</p>
+    <span class="wm-card-cta">Read the writing →</span>
   </a>
-  <a class="wm-card" href="blog/index.html">
-    <span class="wm-card-icon"><i class="bi bi-pencil-square"></i></span>
-    <h2 class="wm-card-title">Blog</h2>
-    <p class="wm-card-text">Shorter, informal posts.</p>
-    <span class="wm-card-cta">Visit the blog →</span>
+  <a class="wm-card" href="teaching/index.html">
+    <span class="wm-card-icon"><i class="bi bi-easel2"></i></span>
+    <h2 class="wm-card-title">Teaching</h2>
+    <p class="wm-card-text">Courses, materials, and outreach.</p>
+    <span class="wm-card-cta">See teaching →</span>
   </a>
 </section>
 ```
 
-::: {.wm-box}
+::: {.wm-box .wm-about}
+
+```{=html}
+<!-- PROFILE PHOTO: upload a file named profile.jpg to the folder images/profile/
+     and it appears here automatically. Until then nothing is shown. -->
+<img class="wm-about-photo" src="images/profile/profile.jpg" alt="Photo of William E. Mahaney" onerror="this.remove()">
+```
+
+::: {.wm-about-text}
 [About me]{.wm-box-label}
 
 I am a PhD student in Mathematics at Virginia Tech in Blacksburg, Virginia.
@@ -78,6 +126,8 @@ I am a PhD student in Mathematics at Virginia Tech in Blacksburg, Virginia.
 <!-- ADD MORE ABOUT YOURSELF HERE: a few sentences between the line above and the hobbies line below. -->
 
 Outside of math I enjoy bouldering, Magic: The Gathering, video games, and spending time with animals.
+:::
+
 :::
 
 :::
