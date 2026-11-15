@@ -3,7 +3,28 @@ title: "Teaching"
 description-meta: "Teaching and outreach of William E. Mahaney at Virginia Tech."
 ---
 
-## Fall 2026
+<!--
+SKELETON FOR THIS PAGE. Everything inside a comment like this one is hidden on the site.
+To show a piece, delete the comment line above it and the "END" comment line below it.
+
+1. APPROACH: two or three sentences on how you teach, with a link to the full statement.
+2. COURSES: one card per course, newest first. Each card has a description and material links.
+3. MATERIALS: handouts or notes that are useful beyond one semester.
+4. MENTORING AND OUTREACH.
+-->
+
+<!-- 1. APPROACH. TO FILL IN, then delete this comment line and the "END" line.
+::: {.wm-box}
+[My approach]{.wm-box-label}
+
+Two or three sentences on how you teach and what you want students to leave with.
+[Read my teaching statement](../statements/teaching/index.qmd).
+:::
+END -->
+
+## Courses
+
+### Fall 2026
 
 ::: {.wm-course}
 ::: {.wm-course-meta}
@@ -12,11 +33,37 @@ Instructor · Virginia Tech
 ::: {.wm-course-title}
 MATH 1214: Preparation for Calculus
 :::
+
+<!-- TO FILL IN: a short description, then delete this comment line and the "END" line.
+::: {.wm-course-text}
+Two sentences: what the course covers, who takes it, and how you run it.
+:::
+END -->
+
+<!-- TO FILL IN: put PDFs in files/teaching/, fix the file names, then delete this comment
+     line and the "END" line.
+::: {.wm-paper-links}
+[Syllabus](../files/teaching/math1214-fall2026-syllabus.pdf){.wm-chip}
+[Course policy](../files/teaching/math1214-fall2026-policy.pdf){.wm-chip}
+[Sample notes](../files/teaching/math1214-coordinate-geometry-notes.pdf){.wm-chip}
+:::
+END -->
 :::
 
-<!-- To add a syllabus or handouts: put the PDF in files/teaching/ and link it, e.g.
-     [Syllabus](../files/teaching/math1214-fall2026-syllabus.pdf){.wm-chip} -->
+<!-- EARLIER COURSES. Copy the course card above under a new "### Semester Year" heading.
+     For a course you assisted with, change "Instructor" to "Teaching assistant" or "Recitation leader". -->
 
-## Service & Outreach
+<!-- 3. MATERIALS. TO FILL IN, then delete this comment line and the "END" line.
+## Materials
+
+Notes and handouts that are useful outside one semester.
+
+- [Title of the handout](../files/teaching/your-file.pdf): one line on what it is for.
+END -->
+
+## Mentoring & Outreach
 
 I am a founding member of the organizational committee of the Directed Reading Program at Virginia Tech (2024–present).
+
+<!-- TO FILL IN: one or two sentences on what the program does, any projects you have
+     mentored (student first names or initials, topic, semester), and a link to its page. -->

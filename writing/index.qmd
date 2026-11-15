@@ -1,0 +1,25 @@
+---
+title: "Writing"
+description: "Expository notes, revised over time, and shorter, informal posts."
+aliases:
+  # The Expository Notes and Blog pages were merged into this one.
+  - /notes/index.html
+  - /blog/index.html
+  # The old "Testing Math" post lived here; it is now an unpublished draft.
+  - /2025/08/13/math_test.html
+listing:
+  # Notes live in notes/articles/, posts in blog/posts/. Both are listed here; the
+  # category buttons ("expository note", "blog post") filter by kind.
+  contents:
+    - "../notes/articles/*/index.qmd"
+    - "../blog/posts/*/index.qmd"
+  type: grid
+  grid-columns: 2
+  sort: "date desc"
+  categories: true
+  feed: true
+  fields: [title, description, date, categories, reading-time]
+  date-format: "MMMM D, YYYY"
+  sort-ui: false
+  filter-ui: false
+---

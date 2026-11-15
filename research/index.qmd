@@ -9,15 +9,53 @@ I work on supersingular isogeny graphs: their spectra, the quaternion orders beh
 
 ## Papers
 
-Advance review copies of papers in progress are available on request; please [email me](mailto:mahaney1@vt.edu).
-
 <!--
 HOW TO ADD A PAPER
-1. Copy one of the blocks below (from "::: {.wm-paper}" down to its closing ":::").
-2. Paste it at the top of this list (newest first) and edit the text.
-3. Put the PDF in the folder files/papers/ and link it as:
-   [PDF](../files/papers/your-file.pdf){.wm-chip}
-Delete any link chip you don't need.
+1. Copy the block under "PAPER TEMPLATE" just below (from "::: {.wm-paper}" down to its
+   closing ":::"), paste it at the top of the list (newest first), and edit the text.
+2. Put the PDF in the folder files/papers/ and link it as
+   [PDF](../files/papers/your-file.pdf){.wm-chip}   (or link the arXiv PDF).
+3. Delete any part you don't need: the summary, a link chip, or a fold-out section.
+
+PAPER TEMPLATE
+
+::: {.wm-paper}
+::: {.wm-paper-meta}
+Preprint · 2027
+:::
+::: {.wm-paper-title}
+*Title of the Paper*
+:::
+::: {.wm-paper-authors}
+with A. Coauthor, B. Coauthor
+:::
+::: {.wm-paper-summary}
+One sentence, in plain language, saying what the paper proves and why it matters.
+:::
+::: {.wm-paper-links}
+[arXiv:0000.00000](https://arxiv.org/abs/0000.00000){.wm-chip}
+[PDF](https://arxiv.org/pdf/0000.00000){.wm-chip}
+[Code](https://github.com/wmahaney/REPO){.wm-chip}
+:::
+
+<details class="wm-fold">
+<summary>Abstract</summary>
+
+Paste the abstract here. Math works as usual: $\ell$-isogenies, $\Phi_\ell(X, Y)$.
+
+</details>
+
+<details class="wm-fold">
+<summary>BibTeX</summary>
+
+```bibtex
+@misc{key,
+  title = {...},
+}
+```
+
+</details>
+:::
 -->
 
 ::: {.wm-paper}
@@ -30,10 +68,46 @@ Preprint · 2026
 ::: {.wm-paper-authors}
 with K. Eisenträger, E. Z. Goren, A. Iezzi, H. Kir, E. Kırımlı, J. Love, J. Park, M. Sabitova
 :::
+
+<!-- TO FILL IN: one plain-language sentence about the result. Delete this comment line and
+     the matching "END" comment line below to show it.
+::: {.wm-paper-summary}
+One sentence, in plain language, saying what the paper proves and why it matters.
+:::
+END -->
+
 ::: {.wm-paper-links}
 [arXiv:2610.10139](https://arxiv.org/abs/2610.10139){.wm-chip}
+[PDF](https://arxiv.org/pdf/2610.10139){.wm-chip}
 [Code](https://github.com/wmahaney/generating_sets_for_maximal_quaternion_orders){.wm-chip}
 :::
+
+<!-- TO FILL IN: paste the abstract, then delete this comment line and the "END" line.
+<details class="wm-fold">
+<summary>Abstract</summary>
+
+Abstract goes here.
+
+</details>
+END -->
+
+<details class="wm-fold">
+<summary>BibTeX</summary>
+
+```bibtex
+@misc{EGIKKLMPS2026generating,
+  title         = {Generating Sets for Maximal Orders in Rational Quaternion Algebras},
+  author        = {Eisentr{\"a}ger, K. and Goren, E. Z. and Iezzi, A. and Kir, H. and
+                   K{\i}r{\i}ml{\i}, E. and Love, J. and Mahaney, W. E. and Park, J. and
+                   Sabitova, M.},
+  year          = {2026},
+  eprint        = {2610.10139},
+  archivePrefix = {arXiv},
+  note          = {Preprint}
+}
+```
+
+</details>
 :::
 
 ::: {.wm-paper}
@@ -46,38 +120,54 @@ Preprint · 2024
 ::: {.wm-paper-authors}
 with Travis Morrison
 :::
+
+<!-- TO FILL IN: one plain-language sentence about the result. A suggested draft is below;
+     edit it, then delete this comment line and the matching "END" comment line to show it.
+::: {.wm-paper-summary}
+The standard way to compute an $\ell$-isogeny from the modular polynomial fails when the pair of $j$-invariants is a singular point of $\Phi_\ell$; we give an algorithm that works there.
+:::
+END -->
+
 ::: {.wm-paper-links}
 [arXiv:2402.02038](https://arxiv.org/abs/2402.02038){.wm-chip}
+[PDF](https://arxiv.org/pdf/2402.02038){.wm-chip}
 [Code](https://github.com/wmahaney/ModularMultipoints){.wm-chip}
 :::
+
+<!-- TO FILL IN: paste the abstract, then delete this comment line and the "END" line.
+<details class="wm-fold">
+<summary>Abstract</summary>
+
+Abstract goes here.
+
+</details>
+END -->
+
+<details class="wm-fold">
+<summary>BibTeX</summary>
+
+```bibtex
+@misc{MahaneyMorrison2024singular,
+  title         = {Computing Isogenies at Singular Points of the Modular Polynomial},
+  author        = {Mahaney, William E. and Morrison, Travis},
+  year          = {2024},
+  eprint        = {2402.02038},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.NT},
+  doi           = {10.48550/arXiv.2402.02038}
+}
+```
+
+</details>
 :::
 
-::: {.wm-paper .wm-paper-empty}
-::: {.wm-paper-meta}
-(in progress)
-:::
+::: {.wm-note}
+Four further papers are in preparation. Advance review copies are available on request; please [email me](mailto:mahaney1@vt.edu).
 :::
 
-::: {.wm-paper .wm-paper-empty}
-::: {.wm-paper-meta}
-(in progress)
-:::
-:::
-
-::: {.wm-paper .wm-paper-empty}
-::: {.wm-paper-meta}
-(in progress)
-:::
-:::
-
-::: {.wm-paper .wm-paper-empty}
-::: {.wm-paper-meta}
-(in progress)
-:::
-:::
-
-<!-- To fill a slot: replace "(in progress)" with a status such as "Preprint · 2026", then add
-     title / authors / links divs exactly like the paper cards above, and delete ".wm-paper-empty".
+<!-- PAPERS IN PREPARATION. When one is ready to be named publicly, add it to the list above
+     with the paper template, using a status such as "In revision" or "In preparation", and
+     lower the count in the sentence above.
 
      Another paper from the old site, uncomment once public:
 
@@ -93,15 +183,52 @@ In revision
 
 ## Talks
 
-::: {.wm-box}
-- MASON VII, University of Maryland, 2025
-- AMS Southeast Sectional, Tulane University, 2025
-- AMS Eastern Sectional, Howard University, 2025
-- AMS Central Sectional, University of Wisconsin–Milwaukee, 2024
-- PANTS XXXVII, Wake Forest University, 2024
+<!--
+HOW TO ADD A TALK
+Copy one "<li> ... </li>" block, paste it at the top of the list (newest first), and edit it.
+To link slides, put the PDF in files/talks/ and add inside the venue line, e.g.
+    <a class="wm-chip" href="../files/talks/mason-vii-2025.pdf">Slides</a>
+A recording or poster works the same way with a different label.
 
-All on computing isogenies at singular points of the modular polynomial.
-:::
+For talks that have not happened yet, add a list headed "### Upcoming" above this one.
+-->
 
-<!-- To link slides, put the PDF in files/talks/ and add e.g.
-     ([slides](../files/talks/mason-vii-2025.pdf)) after the talk. -->
+```{=html}
+<ul class="wm-talks">
+  <li>
+    <span class="wm-talk-year">2025</span>
+    <div class="wm-talk-body">
+      <div class="wm-talk-title">Computing isogenies at singular points of the modular polynomial</div>
+      <div class="wm-talk-venue">MASON VII, University of Maryland</div>
+    </div>
+  </li>
+  <li>
+    <span class="wm-talk-year">2025</span>
+    <div class="wm-talk-body">
+      <div class="wm-talk-title">Computing isogenies at singular points of the modular polynomial</div>
+      <div class="wm-talk-venue">AMS Southeast Sectional Meeting, Tulane University</div>
+    </div>
+  </li>
+  <li>
+    <span class="wm-talk-year">2025</span>
+    <div class="wm-talk-body">
+      <div class="wm-talk-title">Computing isogenies at singular points of the modular polynomial</div>
+      <div class="wm-talk-venue">AMS Eastern Sectional Meeting, Howard University</div>
+    </div>
+  </li>
+  <li>
+    <span class="wm-talk-year">2024</span>
+    <div class="wm-talk-body">
+      <div class="wm-talk-title">Computing isogenies at singular points of the modular polynomial</div>
+      <div class="wm-talk-venue">AMS Central Sectional Meeting, University of Wisconsin–Milwaukee</div>
+    </div>
+  </li>
+  <li>
+    <span class="wm-talk-year">2024</span>
+    <div class="wm-talk-body">
+      <div class="wm-talk-title">Computing isogenies at singular points of the modular polynomial</div>
+      <div class="wm-talk-venue">PANTS XXXVII, Wake Forest University</div>
+    </div>
+  </li>
+</ul>
+```

@@ -1,3 +1,5 @@
 # Settings applied to every note in this folder.
 toc: true
 toc-title: "Contents"
+# Shown on the Writing page so notes can be told apart from blog posts.
+categories: [expository note]

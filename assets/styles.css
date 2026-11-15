@@ -163,52 +163,214 @@ h1, h2, h3, h4, h5, h6,
   gap: 0.75rem;
 }
 
-/* Profile photo: a reserved, empty frame until images/profile/profile.jpg exists */
-.wm-photo {
-  flex: 0 0 auto;
-  width: 300px;
-  max-width: 100%;
-}
-.wm-photo-frame {
+/* ---- Home page: interactive isogeny graph ------------------------------ */
+.wm-graph {
   position: relative;
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
-  border-radius: 28px;
-  background: var(--wm-tint);
-  border: 2px dashed var(--wm-line);
+  flex: 1 1 24rem;
+  min-width: 0;
+  max-width: 600px;
+  margin: 0 auto;
+  font-family: var(--wm-sans);
+}
+.wm-graph-controls {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
 }
-.wm-photo-frame img {
-  position: absolute;
-  inset: 0;
+.wm-seg {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--wm-tint);
+}
+.wm-seg button {
+  font: 600 0.8rem/1.2 var(--wm-sans);
+  color: var(--wm-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.45rem 0.85rem;
+  cursor: pointer;
+}
+.wm-seg button[aria-pressed="true"] {
+  background: var(--wm-accent);
+  color: var(--wm-accent-ink);
+}
+.wm-seg button:focus-visible,
+.wm-graph-prime select:focus-visible {
+  outline: 2px solid var(--wm-accent2);
+  outline-offset: 2px;
+}
+.wm-graph-prime {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--wm-muted);
+}
+.wm-graph-prime select {
+  font: 600 0.85rem/1.2 var(--wm-sans);
+  color: var(--wm-ink);
+  background: var(--wm-surface);
+  border: 1.5px solid var(--wm-line);
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+}
+.wm-graph-stage {
+  position: relative;
+  background: var(--wm-surface);
+  border: 1.5px solid var(--wm-line);
+  border-radius: 1.5rem;
+  overflow: hidden;
+}
+.wm-graph-svg {
+  display: block;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  aspect-ratio: 6 / 5;
 }
-.wm-photo-placeholder {
+.wm-g-edge {
+  fill: none;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  opacity: 0.55;
+  transition: opacity 0.15s ease;
+}
+.wm-g-edge-2 { stroke: var(--wm-accent); }
+.wm-g-edge-3 { stroke: var(--wm-red); }
+.wm-g-edge-hot { opacity: 1; stroke-width: 2.6; }
+.wm-g-node {
+  fill: var(--wm-accent);
+  stroke: var(--wm-surface);
+  stroke-width: 1.5;
+  cursor: grab;
+  touch-action: none;
+  transition: opacity 0.15s ease;
+}
+.wm-g-node-fp { fill: var(--wm-accent2); }
+.wm-g-node:active { cursor: grabbing; }
+.wm-g-focus { stroke: var(--wm-ink); stroke-width: 2.5; }
+.wm-g-dim { opacity: 0.12; }
+.wm-g-walker {
+  fill: var(--wm-surface);
+  stroke: var(--wm-ink);
+  stroke-width: 2.5;
+  pointer-events: none;
+}
+.wm-graph-tip sub,
+.wm-graph figcaption sub { font-size: 0.75em; }
+.wm-graph-tip {
+  position: absolute;
+  z-index: 2;
+  max-width: 92%;
+  padding: 0.3rem 0.65rem;
+  border-radius: 0.6rem;
+  background: var(--wm-ink);
+  color: var(--wm-bg);
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.wm-graph figcaption {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
+  gap: 0.3rem;
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
   color: var(--wm-muted);
+}
+.wm-graph-caption {
+  font-family: var(--wm-serif);
+  font-size: 0.95rem;
+  color: var(--wm-ink);
+}
+.wm-graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.9rem;
+}
+.wm-graph-legend > span { display: inline-flex; align-items: center; gap: 0.35rem; }
+.wm-graph-legend > span[hidden] { display: none; }
+.wm-key { display: inline-block; flex: none; }
+.wm-key-node,
+.wm-key-fp,
+.wm-key-walk { width: 0.6rem; height: 0.6rem; border-radius: 50%; }
+.wm-key-node { background: var(--wm-accent); }
+.wm-key-fp { background: var(--wm-accent2); }
+.wm-key-walk { background: var(--wm-surface); border: 2px solid var(--wm-ink); }
+.wm-key-2,
+.wm-key-3 { width: 1rem; height: 2px; border-radius: 1px; }
+.wm-key-2 { background: var(--wm-accent); }
+.wm-key-3 { background: var(--wm-red); }
+/* If the data cannot be loaded, drop the figure rather than show an empty frame. */
+.wm-graph.wm-graph-failed { display: none; }
+.wm-graph:not(.wm-graph-ready) .wm-graph-controls,
+.wm-graph:not(.wm-graph-ready) .wm-graph-legend,
+.wm-graph:not(.wm-graph-ready) .wm-graph-hint { visibility: hidden; }
+@media (prefers-reduced-motion: reduce) {
+  .wm-key-walk, .wm-graph-legend > span:has(.wm-key-walk) { display: none; }
+}
+
+/* ---- Home page: news strip ------------------------------------------------ */
+.wm-news {
+  border-left: 4px solid var(--wm-accent2);
+  padding: 0.25rem 0 0.25rem 1.5rem;
+}
+.wm-news ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.6rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.wm-news li {
+  position: relative;
+  padding-left: 7rem;
+}
+.wm-news-date {
+  position: absolute;
+  left: 0;
+  top: 0.25rem;
   font-family: var(--wm-sans);
-  font-size: 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--wm-muted);
 }
-.wm-photo-placeholder .bi {
-  font-size: 3.5rem;
+
+/* ---- Home page: about box, with an optional photo ------------------------- */
+.wm-about {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.25rem 2rem;
+  padding: 1.5rem 1.75rem;
 }
+.wm-about-photo {
+  flex: none;
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--wm-surface);
+}
+.wm-about-text {
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+.wm-about-text p:last-child { margin-bottom: 0; }
 
 /* Section cards on the home page */
 .wm-cards {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14.5rem, 1fr));
   gap: 1.5rem;
 }
 .wm-card {
   position: relative;
-  flex: 1 1 16rem;
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
@@ -301,7 +463,8 @@ h1, h2, h3, h4, h5, h6,
   font-size: 1.2rem;
   font-weight: 700;
 }
-.wm-paper-authors {
+.wm-paper-authors,
+.wm-course-text {
   color: var(--wm-muted);
 }
 .wm-paper-links > p {
@@ -311,7 +474,58 @@ h1, h2, h3, h4, h5, h6,
   gap: 0.5rem;
 }
 
-/* ---- Listing pages (Expository Notes, Blog): cards -------------------- */
+.wm-paper-summary {
+  margin-top: 0.6rem;
+}
+/* Fold-out sections on a paper card (abstract, BibTeX) */
+.wm-fold {
+  margin-top: 0.75rem;
+  border-top: 1px solid var(--wm-line);
+  padding-top: 0.6rem;
+}
+.wm-fold + .wm-fold { margin-top: 0.4rem; }
+.wm-fold > summary {
+  font-family: var(--wm-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--wm-accent);
+  cursor: pointer;
+}
+.wm-fold > summary + * { margin-top: 0.6rem; }
+.wm-fold p:last-child,
+.wm-fold div.sourceCode:last-child { margin-bottom: 0; }
+.wm-fold pre { font-size: 0.78rem; }
+.wm-note {
+  color: var(--wm-muted);
+  font-size: 0.95rem;
+}
+
+/* Talks: one row per talk */
+.wm-talks {
+  list-style: none;
+  padding: 0;
+  margin: 1.25rem 0;
+  border-top: 1px solid var(--wm-line);
+}
+.wm-talks > li {
+  display: grid;
+  grid-template-columns: 4rem 1fr;
+  gap: 0.25rem 1rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--wm-line);
+}
+.wm-talk-year {
+  font-family: var(--wm-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--wm-accent);
+  padding-top: 0.2rem;
+}
+.wm-talk-title { font-style: italic; }
+.wm-talk-venue { color: var(--wm-muted); font-size: 0.95rem; }
+.wm-talk-body .wm-chip { margin-left: 0.4rem; }
+
+/* ---- Listing pages (Writing): cards ------------------------------------ */
 .quarto-grid-item.card {
   background: var(--wm-surface);
   border: 1.5px solid var(--wm-line);
@@ -387,16 +601,11 @@ a.quarto-grid-link:hover .quarto-grid-item.card {
     padding-top: 2rem;
     gap: 2.5rem;
   }
-}
-
-/* ---- Research: empty "(in progress)" slots ------------------------------ */
-.wm-paper-empty {
-  background: transparent;
-  border-style: dashed;
-  min-height: 5.5rem;
-}
-.wm-paper-empty .wm-paper-meta {
-  color: var(--wm-muted);
+  .wm-news { padding-left: 1rem; }
+  .wm-news li { padding-left: 0; }
+  .wm-news-date { position: static; display: block; }
+  .wm-seg button { padding: 0.45rem 0.7rem; }
+  .wm-graph-hint { display: none; }
 }
 
 /* ---- CV page: embedded PDF ------------------------------------------------ */
