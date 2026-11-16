@@ -113,11 +113,14 @@ The Animations menu has five pages in `animations/`: **Random walks** (`walks.qm
 (`balls.qmd`), **Spectral law** (`spectral.qmd`) and **Read more** (`about.qmd`, the definitions, with
 pictures of the F_p-subgraphs), plus the landing page `index.qmd`. The interactive graph is one shared
 piece of markup, `_partials/isogeny-widget.qmd`, used by the home page and the animation pages; its
-**animation** menu switches between the random walk, the growing ball and the spectral law, and its
+**animation** menu switches between the graph viewer (the default on the home page), the random walk,
+the growing ball and the spectral law, and its
 **view** menu between the full graph, the F_p-subgraph and the quotient by Frobenius.
 
 - Data: `python3 _scripts/isogeny_graphs.py` writes `assets/data/isogeny/` (one file per prime, plus
-  `spectra.json` with the Hecke eigenvalues; add `--skip-spectra` to leave that file alone). The
+  `spectra.json` with histograms of the Hecke eigenvalues for about 100 primes; add `--skip-spectra`
+  to leave that file alone, or `--spectra-only` to remake only it). The Gamma(4) examples use their own
+  small primes (`GAMMA4_PRIMES`). The
   graphs and their caps are listed at the top of the script.
 - Pictures: `python3 _scripts/spine_diagrams.py` (F_p-subgraphs, `assets/img/spine/`, needs
   `pip install networkx`) and `python3 _scripts/ball_diagrams.py` (growing-ball figures).

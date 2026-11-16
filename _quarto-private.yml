@@ -20,7 +20,7 @@ website:
           - href: animations/walks.qmd
             text: Random walks
           - href: animations/balls.qmd
-            text: Growing balls
+            text: Blooming
           - href: animations/spectral.qmd
             text: Spectral law
           - href: animations/about.qmd

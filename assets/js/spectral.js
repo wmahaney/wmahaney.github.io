@@ -1,7 +1,9 @@
 // The spectral-law animation: eigenvalues of the Hecke operator T_l on S_2(Gamma_0(p))
 // for a growing list of primes p, as a histogram against the Kesten-McKay law.
-// Data: assets/data/isogeny/spectra.json, made by _scripts/isogeny_graphs.py
-// (the Brandt matrices of G_p(l) with the Eisenstein eigenvalue l + 1 removed).
+// Data: assets/data/isogeny/spectra.json, made by _scripts/isogeny_graphs.py: for about
+// 100 primes, a 60-bin histogram of the eigenvalues over [-2 sqrt l, 2 sqrt l] (the Brandt
+// matrix of G_p(l) without the Eisenstein eigenvalue l + 1) and the Kolmogorov distance
+// to the Kesten-McKay law. Between two primes the bars glide from one histogram to the next.
 //
 // Serre (1997): for fixed l, as p -> infinity the eigenvalues of T_l on S_2(Gamma_0(p))
 // become equidistributed in [-2 sqrt l, 2 sqrt l] for the Kesten-McKay law of the
@@ -20,41 +22,20 @@ const text = (parent, x, y, str, attrs = {}) => {
   t.textContent = str;
   return t;
 };
+const SUB = { 2: "₂", 3: "₃", 5: "₅" };
+const DISPLAY_BINS = 30;          // the 60 stored bins, merged in pairs
 
 export function kmDensity(q, x) {
   const r = 4 * q - x * x;
   return r <= 0 ? 0 : ((q + 1) / (2 * Math.PI)) * Math.sqrt(r) / ((q + 1) ** 2 - x * x);
 }
 
-// The Kesten-McKay distribution function on a fine grid (trapezoid rule, normalised).
-function kmCdf(q) {
-  const a = 2 * Math.sqrt(q), m = 4000, xs = [], cs = [0];
-  for (let i = 0; i <= m; i++) xs.push(-a + (2 * a * i) / m);
-  for (let i = 1; i <= m; i++) {
-    cs.push(cs[i - 1] + ((kmDensity(q, xs[i - 1]) + kmDensity(q, xs[i])) / 2) * (xs[i] - xs[i - 1]));
-  }
-  const total = cs[m];
-  return (x) => {
-    if (x <= -a) return 0;
-    if (x >= a) return 1;
-    const t = ((x + a) / (2 * a)) * m, i = Math.min(m - 1, Math.floor(t));
-    return (cs[i] + (cs[i + 1] - cs[i]) * (t - i)) / total;
-  };
-}
-
-// sup_x |F_empirical(x) - F_KM(x)|
-function kolmogorov(evs, F) {
-  const s = [...evs].sort((u, v) => u - v), n = s.length;
-  let d = 0;
-  s.forEach((x, i) => { d = Math.max(d, Math.abs((i + 1) / n - F(x)), Math.abs(i / n - F(x))); });
-  return d;
-}
-
 export function createSpectral({ svg, base, W, H, onStatus, reduced }) {
   const g = el("g", { class: "wm-spec" }, svg);
   g.style.display = "none";
   let data = null, ell = 2, idx = 0, t0 = 0, holdUntil = 0, active = false;
-  const cdfs = {}, dists = {};
+  let bars = [], shown = [], from = [], to = [], tweenStart = 0, tweenMs = 1;
+  let label = {}, inset = null;
 
   async function ensure() {
     if (!data) {
@@ -63,43 +44,46 @@ export function createSpectral({ svg, base, W, H, onStatus, reduced }) {
       data = await r.json();
     }
   }
-  function distances(l) {
-    if (!dists[l]) {
-      cdfs[l] = cdfs[l] || kmCdf(l);
-      dists[l] = data.map((row) => kolmogorov(row.eigenvalues[l], cdfs[l]));
-    }
-    return dists[l];
-  }
 
   // plot geometry
   const L = 56, R = W - 22, T = 128, B = H - 54;
-  function draw() {
-    const q = ell, a = 2 * Math.sqrt(q), row = data[idx], evs = row.eigenvalues[q];
-    const n = evs.length, D = distances(q);
-    const xmax = a * 1.1, X = (x) => L + ((x + xmax) / (2 * xmax)) * (R - L);
+  let X, Y, a, w;
+
+  function heights(k) {
+    const row = data.primes[k], counts = row.hist[ell], n = row.dim, out = [];
+    const per = counts.length / DISPLAY_BINS;
+    for (let b = 0; b < DISPLAY_BINS; b++) {
+      let c = 0;
+      for (let i = 0; i < per; i++) c += counts[b * per + i];
+      out.push(c / (n * w));
+    }
+    return out;
+  }
+
+  // Axes, curve and empty bars: once per choice of l.
+  function scaffold() {
+    const q = ell;
+    a = 2 * Math.sqrt(q);
+    w = (2 * a) / DISPLAY_BINS;
+    const xmax = a * 1.1;
+    X = (x) => L + ((x + xmax) / (2 * xmax)) * (R - L);
     let peak = 0;
     for (let i = 0; i <= 400; i++) peak = Math.max(peak, kmDensity(q, -a + (2 * a * i) / 400));
-    const ymax = peak * 1.75, Y = (y) => B - (Math.min(y, ymax) / ymax) * (B - T);
+    const ymax = peak * 1.75;
+    Y = (y) => B - (Math.min(y, ymax) / ymax) * (B - T);
     g.replaceChildren();
-
-    // histogram of the eigenvalues, bins over [-2 sqrt l, 2 sqrt l]
-    const nb = Math.max(10, Math.min(36, Math.round(1.7 * Math.sqrt(n)))), w = (2 * a) / nb;
-    const counts = new Array(nb).fill(0);
-    for (const x of evs) counts[Math.min(nb - 1, Math.max(0, Math.floor((x + a) / w)))] += 1;
-    counts.forEach((c, k) => {
-      if (!c) return;
-      const h = c / (n * w), x0 = X(-a + k * w), x1 = X(-a + (k + 1) * w);
-      el("rect", { class: "wm-spec-bar", x: (x0 + 1).toFixed(1), y: Y(h).toFixed(1),
-        width: Math.max(0.5, x1 - x0 - 2).toFixed(1), height: (B - Y(h)).toFixed(1), rx: 2 }, g);
-    });
-    // the Kesten-McKay density
+    bars = [];
+    for (let k = 0; k < DISPLAY_BINS; k++) {
+      const x0 = X(-a + k * w), x1 = X(-a + (k + 1) * w);
+      bars.push(el("rect", { class: "wm-spec-bar", x: (x0 + 1).toFixed(1), y: B,
+        width: Math.max(0.5, x1 - x0 - 2).toFixed(1), height: 0, rx: 2 }, g));
+    }
     let d = "";
     for (let i = 0; i <= 300; i++) {
       const x = -a + (2 * a * i) / 300;
       d += `${i ? "L" : "M"}${X(x).toFixed(1)},${Y(kmDensity(q, x)).toFixed(1)}`;
     }
     el("path", { class: "wm-spec-curve", d }, g);
-    // axes and ticks
     el("line", { class: "wm-spec-axis", x1: L, x2: R, y1: B, y2: B }, g);
     for (let t = -Math.floor(xmax); t <= Math.floor(xmax); t++) {
       el("line", { class: "wm-spec-tick", x1: X(t), x2: X(t), y1: B, y2: B + 5 }, g);
@@ -109,35 +93,61 @@ export function createSpectral({ svg, base, W, H, onStatus, reduced }) {
       el("line", { class: "wm-spec-edge", x1: X(s * a), x2: X(s * a), y1: T - 6, y2: B }, g);
       text(g, X(s * a), T - 10, `${s < 0 ? "−" : ""}2√${q}`, { class: "wm-spec-label", "text-anchor": "middle" });
     }
-    text(g, (L + R) / 2, H - 14, `eigenvalue λ of T${"₂₃₅"[[2, 3, 5].indexOf(q)]}`, {
-      class: "wm-spec-label", "text-anchor": "middle" });
-
-    // header: p and the size of the space
-    text(g, L, 34, `p = ${row.p}`, { class: "wm-spec-big" });
-    text(g, L, 56, `${n} eigenvalues = dim S₂(Γ₀(p))`, { class: "wm-spec-label" });
-    text(g, L, 76, `Kolmogorov distance ${D[idx].toFixed(3)}`, { class: "wm-spec-label" });
-
-    // inset: the distance against p, for the primes shown so far
+    text(g, (L + R) / 2, H - 14, `eigenvalue λ of T${SUB[q]}`, { class: "wm-spec-label", "text-anchor": "middle" });
+    label = {
+      p: text(g, L, 34, "", { class: "wm-spec-big" }),
+      dim: text(g, L, 56, "", { class: "wm-spec-label" }),
+      ks: text(g, L, 76, "", { class: "wm-spec-label" }),
+    };
+    // inset: the distance against p (log scale), for the primes shown so far
     const ix0 = W - 250, ix1 = W - 76, iy0 = 22, iy1 = 76;   // clear of the eye icon
-    const lp = (p) => Math.log(p), pmin = lp(data[0].p), pmax = lp(data[data.length - 1].p);
-    const dmax = Math.max(...D) * 1.1;
-    const IX = (p) => ix0 + ((lp(p) - pmin) / (pmax - pmin)) * (ix1 - ix0);
-    const IY = (v) => iy1 - (v / dmax) * (iy1 - iy0);
+    const lp = Math.log, pmin = lp(data.primes[0].p), pmax = lp(data.primes[data.primes.length - 1].p);
+    const dmax = Math.max(...data.primes.map((row) => row.ks[q])) * 1.1;
+    inset = {
+      IX: (p) => ix0 + ((lp(p) - pmin) / (pmax - pmin)) * (ix1 - ix0),
+      IY: (v) => iy1 - (v / dmax) * (iy1 - iy0),
+    };
     el("rect", { class: "wm-spec-inset", x: ix0 - 34, y: iy0 - 12, width: ix1 - ix0 + 44, height: iy1 - iy0 + 34, rx: 8 }, g);
     text(g, ix0 - 26, iy0 - 1, "distance", { class: "wm-spec-small" });
     text(g, ix1, iy1 + 16, "p →", { class: "wm-spec-small", "text-anchor": "end" });
-    let path = "";
-    for (let k = 0; k <= idx; k++) path += `${k ? "L" : "M"}${IX(data[k].p).toFixed(1)},${IY(D[k]).toFixed(1)}`;
-    el("path", { class: "wm-spec-trace", d: path }, g);
-    for (let k = 0; k <= idx; k++) {
-      el("circle", { class: k === idx ? "wm-spec-dot wm-spec-now" : "wm-spec-dot",
-        cx: IX(data[k].p).toFixed(1), cy: IY(D[k]).toFixed(1), r: k === idx ? 3.6 : 2.2 }, g);
-    }
-    text(g, ix0 - 26, iy1 + 16, `${data[0].p}`, { class: "wm-spec-small" });
+    text(g, ix0 - 26, iy1 + 16, `${data.primes[0].p}`, { class: "wm-spec-small" });
+    inset.trace = el("path", { class: "wm-spec-trace" }, g);
+    inset.dot = el("circle", { class: "wm-spec-dot wm-spec-now", r: 3.6 }, g);
+    shown = new Array(DISPLAY_BINS).fill(0);
+  }
 
-    onStatus(`T${"₂₃₅"[[2, 3, 5].indexOf(q)]} on S₂(Γ₀(${row.p})): ${n} eigenvalues. ` +
-      `Kolmogorov distance to the Kesten–McKay law: ${D[idx].toFixed(3)}` +
-      (idx === data.length - 1 ? " (largest p shown; the animation starts again)." : "."));
+  function paintBars(hs) {
+    hs.forEach((h, k) => {
+      const y = Y(h);
+      bars[k].setAttribute("y", y.toFixed(1));
+      bars[k].setAttribute("height", (B - y).toFixed(1));
+    });
+  }
+
+  // Move to prime number k: labels and inset now, bars by a short glide.
+  function goTo(k, now, ms) {
+    idx = k;
+    const row = data.primes[k], D = row.ks[ell];
+    label.p.textContent = `p = ${row.p}`;
+    label.dim.textContent = `${row.dim} eigenvalues = dim S₂(Γ₀(p))`;
+    label.ks.textContent = `Kolmogorov distance ${D.toFixed(3)}`;
+    let path = "";
+    for (let i = 0; i <= k; i++) {
+      const r = data.primes[i];
+      path += `${i ? "L" : "M"}${inset.IX(r.p).toFixed(1)},${inset.IY(r.ks[ell]).toFixed(1)}`;
+    }
+    inset.trace.setAttribute("d", path);
+    inset.dot.setAttribute("cx", inset.IX(row.p).toFixed(1));
+    inset.dot.setAttribute("cy", inset.IY(D).toFixed(1));
+    from = shown.slice();
+    to = heights(k);
+    tweenStart = now;
+    tweenMs = Math.max(1, ms * 0.85);
+    if (reduced) { shown = to.slice(); paintBars(shown); }
+    const last = k === data.primes.length - 1;
+    onStatus(`T${SUB[ell]} on S₂(Γ₀(${row.p})): ${row.dim} eigenvalues. ` +
+      `Kolmogorov distance to the Kesten–McKay law: ${D.toFixed(3)}` +
+      (last ? " (largest p shown; the animation starts again)." : "."));
   }
 
   return {
@@ -150,25 +160,36 @@ export function createSpectral({ svg, base, W, H, onStatus, reduced }) {
       }
       if (!active) return;
       g.style.display = "";
-      idx = reduced ? data.length - 1 : 0;
+      scaffold();
       t0 = performance.now(); holdUntil = 0;
-      draw();
+      goTo(reduced ? data.primes.length - 1 : 0, t0, 600);
     },
     hide() { active = false; g.style.display = "none"; },
-    setEll(l) { ell = Number(l); if (active && data) draw(); },
+    setEll(l) {
+      ell = Number(l);
+      if (active && data) {
+        scaffold();
+        goTo(idx, performance.now(), 600);
+        if (reduced) paintBars(shown);
+      }
+    },
     step(now, ms) {
       if (!active || !data || reduced) return;
+      // the glide between two histograms
+      const t = Math.min(1, (now - tweenStart) / tweenMs), e = t * t * (3 - 2 * t);
+      shown = from.map((f, k) => f + (to[k] - f) * e);
+      paintBars(shown);
       if (holdUntil) {
         if (now < holdUntil) return;
-        holdUntil = 0; idx = 0; t0 = now; draw();
+        holdUntil = 0; t0 = now;
+        goTo(0, now, ms);
         return;
       }
       if (now - t0 < ms) return;
       t0 = now;
-      if (idx < data.length - 1) {
-        idx += 1;
-        draw();
-        if (idx === data.length - 1) holdUntil = now + 4 * ms;
+      if (idx < data.primes.length - 1) {
+        goTo(idx + 1, now, ms);
+        if (idx === data.primes.length - 1) holdUntil = now + 8 * ms;
       }
     },
   };

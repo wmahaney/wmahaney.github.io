@@ -14,7 +14,7 @@ This page states exactly what the [animations](walks.qmd) draw. Everything is co
 - $p \geq 5$ is prime, and $\mathbb{F}_{p^2} = \mathbb{F}_p(i)$ with $i^2 = r$ a quadratic non-residue ($r = -1$ when $p \equiv 3 \pmod 4$). Each $j$-invariant is written $a + bi$ with $a, b \in \mathbb{F}_p$.
 - $S$ is the set of supersingular $j$-invariants. They all lie in $\mathbb{F}_{p^2}$, and $\#S = \lfloor p/12 \rfloor + \{0, 1, 1, 2\}$ for $p \equiv 1, 5, 7, 11 \pmod{12}$.
 - **Edges are directed and counted by kernels.** For a prime $\ell \neq p$, each of the $\ell + 1$ subgroups $K \subset E[\ell]$ of order $\ell$ gives an edge $E \to E/K$. Without level structure, the adjacency matrix $A$ satisfies $A_{ij}\,\lvert\mathrm{Aut}(E_j)\rvert = A_{ji}\,\lvert\mathrm{Aut}(E_i)\rvert$ (*checked*), so it is symmetric away from $j = 0, 1728$.
-- **Drawing.** Between two vertices of an undirected graph, $\max(A_{ij}, A_{ji})$ edges are drawn as parallel arcs, and $E/K \cong E$ is drawn as a loop. Vertices are labelled by $j$-invariants (with level structure, by $j(E)$).
+- **Drawing.** Between two vertices of an undirected graph, $\max(A_{ij}, A_{ji})$ edges are drawn as parallel arcs, and $E/K \cong E$ is drawn as a loop. Vertices are labelled by $j$-invariants (with level structure, by $j(E)$). How the unbalanced edges at $j = 0, 1728$ are handled is explained [below](#directed).
 
 ## The graphs
 
@@ -38,7 +38,40 @@ A vertex is a pair $(E, \pm P)$ with $P \in E$ a point of order 5, up to isomorp
 
 ### Full level structure $\Gamma(2)$: $G_p(3)$ {#graph-3g2}
 
-A small example of full level structure. A vertex is a pair $(E, (P, Q))$ with $(P, Q)$ an ordered basis of $E[2]$, up to isomorphism. Write $e_1, e_2, e_3$ for the $x$-coordinates of $P, Q, P + Q$. Then the Legendre invariant $\lambda = (e_3 - e_1)/(e_2 - e_1)$ is a complete invariant, so the vertices are the supersingular $\lambda$: the roots of the Hasse polynomial $\sum_{i=0}^{m} \binom{m}{i}^2 \lambda^i$, $m = (p-1)/2$. There are exactly $(p-1)/2$ of them (*checked*). A 3-isogeny $\varphi$ gives $(E, (P, Q)) \to (E/K, (\varphi P, \varphi Q))$. Since $3 \equiv 1 \pmod 2$, the dual returns the same basis, so this graph is undirected. The mass is $(p-1)/4$ (*checked*). Offered for $p \le 431$.
+A small example of full level structure. (Why $N = 2$: for full level $N$ the Weil pairing $e_N(P, Q)$ is an invariant, and an $\ell$-isogeny sends it to $e_N(P, Q)^\ell$, so the graph splits into at least as many pieces as there are orbits of multiplication by $\ell$ on $(\mathbb{Z}/N)^\times$. For $N = 2$ there is one; for $\Gamma(5)$ with $\ell = 2$ there is also one, since 2 generates $(\mathbb{Z}/5)^\times$, but the four Weil-pairing classes are visited cyclically, which gives eigenvalues $3, 3i, -3, -3i$ of modulus 3.) A vertex is a pair $(E, (P, Q))$ with $(P, Q)$ an ordered basis of $E[2]$, up to isomorphism. Write $e_1, e_2, e_3$ for the $x$-coordinates of $P, Q, P + Q$. Then the Legendre invariant $\lambda = (e_3 - e_1)/(e_2 - e_1)$ is a complete invariant, so the vertices are the supersingular $\lambda$: the roots of the Hasse polynomial $\sum_{i=0}^{m} \binom{m}{i}^2 \lambda^i$, $m = (p-1)/2$. There are exactly $(p-1)/2$ of them (*checked*). A 3-isogeny $\varphi$ gives $(E, (P, Q)) \to (E/K, (\varphi P, \varphi Q))$. Since $3 \equiv 1 \pmod 2$, the dual returns the same basis, so this graph is undirected. The mass is $(p-1)/4$ (*checked*). Offered for $p \le 431$.
+
+### Full level structure $\Gamma(4)$: $G_p(3)$ and $G_p(5)$, two examples of disconnection {#graph-3g4}
+
+A vertex is $(E, (P, Q))$ with $(P, Q)$ an ordered basis of $E[4]$, up to isomorphism. The examples use primes $p \equiv 3 \pmod 4$ from 11 to 103. Every supersingular curve has a model over $\mathbb{F}_{p^2}$ whose $p^2$-Frobenius is $-p$. On it $E[N] \subset E(\mathbb{F}_{p^2})$ whenever $N \mid p + 1$, so for these primes all of $E[4]$, and every point the script needs, is defined over $\mathbb{F}_{p^2}$. Isomorphisms act by $(a, b, x, y) \mapsto (u^4 a, u^6 b, u^2 x, u^3 y)$, so $(a/x_P^2,\ b/x_P^3,\ x_Q/x_P,\ y_Q/y_P)$ is a complete invariant. Edges push $P$ and $Q$ through Vélu's formulas.
+
+- **Vertices.** For $N \ge 3$ an automorphism fixing a basis of $E[N]$ is the identity, so there are $\sum_E \lvert\mathrm{GL}_2(\mathbb{Z}/4)\rvert / \lvert\mathrm{Aut}\,E\rvert = 96 \cdot (p-1)/24 = 4(p-1)$ vertices (*checked*), and the graphs are undirected.
+- **The Weil pairing splits the vertices into two classes.** $e_4(P, Q)$ is a primitive 4th root of unity, $\pm i$, and an $\ell$-isogeny $\varphi$ satisfies $e_4(\varphi P, \varphi Q) = e_4(P, Q)^{\ell}$.
+  - For $\ell = 3 \equiv -1 \pmod 4$ every edge joins the two classes. "3 · Γ(4)" is connected but **bipartite**, with eigenvalue $-4$.
+  - For $\ell = 5 \equiv 1 \pmod 4$ no edge leaves a class. "5 · Γ(4)" is **disconnected**: it has exactly two components, and the eigenvalue 6 appears twice.
+  - *Checked*: the 3-graph is bipartite, the 5-graph has exactly two components, and these components are exactly the two sides of the bipartition. The two classes are coloured differently.
+- **Frobenius swaps the classes.** $e_4(\sigma P, \sigma Q) = e_4(P, Q)^p = e_4(P, Q)^{-1}$ since $p \equiv 3 \pmod 4$. So no vertex is fixed, the $\mathbb{F}_p$-subgraph is always empty, and the quotient by Frobenius glues the two classes together.
+
+In general, with full level $N$ the graph splits into at least as many pieces as there are orbits of $\ell$ acting by multiplication on $(\mathbb{Z}/N)^\times$. This is the smallest example within reach here: $\ell \in \{2, 3, 5\}$, and the level small enough to draw.
+
+## Directed edges in the pictures {#directed}
+
+**Where the edge counts are unbalanced.** Edges are counted by kernels, so $A_{ij}$ is the number of subgroups $K \subset E_i$ with $E_i/K \cong E_j$. The Brandt relation $A_{ij}\,\lvert\mathrm{Aut}\,E_j\rvert = A_{ji}\,\lvert\mathrm{Aut}\,E_i\rvert$ makes $A$ symmetric except at vertices with more automorphisms than $\pm1$:
+
+- without level structure, $j = 0$ (when $p \equiv 2 \pmod 3$) and $j = 1728$ (when $p \equiv 3 \pmod 4$);
+- with level structure, the vertices over those two $j$-invariants whose automorphism group is larger than $\pm1$.
+
+For example, in $G_p(2)$ at $p = 431$ there are 3 kernels from $j = 0$ to $j = 125$ but only 1 back, and 2 from $j = 1728$ (written 4) to $j = 19$ but only 1 back. For $p \equiv 1 \pmod{12}$ neither $j = 0$ nor $j = 1728$ is supersingular, and $A$ is symmetric.
+
+**What the pictures do.** All primes are kept; I do **not** restrict to $p \equiv 1 \pmod{12}$, and no edges are thrown away.
+
+- **Drawing:** between two vertices the picture draws $\max(A_{ij}, A_{ji})$ undirected edges. So at $p = 431$ there are 3 edges between $0$ and $125$, without arrows.
+- **Random walk and growing ball:** both move along the drawn edges, in either direction. So the random walk is the simple random walk on this symmetrised multigraph, not the walk that picks one of the $\ell + 1$ kernels uniformly; the two differ only at the vertices above. Likewise the ball's distances are distances in the drawn graph.
+- **Second-largest eigenvalue and spectral law:** these use the true directed matrices $A$ (equivalently the symmetric matrix $D^{-1/2}(AD)D^{-1/2}$ with $D = \mathrm{diag}\,\lvert\mathrm{Aut}\rvert$, which is similar to $A$).
+- **Edge counts on this page:** these are directed counts, kernel by kernel.
+- **𝔽ₚ-subgraph and its alternative display:** induced from the drawn graph.
+- **Quotient by Frobenius:** computed from the directed edges (orbits of kernels), then drawn with $\max(B_{ij}, B_{ji})$ in the same way.
+- **The one genuinely directed graph, $G_p(2)$ with $\Gamma_1(5)$:** there $A_{vw} \ne 0$ does not imply $A_{wv} \ne 0$, because the dual edge returns to $(E, \pm 2P)$. Every arc is drawn separately, and the walk and the ball follow arcs only forwards.
+- **$\Gamma(4)$:** no vertex has a nontrivial automorphism, so $A$ is symmetric for every $p$ (*checked*).
 
 ## Frobenius {#frobenius}
 
@@ -69,18 +102,33 @@ Some examples, one prime per residue class. Each panel gives the numbers of vert
 
 ![$G_p(\{2,3\})$ with $\Gamma_0(5)$ structure, by $p \bmod 24$ (primes with $p \equiv \pm1 \pmod 5$).](../assets/img/spine/spine-23b5.svg)
 
+### An alternative display for level structure {#over}
+
+For a graph with level structure, forgetting the level structure maps it onto $G_p(\ell)$. The **part over the $\mathbb{F}_p$-subgraph** is the subgraph induced on the vertices $(E, \cdot)$ with $j(E) \in \mathbb{F}_p$, that is, on the preimage of the $\mathbb{F}_p$-subgraph of $G_p(\ell)$. Frobenius maps it to itself. Its fixed vertices (gold) span the $\mathbb{F}_p$-subgraph of the level-structure graph; the other vertices (blue) are joined to their Frobenius images by dashed lines. On the animations page this is the fourth option of the view menu, offered for the graphs with level structure.
+
+Below, one prime per residue class. The header of each panel counts the components of the subgraph itself; the shaded boxes group pieces that Frobenius joins. As the [proposition below](#fixed-level) predicts, there are no gold vertices for $\Gamma_0(5)$ when $p \equiv \pm 2 \pmod 5$, for $\Gamma_1(5)$ unless $p \equiv 4 \pmod 5$, and for $\Gamma(2)$ when $p \equiv 1 \pmod 4$.
+
+![$G_p(2)$ with $\Gamma_0(5)$ structure over the $\mathbb{F}_p$-subgraph, by $p \bmod 5$.](../assets/img/spine/over-2b5.svg)
+
+![$G_p(2)$ with $\Gamma_1(5)$ structure over the $\mathbb{F}_p$-subgraph, by $p \bmod 5$ (a directed graph, drawn without arrows).](../assets/img/spine/over-2g15.svg)
+
+![$G_p(3)$ with $\Gamma(2)$ structure over the $\mathbb{F}_p$-subgraph, by $p \bmod 8$.](../assets/img/spine/over-3g2.svg)
+
 ## The quotient by Frobenius {#folded}
 
 **Definition.** The vertices of the quotient are the orbits of Frobenius on vertices, and its directed edges are the orbits of Frobenius on directed edges, running from the orbit of the source to the orbit of the target. This is well defined because Frobenius respects sources and targets.
 
 The edge orbits need Frobenius on edges, not just on vertices, so the script computes them and the page only draws them. When Frobenius is an involution, the quotient has $(n + f_V)/2$ vertices and $(\lvert E\rvert + f_E)/2$ directed edges, where $f_V$ and $f_E$ count the fixed vertices and fixed directed edges. A fixed vertex $v$ with $f_v$ fixed outgoing edges has $(\deg v + f_v)/2$ outgoing edges in the quotient. For example, a vertex of $G_p(2)$ with $j \in \mathbb{F}_p$ and $p \equiv 1 \pmod 4$ has one fixed outgoing edge (Delfs–Galbraith), so 2 outgoing edges in the quotient.
 
-## Growing balls {#ball}
+## Blooming {#ball}
 
-The [growing-ball animation](balls.qmd) runs a breadth-first search from a random vertex $v$ in the full graph, one layer at a time.
+Both blooming animations grow a ball from a vertex $v$ by breadth-first search, one layer at a time.
 
-- **On the full graph** it stops once the ball contains two vertices of one Frobenius orbit, for instance $w$ and $w^{(p)} \neq w$. Since $\sigma$ preserves distances, $w, \sigma w \in B_r(v)$ exactly when $w \in B_r(v) \cap B_r(\sigma v)$. Joining the two shortest paths gives a path from $E$ to $E^{(p)}$ of length at most $2r$, and composing it with Frobenius gives an endomorphism of $E$.
-- **On the quotient by Frobenius** the ball is the image of the ball upstairs, and it remembers which lift it reached each vertex by. It stops at the first self-collision, when a vertex is reached again by a different lift (the condition above), or when it reaches the $\mathbb{F}_p$-subgraph (a vertex fixed by Frobenius), whichever comes first.
+- **Blooming for collision** searches the graph shown. It stops at the first edge that reaches a vertex already in the ball, other than along the tree edge it came in by. Such an edge closes a cycle through the tree; the shortest one found in that layer is drawn. Loops (length 1) and parallel edges (length 2) count. In the directed $\Gamma_1(5)$ graph the search follows arcs forwards, so it stops when two shortest paths from $v$ meet, which is a cycle only once directions are ignored. The cycle drawn runs through the last common ancestor of its two ends in the search tree, which need not be $v$.
+- **Blooming for conjugates** always searches the full graph ("upstairs"), even when the picture shows the quotient.
+  - **On the full graph** it stops once the ball contains two vertices of one Frobenius orbit, for instance $w$ and $w^{(p)} \neq w$. Since $\sigma$ preserves distances, $w, \sigma w \in B_r(v)$ exactly when $w \in B_r(v) \cap B_r(\sigma v)$. Joining the two shortest paths gives a path from $E$ to $E^{(p)}$ of length at most $2r$, and composing it with Frobenius gives an endomorphism of $E$.
+  - **On the quotient by Frobenius** the ball is the image of the ball upstairs, and it remembers which lift it reached each vertex by. It stops at the first self-collision, when a vertex is reached again by a different lift (the condition above), or when it reaches the $\mathbb{F}_p$-subgraph (a vertex fixed by Frobenius), whichever comes first.
+- On the disconnected $\Gamma(4)$ graph a ball can fill its whole component without stopping, since Frobenius swaps the components; the animation says so.
 
 ## The spectral law {#spectral}
 
@@ -90,7 +138,7 @@ For $\ell \neq p$ the adjacency matrix of $G_p(\ell)$ is the Brandt matrix $B(\e
 $$\mu_\ell = \frac{\ell+1}{2\pi}\,\frac{\sqrt{4\ell - x^2}}{(\ell+1)^2 - x^2}\,dx \quad\text{on } [-2\sqrt\ell, 2\sqrt\ell],$$
 the spectral measure of the $(\ell+1)$-regular tree (Kesten, McKay).
 
-The animation shows the histogram of the eigenvalues for 21 primes from 101 to 20369, with the density of $\mu_\ell$ in red. The inset tracks the Kolmogorov distance $\sup_x \lvert F_p(x) - F_\ell(x)\rvert$ between the empirical distribution function and that of $\mu_\ell$. For $\ell = 2$ it falls from 0.125 at $p = 101$ to 0.005 at $p = 20369$; for $\ell = 3$ from 0.197 to 0.008; for $\ell = 5$ from 0.232 to 0.008. These eigenvalues are stored in `assets/data/isogeny/spectra.json`.
+The animation shows the histogram of the eigenvalues for 99 primes, roughly geometrically spaced from 101 to 20011, with the density of $\mu_\ell$ in red. Between two primes the bars move continuously from one histogram to the next. The script stores a 60-bin histogram and the distance for each prime, rather than the eigenvalues, which keeps the file small. The inset tracks the Kolmogorov distance $\sup_x \lvert F_p(x) - F_\ell(x)\rvert$ between the empirical distribution function and that of $\mu_\ell$. For $\ell = 2$ it falls from 0.125 at $p = 101$ to 0.006 at $p = 20011$; for $\ell = 3$ from 0.197 to 0.007; for $\ell = 5$ from 0.232 to 0.007. The data is in `assets/data/isogeny/spectra.json`.
 
 ## When the $\mathbb{F}_p$-subgraph is empty {#fixed-level}
 
@@ -140,7 +188,8 @@ For every prime it computes, the script stops with an error unless all of the fo
 - The Brandt symmetry holds (twisted by $\langle 2\rangle$ for $\Gamma_1(5)$).
 - The masses are $(p-1)/4$ ($\Gamma_0(5)$), $(p-1)/2$ ($\Gamma_1(5)$) and $(p-1)/4$ ($\Gamma(2)$), and $\Gamma(2)$ has $(p-1)/2$ vertices.
 - Frobenius is an automorphism on vertices and edges, of order 2, except that on $\Gamma_1(5)$ its square is $\langle p\rangle$.
-- The second-largest eigenvalue is within the Ramanujan bound, and every eigenvalue of $T_\ell$ on $S_2(\Gamma_0(p))$ lies in $[-2\sqrt\ell, 2\sqrt\ell]$.
+- The second-largest eigenvalue is within the Ramanujan bound (except for $\Gamma(4)$, which is bipartite or disconnected by design), and every eigenvalue of $T_\ell$ on $S_2(\Gamma_0(p))$ lies in $[-2\sqrt\ell, 2\sqrt\ell]$.
+- For $\Gamma(4)$: there are $4(p-1)$ vertices, every pushed point lies on the image curve, the adjacency matrices are symmetric, Frobenius is an involution on vertices and edges, the 3-graph is bipartite, and the two components of the 5-graph are the two sides of the bipartition.
 
 ## Sources
 

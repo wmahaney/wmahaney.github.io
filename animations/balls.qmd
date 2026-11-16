@@ -1,11 +1,12 @@
 ---
-title: "Growing balls"
+title: "Blooming"
 description-meta: "Balls in supersingular isogeny graphs grown until they contain a Frobenius conjugate pair."
 ---
 
-Pick a vertex $v$ of a supersingular isogeny graph and grow the ball $B_r(v)$ around it one layer at a time, $r = 0, 1, 2, \dots$, until it contains a vertex $w$ together with its Frobenius conjugate $w^{(p)} \neq w$. The animation does this from a random vertex, shows where it stopped in red and the shortest paths from the centre in bold, then starts again elsewhere. Tap a vertex to grow a ball from it.
+Two animations grow a ball $B_r(v)$ around a vertex $v$, one layer at a time ($r = 0, 1, 2, \dots$), and stop at different events. Choose one in the **animation** menu, and tap a vertex to start from it.
 
-Switch the **view** to the **quotient by Frobenius** for a second version. There the ball remembers which lift it reached each vertex by, and it stops at the first **self-collision** (a vertex reached again by the other lift, which is the condition above) or when it **reaches the $\mathbb{F}_p$-subgraph**, whichever comes first.
+- **Blooming for collision** stops when the ball first runs into itself: an edge reaches a vertex that is already in the ball, other than along the edge it came in by, closing a cycle. The cycle is shown in bold. It works in every view.
+- **Blooming for conjugates** stops when the ball contains a vertex $w$ together with its Frobenius conjugate $w^{(p)} \neq w$. Where it stopped is red and the shortest paths from the centre are bold. In the **quotient by Frobenius** it stops at the first **self-collision** (a vertex reached again by another lift, which is the same condition) or when it **reaches the $\mathbb{F}_p$-subgraph**, whichever comes first.
 
 ::: {data-mode="ball"}
 {{< include /_partials/isogeny-widget.qmd >}}
@@ -15,7 +16,7 @@ Switch the **view** to the **quotient by Frobenius** for a second version. There
 <script type="module" src="../assets/js/isogeny-hero.js"></script>
 ```
 
-## Why the pair is worth finding
+## Blooming for conjugates: why the pair is worth finding
 
 Frobenius $\sigma\colon E \mapsto E^{(p)}$ is an automorphism of the graph, so it preserves distances. Hence $w$ and $\sigma(w)$ both lie in $B_r(v)$ exactly when $w$ lies in $B_r(v) \cap B_r(\sigma(v))$. Write $E$ for the curve at $v$. The conjugate of a shortest path from $v$ to $\sigma(w)$ runs from $\sigma(v)$ to $w$; following the path from $v$ to $w$ and then that conjugate path backwards gives a path from $E$ to $E^{(p)}$ of length at most $2r$. Composing it with the Frobenius isogeny $E^{(p)} \to E^{(p^2)} \cong E$ gives an endomorphism of $E$.
 
