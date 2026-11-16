@@ -38,7 +38,7 @@ A vertex is a pair $(E, \pm P)$ with $P \in E$ a point of order 5, up to isomorp
 
 ### Full level structure $\Gamma(2)$: $G_p(3)$ {#graph-3g2}
 
-A small example of full level structure. A vertex is a pair $(E, (P, Q))$ with $(P, Q)$ an ordered basis of $E[2]$, up to isomorphism. Write $e_1, e_2, e_3$ for the $x$-coordinates of $P, Q, P + Q$. Then the Legendre invariant $\lambda = (e_3 - e_1)/(e_2 - e_1)$ is a complete invariant, so the vertices are the supersingular $\lambda$: the roots of the Hasse polynomial $\sum_{i=0}^{m} \binom{m}{i}^2 \lambda^i$, $m = (p-1)/2$. There are exactly $(p-1)/2$ of them (*checked*). A 3-isogeny $\varphi$ gives $(E, (P, Q)) \to (E/K, (\varphi P, \varphi Q))$. Since $3 \equiv 1 \pmod 2$, the dual returns the same basis, so this graph is undirected. The mass is $(p-1)/4$ (*checked*). Offered for $p \le 431$.
+A small example of full level structure. (Why $N = 2$: for full level $N$ the Weil pairing $e_N(P, Q)$ is an invariant, and an $\ell$-isogeny sends it to $e_N(P, Q)^\ell$, so the graph splits into at least as many pieces as there are orbits of multiplication by $\ell$ on $(\mathbb{Z}/N)^\times$. For $N = 2$ there is one; for $\Gamma(5)$ with $\ell = 2$ there is also one, since 2 generates $(\mathbb{Z}/5)^\times$, but the four Weil-pairing classes are visited cyclically, which gives eigenvalues $3, 3i, -3, -3i$ of modulus 3.) A vertex is a pair $(E, (P, Q))$ with $(P, Q)$ an ordered basis of $E[2]$, up to isomorphism. Write $e_1, e_2, e_3$ for the $x$-coordinates of $P, Q, P + Q$. Then the Legendre invariant $\lambda = (e_3 - e_1)/(e_2 - e_1)$ is a complete invariant, so the vertices are the supersingular $\lambda$: the roots of the Hasse polynomial $\sum_{i=0}^{m} \binom{m}{i}^2 \lambda^i$, $m = (p-1)/2$. There are exactly $(p-1)/2$ of them (*checked*). A 3-isogeny $\varphi$ gives $(E, (P, Q)) \to (E/K, (\varphi P, \varphi Q))$. Since $3 \equiv 1 \pmod 2$, the dual returns the same basis, so this graph is undirected. The mass is $(p-1)/4$ (*checked*). Offered for $p \le 431$.
 
 ## Frobenius {#frobenius}
 
@@ -68,6 +68,18 @@ Some examples, one prime per residue class. Each panel gives the numbers of vert
 ![$G_p(2)$ with $\Gamma_0(5)$ structure, by $p \bmod 24$ (primes with $p \equiv \pm1 \pmod 5$; for the others it is empty).](../assets/img/spine/spine-2b5.svg)
 
 ![$G_p(\{2,3\})$ with $\Gamma_0(5)$ structure, by $p \bmod 24$ (primes with $p \equiv \pm1 \pmod 5$).](../assets/img/spine/spine-23b5.svg)
+
+### An alternative display for level structure {#over}
+
+For a graph with level structure, forgetting the level structure maps it onto $G_p(\ell)$. The **part over the $\mathbb{F}_p$-subgraph** is the subgraph induced on the vertices $(E, \cdot)$ with $j(E) \in \mathbb{F}_p$, that is, on the preimage of the $\mathbb{F}_p$-subgraph of $G_p(\ell)$. Frobenius maps it to itself. Its fixed vertices (gold) span the $\mathbb{F}_p$-subgraph of the level-structure graph; the other vertices (blue) are joined to their Frobenius images by dashed lines. On the animations page this is the fourth option of the view menu, offered for the graphs with level structure.
+
+Below, one prime per residue class. The header of each panel counts the components of the subgraph itself; the shaded boxes group pieces that Frobenius joins. As the [proposition below](#fixed-level) predicts, there are no gold vertices for $\Gamma_0(5)$ when $p \equiv \pm 2 \pmod 5$, for $\Gamma_1(5)$ unless $p \equiv 4 \pmod 5$, and for $\Gamma(2)$ when $p \equiv 1 \pmod 4$.
+
+![$G_p(2)$ with $\Gamma_0(5)$ structure over the $\mathbb{F}_p$-subgraph, by $p \bmod 5$.](../assets/img/spine/over-2b5.svg)
+
+![$G_p(2)$ with $\Gamma_1(5)$ structure over the $\mathbb{F}_p$-subgraph, by $p \bmod 5$ (a directed graph, drawn without arrows).](../assets/img/spine/over-2g15.svg)
+
+![$G_p(3)$ with $\Gamma(2)$ structure over the $\mathbb{F}_p$-subgraph, by $p \bmod 8$.](../assets/img/spine/over-3g2.svg)
 
 ## The quotient by Frobenius {#folded}
 

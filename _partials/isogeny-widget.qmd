@@ -25,9 +25,10 @@
           <option value="full" selected>full graph</option>
           <option value="spine">𝔽ₚ-subgraph</option>
           <option value="folded">quotient by Frobenius</option>
+          <option value="over" hidden>over the 𝔽ₚ-subgraph (level structure)</option>
         </select>
       </label>
-      <button type="button" class="wm-q" data-terms="full spine folded frobenius pair" aria-label="What do full graph, F_p-subgraph and quotient by Frobenius mean?" aria-expanded="false">?</button>
+      <button type="button" class="wm-q" data-terms="full spine folded over frobenius pair" aria-label="What do full graph, F_p-subgraph and quotient by Frobenius mean?" aria-expanded="false">?</button>
       <label class="wm-graph-prime">p = <select aria-label="Characteristic p"></select></label>
       <label class="wm-graph-labels"><input type="checkbox" checked> j labels</label>
       <button type="button" class="wm-q" data-terms="p jinv fp" aria-label="What is p?" aria-expanded="false">?</button>
@@ -83,6 +84,7 @@
       <span class="wm-graph-legend-fp"><i class="wm-key wm-key-fp"></i><span>fixed by Frobenius</span></span>
       <span><i class="wm-key wm-key-2"></i>2-isogeny</span>
       <span class="wm-graph-legend-3" hidden><i class="wm-key wm-key-3"></i>3-isogeny</span>
+      <span class="wm-graph-legend-frob" hidden><i class="wm-key wm-key-frob"></i>Frobenius</span>
       <span class="wm-graph-legend-5" hidden><i class="wm-key wm-key-5"></i>5-isogeny</span>
       <span class="wm-graph-legend-spec"><i class="wm-key wm-key-bar"></i>eigenvalues (histogram) <i class="wm-key wm-key-3"></i>Kesten–McKay density</span>
       <span class="wm-graph-legend-ball"><i class="wm-key wm-key-ball"></i>ball <i class="wm-key wm-key-hit"></i>shortest paths to the conjugate pair (red)</span>
@@ -120,6 +122,8 @@
       <dd>Every vertex and every edge.</dd>
       <dt data-term="spine">F<sub>p</sub>-subgraph (the spine)</dt>
       <dd>The subgraph induced on the vertices fixed by Frobenius: those vertices and every edge of the graph between them, whether or not Frobenius fixes the edge. With level structure it can be empty (the "?" in the empty box says why). When it is not connected the random walk is switched off.</dd>
+      <dt data-term="over">Over the F<sub>p</sub>-subgraph (level structure only)</dt>
+      <dd>An alternative display of the F<sub>p</sub>-part of a graph with level structure: all vertices (E, ·) whose curve has j(E) in F<sub>p</sub>, i.e. the vertices lying over the F<sub>p</sub>-subgraph of the graph without level structure, and the edges between them. The ones fixed by Frobenius (gold) form the F<sub>p</sub>-subgraph proper; dashed lines join each other vertex to its Frobenius image.</dd>
       <dt data-term="folded">Quotient by Frobenius</dt>
       <dd>Its vertices are the orbits of Frobenius on vertices (a conjugate pair becomes one vertex, drawn larger with a gold ring) and its edges are the orbits of Frobenius on edges. Two parallel edges with conjugate kernels between two vertices with j in F<sub>p</sub> are swapped by Frobenius and become one edge.</dd>
       <dt data-term="walk">Random walk</dt>

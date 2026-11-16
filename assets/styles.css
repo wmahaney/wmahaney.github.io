@@ -983,3 +983,8 @@ body.quarto-dark .quarto-color-scheme-toggle .bi::before,
 .wm-spec-dot { fill: var(--wm-accent); }
 .wm-spec-dot.wm-spec-now { fill: var(--wm-red); }
 .wm-key-bar { width: 0.7rem; height: 0.7rem; border-radius: 2px; background: var(--wm-accent); opacity: 0.6; }
+
+/* "Over the F_p-subgraph" view: Frobenius drawn as dashed links */
+.wm-g-frob { stroke: #7A3E9D; stroke-width: 1.4; stroke-dasharray: 4 4; opacity: 0.75; }
+.wm-key-frob { width: 1rem; height: 0; border-top: 2px dashed #7A3E9D; background: none !important; }
+.wm-spec-mode .wm-g-frobs { display: none; }

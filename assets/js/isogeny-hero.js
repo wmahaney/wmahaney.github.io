@@ -28,25 +28,25 @@ const KINDS = {
       `joined by 2-, 3- and 5-isogenies.`,
   },
   "2b5": {
-    defaultP: 101, ells: [2], bound: "2√2", boundVal: 2 * Math.SQRT2,
+    defaultP: 101, level: true, ells: [2], bound: "2√2", boundVal: 2 * Math.SQRT2,
     caption: (p, n) => `The 2-isogeny graph with Borel level-5 structure in characteristic ${p}: ` +
       `${n} pairs (E, C), where C is a subgroup of E of order 5.`,
   },
   "23b5": {
-    defaultP: 101, ells: [2, 3], bound: "2√2 + 2√3",
+    defaultP: 101, level: true, ells: [2, 3], bound: "2√2 + 2√3",
     boundVal: 2 * Math.SQRT2 + 2 * Math.sqrt(3),
     caption: (p, n) => `The (2,3)-isogeny graph with Borel level-5 structure in characteristic ${p}: ` +
       `${n} pairs (E, C), where C is a subgroup of E of order 5.`,
   },
   "2g15": {
-    defaultP: 101, ells: [2], bound: "2√2", boundVal: 2 * Math.SQRT2,
+    defaultP: 101, level: true, ells: [2], bound: "2√2", boundVal: 2 * Math.SQRT2,
     caption: (p, n) => `The 2-isogeny graph with Γ₁(5) structure in characteristic ${p}: ` +
       `${n} pairs (E, ±P), where P is a point of order 5. It is directed: the dual of an edge ` +
       "out of (E, ±P) leads back to (E, ±2P), so the walk follows the edges' directions.",
     tip: (l) => `(j(E), j(E/⟨P⟩)) = (${l[0]}, ${l[1]})`,
   },
   "3g2": {
-    defaultP: 101, ells: [3], bound: "2√3", boundVal: 2 * Math.sqrt(3),
+    defaultP: 101, level: true, ells: [3], bound: "2√3", boundVal: 2 * Math.sqrt(3),
     caption: (p, n) => `The 3-isogeny graph with full level-2 structure in characteristic ${p}: ` +
       `${n} pairs (E, (P, Q)), (P, Q) an ordered basis of E[2]; these are the supersingular ` +
       "Legendre invariants λ, and there are (p − 1)/2 of them.",
@@ -70,7 +70,8 @@ const EMPTY_WHY = {
 EMPTY_WHY["23b5"] = EMPTY_WHY["2b5"];
 
 // The view menu's names for the three views.
-const VIEW_NAME = { full: "full graph", spine: "F_p-subgraph", folded: "quotient by Frobenius" };
+const VIEW_NAME = { full: "full graph", spine: "F_p-subgraph", folded: "quotient by Frobenius",
+                    over: "part over the F_p-subgraph of G_p" };
 
 // The three ways to look at each graph (the data come from _scripts/isogeny_graphs.py).
 //  full    every vertex and edge.
@@ -90,6 +91,25 @@ function derive(g, view) {
       nodes: keep.map((i) => ({ label: g.nodes[i], members: [i], fp: true })),
       links: g.links.filter(([s, t]) => at.has(s) && at.has(t))
         .map(([s, t, ell, m]) => [at.get(s), at.get(t), ell, m]),
+    };
+  }
+  if (view === "over") {
+    // Level structure only: the vertices (E, .) whose curve E has j(E) in F_p, i.e. the
+    // preimage of the F_p-subgraph of the graph without level structure, and the edges
+    // between them. The vertices fixed by Frobenius (the F_p-subgraph proper) are gold,
+    // and Frobenius itself is drawn as dashed links v - sigma(v).
+    const jfp = g.jfp, keep = [], at = new Map();
+    for (let i = 0; i < n; i++) if (jfp[i]) { at.set(i, keep.length); keep.push(i); }
+    const frob = [];
+    for (const i of keep) {
+      const k = sigma[i];
+      if (k !== i && at.has(k) && !(sigma[k] === i && k < i)) frob.push([at.get(i), at.get(k)]);
+    }
+    return {
+      nodes: keep.map((i) => ({ label: g.nodes[i], members: [i], fp: fixed[i] })),
+      links: g.links.filter(([s, t]) => at.has(s) && at.has(t))
+        .map(([s, t, ell, m]) => [at.get(s), at.get(t), ell, m]),
+      frob,
     };
   }
   if (view === "folded") {
@@ -182,6 +202,7 @@ function init(root, index, base) {
   const labelBox = root.querySelector(".wm-graph-labels input");
   const ellSelect = root.querySelector(".wm-graph-ell select");
   const legend5 = root.querySelector(".wm-graph-legend-5");
+  const legendFrob = root.querySelector(".wm-graph-legend-frob");
   const eye = root.querySelector(".wm-graph-eye");
   const legendPair = root.querySelector(".wm-graph-legend-pair");
   const trailLabel = root.querySelector(".wm-trail-n");
@@ -200,6 +221,7 @@ function init(root, index, base) {
   el("feGaussianBlur", { in: "SourceGraphic", stdDeviation: 2.6, result: "b" }, glow);
   const merge = el("feMerge", {}, glow);
   for (const src of ["b", "b", "SourceGraphic"]) el("feMergeNode", { in: src }, merge);
+  const gFrob = el("g", { class: "wm-g-frobs" }, svg);
   const gEdges = el("g", { class: "wm-g-edges" }, svg);
   const gNodes = el("g", { class: "wm-g-nodes" }, svg);
   const gLabels = el("g", { class: "wm-g-labels", "aria-hidden": "true" }, svg);
@@ -271,8 +293,11 @@ function init(root, index, base) {
     }
     // The growing ball runs on the full graph or on the quotient by Frobenius.
     const spineOpt = viewSelect.querySelector('option[value="spine"]');
+    const overOpt = viewSelect.querySelector('option[value="over"]');
     spineOpt.disabled = mode === "ball";
+    overOpt.hidden = overOpt.disabled = !cfg.level || mode === "ball";
     if (mode === "ball" && viewSelect.value === "spine") viewSelect.value = "full";
+    if (overOpt.disabled && viewSelect.value === "over") viewSelect.value = cfg.level ? "full" : "spine";
     const view = viewSelect.value;
     // Some spines are empty (no vertex fixed by Frobenius): for example the level-3 graph
     // when p = 1 (mod 3). In the spine view those primes are marked in the menu, and
@@ -322,6 +347,12 @@ function init(root, index, base) {
       for (let k = 0; k < m; k++) groups.get(key).push([s, t, ell]);
     }
     const strands = [], simLinks = [], adj = nodes.map(() => []);
+    // Frobenius as dashed links (the "over" view); they also pull orbits together.
+    gFrob.replaceChildren();
+    const frobs = (d.frob || []).map(([a, b]) => {
+      simLinks.push({ source: a, target: b });
+      return { a, b, line: el("line", { class: "wm-g-frob" }, gFrob) };
+    });
     for (const [key, list] of groups) {
       const [u, v] = key.split("-").map(Number);
       if (u !== v) simLinks.push({ source: u, target: v });
@@ -357,7 +388,7 @@ function init(root, index, base) {
       }
     }
     gLabels.style.display = labelled && labelBox.checked ? "" : "none";
-    Object.assign(state, { nodes, strands, adj, pinned: null, r, graph: g, sigma: g.sigma,
+    Object.assign(state, { frobs, nodes, strands, adj, pinned: null, r, graph: g, sigma: g.sigma,
                            shownView: view, ballGraph: null });
     painted = [];
     hideTip();
@@ -384,7 +415,7 @@ function init(root, index, base) {
     const nFull = g.nodes.length;
     const nComp = components(n, d.links);
     // The random walk needs a connected graph: on a disconnected F_p-subgraph it is off.
-    state.walkOff = view === "spine" && (n === 0 || nComp > 1);
+    state.walkOff = (view === "spine" || view === "over") && (n === 0 || nComp > 1);
     if (view === "folded") {
       caption.textContent = cfg.caption(p, nFull).replace(/ in characteristic/, ", quotient by Frobenius, in characteristic")
         .replace(/: .*$/, `: ${n} vertices, the orbits of Frobenius on ${nFull} vertices.`);
@@ -393,6 +424,15 @@ function init(root, index, base) {
       stats.textContent = `${bySize[1] || 0} vertices fixed by Frobenius, ${bySize[2] || 0} orbits of size 2` +
         (bySize[4] ? `, ${bySize[4]} of size 4 (here Frobenius² is the diamond operator ⟨p⟩ ≠ 1)` : "") +
         " (drawn larger). Edges are Frobenius-orbits of edges.";
+    } else if (view === "over") {
+      const nFix = d.nodes.filter((nd) => nd.fp).length;
+      caption.textContent = cfg.caption(p, nFull).replace(/ in characteristic/, ", over the F_p-subgraph, in characteristic")
+        .replace(/: .*$/, `: the subgraph induced on the ${n} of ${nFull} vertices (E, ·) with j(E) in F_p. ` +
+          `Gold: the ${nFix} fixed by Frobenius (the F_p-subgraph itself); dashed: Frobenius.`);
+      stats.textContent = (nComp === 1 ? "This subgraph is connected." :
+        `This subgraph has ${nComp} connected components.`) +
+        ` Frobenius moves ${n - nFix} of its vertices.` +
+        (state.walkOff && mode === "walk" ? " The random walk is off, since it is not connected." : "");
     } else if (view === "spine") {
       caption.textContent = cfg.caption(p, nFull).replace(/ in characteristic/, ", F_p-subgraph, in characteristic")
         .replace(/: .*$/, `: the subgraph induced on the ${n} of ${nFull} vertices fixed by Frobenius.`);
@@ -412,6 +452,7 @@ function init(root, index, base) {
     if (legend5) legend5.hidden = !cfg.ells.includes(5);
     if (legendFp) legendFp.hidden = !d.nodes.some((nd) => nd.fp);
     if (legendPair) legendPair.hidden = view !== "folded";
+    if (legendFrob) legendFrob.hidden = view !== "over";
     const nEdges = d.links.filter(([a, b]) => a !== b).length;
     showEmpty(view === "spine" && (n === 0 || nEdges === 0)
       ? { kind, p, n, alternative: nearestNonempty() } : null);
@@ -513,6 +554,11 @@ function init(root, index, base) {
         nd.text.setAttribute("x", f(nd.sx + off));
         nd.text.setAttribute("y", f(nd.sy - off * 0.6));
       }
+    }
+    for (const fl of state.frobs || []) {
+      const a = state.nodes[fl.a], b = state.nodes[fl.b];
+      fl.line.setAttribute("x1", f(a.sx)); fl.line.setAttribute("y1", f(a.sy));
+      fl.line.setAttribute("x2", f(b.sx)); fl.line.setAttribute("y2", f(b.sy));
     }
     for (const st of state.strands) {
       const g = geometry(st);

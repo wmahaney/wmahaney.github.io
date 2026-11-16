@@ -44,20 +44,27 @@ def graphs(p: int, level5: bool) -> dict:
     return _cache[(p, level5)]
 
 
-def spine(p: int, kind: str):
-    """(multigraph on the fixed vertices, set of special vertices) for G_p(kind)."""
-    d = graphs(p, kind.endswith("b5"))[kind]
-    # The spine: the subgraph induced on the vertices fixed by Frobenius.
-    fixed = [i for i, f in enumerate(d["fp"]) if f]
+def spine(p: int, kind: str, over: bool = False):
+    """(multigraph, special vertices) for the F_p-subgraph of G_p(kind): the subgraph
+    induced on the vertices fixed by Frobenius. With over=True (level structure only):
+    the subgraph induced on the vertices (E, .) with j(E) in F_p, with node attribute
+    "fixed" and the Frobenius links v - sigma(v) in G.graph["frob"]."""
+    d = graphs(p, kind in ("2b5", "23b5", "2g15", "3g2"))[kind]
+    fixed = [i for i, f in enumerate(d["jfp" if over else "fp"]) if f]
     keep = set(fixed)
     G = nx.MultiGraph()
-    G.add_nodes_from(fixed)
+    for i in fixed:
+        G.add_node(i, fixed=d["fp"][i])
+    if over:
+        sig = d["sigma"]
+        G.graph["frob"] = sorted({(min(i, sig[i]), max(i, sig[i])) for i in fixed
+                                  if sig[i] != i and sig[i] in keep})
     for s, t, ell, m in d["links"]:
         if s in keep and t in keep:
             for _ in range(m):
                 G.add_edge(s, t, ell=ell)
     special = {}
-    for i in fixed:
+    for i in ([] if over else fixed):
         lab = d["nodes"][i]
         j = lab[0] if isinstance(lab, list) else lab
         if j == "0":
@@ -67,14 +74,14 @@ def spine(p: int, kind: str):
     return G, special
 
 
-def pick(kind: str, cond, lo=7, hi=46, start=300):
+def pick(kind: str, cond, lo=7, hi=46, start=300, over=False):
     """Smallest prime >= start with p satisfying cond and a spine of lo..hi vertices."""
     p = start
     while True:
         p += 1
         if not ig.is_prime(p) or not cond(p):
             continue
-        n = spine(p, kind)[0].number_of_nodes()
+        n = spine(p, kind, over)[0].number_of_nodes()
         if lo <= n <= hi:
             return p
 
@@ -85,6 +92,7 @@ def pick(kind: str, cond, lo=7, hi=46, start=300):
 def layout_components(G):
     """Place each connected component, then shelf-pack them into a PW x PH panel."""
     simple = nx.Graph(G)
+    simple.add_edges_from(G.graph.get("frob", []))        # keep Frobenius orbits together
     simple.remove_edges_from(nx.selfloop_edges(simple))
     comps = sorted(nx.connected_components(simple), key=lambda c: (-len(c), min(c)))
     boxes = []
@@ -138,8 +146,8 @@ def esc(s):
     return s.replace("&", "&amp;").replace("<", "&lt;")
 
 
-def panel(p: int, kind: str, note: str) -> str:
-    G, special = spine(p, kind)
+def panel(p: int, kind: str, note: str, over: bool = False) -> str:
+    G, special = spine(p, kind, over)
     n = G.number_of_nodes()
     out = [f'<rect x="0.75" y="0.75" width="{PW - 1.5}" height="{PH - 1.5}" rx="16" '
            f'fill="{PAPER}" stroke="{LINE}" stroke-width="1.5"/>']
@@ -147,8 +155,17 @@ def panel(p: int, kind: str, note: str) -> str:
     comp_word = "component" if ncomp == 1 else "components"
     out.append(f'<text x="18" y="26" font-size="14" font-weight="700" fill="{INK}">p = {p}'
                f'<tspan font-weight="400" fill="{MUTED}">  ·  {esc(note)}</tspan></text>')
-    out.append(f'<text x="18" y="44" font-size="12" fill="{MUTED}">'
-               f'{n} vertices, {G.number_of_edges()} edges, {ncomp} {comp_word}</text>')
+    if over:      # components of the subgraph itself (the layout also uses Frobenius)
+        plain = nx.Graph(G)
+        plain.remove_edges_from(nx.selfloop_edges(plain))
+        ncomp = nx.number_connected_components(plain) if n else 0
+        comp_word = "component" if ncomp == 1 else "components"
+        nfix = sum(1 for _, a in G.nodes(data=True) if a["fixed"])
+        out.append(f'<text x="18" y="44" font-size="12" fill="{MUTED}">'
+                   f'{n} vertices ({nfix} fixed), {G.number_of_edges()} edges, {ncomp} {comp_word}</text>')
+    else:
+        out.append(f'<text x="18" y="44" font-size="12" fill="{MUTED}">'
+                   f'{n} vertices, {G.number_of_edges()} edges, {ncomp} {comp_word}</text>')
     if not n:
         out.append(f'<text x="{PW / 2}" y="{PH / 2 + 16}" font-size="14" text-anchor="middle" '
                    f'fill="{MUTED}">empty</text>')
@@ -159,6 +176,10 @@ def panel(p: int, kind: str, note: str) -> str:
         for bx, by, bw, bh in boxes:
             out.append(f'<rect x="{bx - pad:.1f}" y="{by - pad:.1f}" width="{bw + 2 * pad:.1f}" '
                        f'height="{bh + 2 * pad:.1f}" rx="12" fill="#F6EFDD" stroke="none"/>')
+    for a, b in G.graph.get("frob", []):
+        (x1, y1), (x2, y2) = pos[a], pos[b]
+        out.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="{PURPLE}" '
+                   f'stroke-width="1.6" stroke-dasharray="4 4" opacity="0.8"/>')
     seen = {}
     for s, t, data in G.edges(data=True):
         key = (min(s, t), max(s, t))
@@ -190,24 +211,30 @@ def panel(p: int, kind: str, note: str) -> str:
             out.append(f'<rect x="{x - r:.1f}" y="{y - r:.1f}" width="{2 * r:.1f}" height="{2 * r:.1f}" '
                        f'fill="{PURPLE}" stroke="{PAPER}" stroke-width="1.5"/>')
         else:
-            fill = INK if tag == "0" else GOLD
+            fill = INK if tag == "0" else GOLD if G.nodes[v]["fixed"] else BLUE
             out.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r:.1f}" fill="{fill}" '
                        f'stroke="{PAPER}" stroke-width="1.5"/>')
     return "\n".join(out)
 
 
-def legend(ells, has_special: bool, y: int) -> str:
-    items = [(BLUE, "line", "2-isogeny")]
+def legend(ells, has_special: bool, y: int, over: bool = False) -> str:
+    items = [(BLUE, "line", "2-isogeny")] if 2 in ells else []
     if 3 in ells:
         items.append((RED, "line", "3-isogeny"))
     if 5 in ells:
         items.append((GREEN, "line", "5-isogeny"))
     items.append((GOLD, "dot", "fixed by Frobenius"))
+    if over:
+        items += [(BLUE, "dot", "moved by Frobenius"), (PURPLE, "dash", "Frobenius")]
     if has_special:
         items += [(INK, "dot", "j = 0"), (PURPLE, "sq", "j = 1728")]
     out, x = [], 8
     for col, shape, text in items:
-        if shape == "line":
+        if shape == "dash":
+            out.append(f'<line x1="{x}" y1="{y}" x2="{x + 18}" y2="{y}" stroke="{col}" '
+                       f'stroke-width="2" stroke-dasharray="4 3"/>')
+            x += 24
+        elif shape == "line":
             out.append(f'<line x1="{x}" y1="{y}" x2="{x + 18}" y2="{y}" stroke="{col}" stroke-width="2.4"/>')
             x += 24
         elif shape == "dot":
@@ -221,7 +248,7 @@ def legend(ells, has_special: bool, y: int) -> str:
     return "\n".join(out)
 
 
-def figure(name: str, kind: str, cases, cols=2, ells=(2,), has_special=True):
+def figure(name: str, kind: str, cases, cols=2, ells=(2,), has_special=True, over=False):
     """cases: list of (prime, note). Writes assets/img/spine/<name>.svg."""
     rows = math.ceil(len(cases) / cols)
     gap = 16
@@ -230,8 +257,8 @@ def figure(name: str, kind: str, cases, cols=2, ells=(2,), has_special=True):
     body = []
     for k, (p, note) in enumerate(cases):
         x, y = (k % cols) * (PW + gap), (k // cols) * (PH + gap)
-        body.append(f'<g transform="translate({x},{y})">{panel(p, kind, note)}</g>')
-    body.append(f'<g transform="translate(0,{H - 14})">{legend(ells, has_special, 0)}</g>')
+        body.append(f'<g transform="translate({x},{y})">{panel(p, kind, note, over)}</g>')
+    body.append(f'<g transform="translate(0,{H - 14})">{legend(ells, has_special and not over, 0, over)}</g>')
     svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" '
            f'font-family="Inter, system-ui, -apple-system, Segoe UI, sans-serif" role="img">\n'
            + "\n".join(body) + "\n</svg>\n")
@@ -241,7 +268,7 @@ def figure(name: str, kind: str, cases, cols=2, ells=(2,), has_special=True):
 
 
 def main():
-    for old in OUT.glob("spine-*.svg"):
+    for old in list(OUT.glob("spine-*.svg")) + list(OUT.glob("over-*.svg")):
         old.unlink()
     # the 2-isogeny graph, by p mod 8
     cases = [(pick("2", lambda p, r=r: p % 8 == r, lo=6, hi=30), f"p ≡ {r} (mod 8)")
@@ -258,6 +285,14 @@ def main():
         cases = [(pick(kind, lambda p, r=r: p % 24 == r, lo=8, hi=60, start=60), f"p ≡ {r} (mod 24)")
                  for r in classes]
         figure(f"spine-{kind}", kind, cases, ells=ells)
+    # Alternative display for level structure: everything over the F_p-subgraph of
+    # G_p(ell) (j(E) in F_p), with the Frobenius-fixed vertices gold and Frobenius dashed.
+    for kind, ells, mod, classes_, hi in (("2b5", (2,), 5, (1, 2, 3, 4), 60),
+                                          ("2g15", (2,), 5, (1, 2, 3, 4), 90),
+                                          ("3g2", (3,), 8, (1, 5, 3, 7), 70)):
+        cases = [(pick(kind, lambda p, r=r: p % mod == r, lo=8, hi=hi, start=40, over=True),
+                  f"p ≡ {r} (mod {mod})") for r in classes_]
+        figure(f"over-{kind}", kind, cases, ells=ells, over=True)
 
 
 if __name__ == "__main__":
