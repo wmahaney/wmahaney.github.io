@@ -33,18 +33,20 @@ const KINDS = {
   },
 };
 
-// The three ways to look at each graph.
-//  full    every vertex.
-//  folded  the quotient by Frobenius (E, C) -> (E^(p), C^(p)): conjugate pairs become one vertex.
-//  spine   only the vertices fixed by Frobenius (the F_p-rational ones), and the edges among them.
+// The three ways to look at each graph (the data come from _scripts/isogeny_graphs.py).
+//  full    every vertex and edge.
+//  spine   the subgraph induced on the vertices whose j-invariant (of E) lies in F_p:
+//          those vertices and every edge between them.
+//  folded  the quotient by Frobenius (E, C) -> (E^(p), C^(p)): vertices are orbits of
+//          vertices, edges are orbits of edges. The edge orbits need Frobenius on edges,
+//          so they are computed by the script ("fold"), not here.
 function derive(g, view) {
-  const n = g.nodes.length, sigma = g.sigma;
-  const base = (i) => ({ label: g.nodes[i], members: [i] });
+  const n = g.nodes.length, sigma = g.sigma, jfp = g.jfp || g.fp;
   if (view === "spine") {
     const keep = [], at = new Map();
-    for (let i = 0; i < n; i++) if (g.fp[i]) { at.set(i, keep.length); keep.push(i); }
+    for (let i = 0; i < n; i++) if (jfp[i]) { at.set(i, keep.length); keep.push(i); }
     return {
-      nodes: keep.map((i) => ({ ...base(i), fp: true })),
+      nodes: keep.map((i) => ({ label: g.nodes[i], members: [i], fp: true })),
       links: g.links.filter(([s, t]) => at.has(s) && at.has(t))
         .map(([s, t, ell, m]) => [at.get(s), at.get(t), ell, m]),
     };
@@ -52,26 +54,36 @@ function derive(g, view) {
   if (view === "folded") {
     const at = new Map(), nodes = [];
     for (let i = 0; i < n; i++) {
-      if (sigma[i] < i) continue;                    // its partner comes first
+      if (sigma[i] < i) continue;                    // the orbit is named by its smaller member
       const pair = sigma[i] !== i;
       at.set(i, nodes.length);
-      if (pair) at.set(sigma[i], nodes.length);
-      nodes.push({ label: g.nodes[i], members: pair ? [i, sigma[i]] : [i], fp: !pair, pair });
+      nodes.push({ label: g.nodes[i], members: pair ? [i, sigma[i]] : [i], fp: jfp[i], pair });
     }
-    // An edge of the quotient is a Frobenius-orbit of edges of the original graph.
-    const seen = new Set(), links = [];
-    const norm = (a, b) => (a <= b ? [a, b] : [b, a]);
-    for (const [s, t, ell, m] of g.links) {
-      const [a, b] = norm(s, t), [c, d] = norm(sigma[s], sigma[t]);
-      const key = `${ell}|${a < c || (a === c && b <= d) ? `${a}-${b}` : `${c}-${d}`}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      links.push([...norm(at.get(s), at.get(t)), ell, m]);
-    }
-    return { nodes, links };
+    return { nodes, links: g.fold.map(([s, t, ell, m]) => [at.get(s), at.get(t), ell, m]) };
   }
-  return { nodes: g.nodes.map((_, i) => ({ ...base(i), fp: g.fp[i] })), links: g.links };
+  return { nodes: g.nodes.map((label, i) => ({ label, members: [i], fp: jfp[i] })), links: g.links };
 }
+
+// The j-invariant(s) to write next to a vertex. Labels are strings "a", "a + bi", "bi"
+// (or pairs [j(E), j(E/C)] with level structure, where j(E) is used). A conjugate pair
+// {a + bi, a - bi} is written a ± bi.
+const jOf = (label) => (Array.isArray(label) ? label[0] : label);
+function shortJ(nodes, nd) {
+  const j1 = jOf(nd.label);
+  if (!nd.pair) return j1;
+  const j2 = jOf(nodes[nd.members[1]]);
+  if (j1 === j2) return j1;
+  const parse = (j) => {
+    const m = /^(?:(\d+) \+ )?(\d*)i$/.exec(j);
+    return m ? [m[1] || "0", Number(m[2] || 1)] : null;
+  };
+  const u = parse(j1), v = parse(j2);
+  if (!u || !v || u[0] !== v[0]) return `${j1} / ${j2}`;
+  const b = Math.min(u[1], v[1]), bi = b === 1 ? "i" : `${b}i`;
+  return u[0] === "0" ? `±${bi}` : `${u[0]} ± ${bi}`;
+}
+// Labels are drawn only for graphs up to this many vertices; beyond that, hover instead.
+const LABEL_MAX = 60;
 
 function components(n, links) {
   const parent = [...Array(n).keys()];
@@ -96,6 +108,10 @@ const sub = html("sub"), sup = html("sup");
 
 // How long one step of the random walk takes, in milliseconds.
 const SPEEDS = { calm: 700, fast: 220, frantic: 90 };
+// How long the growing ball waits between layers, and how long it rests once it has
+// found a conjugate pair before starting again somewhere else.
+const BALL_MS = { calm: 1400, fast: 750, frantic: 330 };
+const BALL_HOLD = 3200;
 
 function init(root, index, base) {
   const svg = root.querySelector("svg");
@@ -106,6 +122,10 @@ function init(root, index, base) {
   const trailSelect = root.querySelector(".wm-graph-trail-len");
   const speedSelect = root.querySelector(".wm-graph-speed");
   const viewSelect = root.querySelector(".wm-graph-view select");
+  const animSelect = root.querySelector(".wm-graph-anim");
+  const ballStatus = root.querySelector(".wm-graph-ball-status");
+  const labelBox = root.querySelector(".wm-graph-labels input");
+  const eye = root.querySelector(".wm-graph-eye");
   const legendPair = root.querySelector(".wm-graph-legend-pair");
   const trailLabel = root.querySelector(".wm-trail-n");
   const buttons = [...root.querySelectorAll("[data-kind]")];
@@ -117,6 +137,7 @@ function init(root, index, base) {
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   const gEdges = el("g", { class: "wm-g-edges" }, svg);
   const gNodes = el("g", { class: "wm-g-nodes" }, svg);
+  const gLabels = el("g", { class: "wm-g-labels", "aria-hidden": "true" }, svg);
   const walkerDot = el("circle", { class: "wm-g-walker", r: 5 }, svg);
 
   const state = {
@@ -128,6 +149,13 @@ function init(root, index, base) {
   // The newest is drawn boldest; older steps fade out.
   let TRAIL = Number(trailSelect.value), hopMs = SPEEDS[speedSelect.value];
   let trail = [], painted = [];
+  // "walk" (a random walk with a fading trail) or "ball" (a ball grown layer by layer
+  // from a random vertex until it contains a vertex and its Frobenius conjugate).
+  const host = root.closest("[data-mode]");
+  if (host && [...animSelect.options].some((o) => o.value === host.dataset.mode)) {
+    animSelect.value = host.dataset.mode;
+  }
+  let mode = animSelect.value, ball = null;
 
   // Each prime's data is a separate small file, fetched the first time it is chosen.
   const cache = new Map();
@@ -149,12 +177,24 @@ function init(root, index, base) {
     if (!primes.includes(state.p[kind])) {
       state.p[kind] = primes.includes(cfg.defaultP) ? cfg.defaultP : primes[0];
     }
+    // The growing ball needs the whole graph; the view menu is set aside meanwhile.
+    const view = mode === "ball" ? "full" : viewSelect.value;
+    viewSelect.disabled = mode === "ball";
+    // Some spines are empty (no vertex fixed by Frobenius): for example the level-3 graph
+    // when p = 1 (mod 3). In the spine view those primes are marked in the menu, and
+    // choosing one shows a short explanation with buttons to move on (see showEmpty).
+    const empty = (q) => view === "spine" && index.spine && index.spine[q] && index.spine[q][kind] === 0;
     const p = state.p[kind];
     select.replaceChildren(...primes.map((q) => {
       const o = document.createElement("option");
-      o.value = q; o.textContent = q; o.selected = q === p;
+      o.value = q; o.selected = q === p;
+      o.textContent = empty(q) ? `${q} (empty spine)` : q;
       return o;
     }));
+    const nearestNonempty = () => {
+      const ok = primes.filter((q) => !empty(q));
+      return ok.length ? ok.reduce((a, b) => (Math.abs(b - p) < Math.abs(a - p) ? b : a)) : null;
+    };
     buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.kind === kind)));
 
     root.classList.add("wm-graph-loading");
@@ -169,7 +209,6 @@ function init(root, index, base) {
     if (id !== buildId) return;        // a newer choice has been made meanwhile
     root.classList.remove("wm-graph-loading");
     const g = entry.graphs[kind];
-    const view = viewSelect.value;
     const d = derive(g, view);
     const n = d.nodes.length;
     const nodes = d.nodes.map((nd, i) => ({
@@ -202,6 +241,10 @@ function init(root, index, base) {
     const rOf = (nd) => (nd.pair ? r * 1.35 : r);
     gEdges.replaceChildren();
     gNodes.replaceChildren();
+    gLabels.replaceChildren();
+    const labelled = n <= LABEL_MAX;
+    labelBox.disabled = !labelled;
+    labelBox.parentNode.title = labelled ? "" : `Labels are shown for graphs with at most ${LABEL_MAX} vertices; hover a vertex instead.`;
     for (const st of strands) {
       st.path = el("path", { class: `wm-g-edge wm-g-edge-${st.ell}` }, gEdges);
     }
@@ -211,8 +254,13 @@ function init(root, index, base) {
         r: rOf(nd), tabindex: "-1",
       }, gNodes);
       attachNodeEvents(nd);
+      if (labelled) {
+        nd.text = el("text", { class: "wm-g-label" }, gLabels);
+        nd.text.textContent = shortJ(g.nodes, nd);
+      }
     }
-    Object.assign(state, { nodes, strands, adj, pinned: null, r, graph: g });
+    gLabels.style.display = labelled && labelBox.checked ? "" : "none";
+    Object.assign(state, { nodes, strands, adj, pinned: null, r, graph: g, sigma: g.sigma });
     painted = [];
     hideTip();
 
@@ -240,33 +288,55 @@ function init(root, index, base) {
     if (view === "folded") {
       caption.textContent = cfg.caption(p, nFull).replace(/ in characteristic/, " folded by Frobenius, in characteristic")
         .replace(/: .*$/, `: ${n} vertices, the orbits of Frobenius on ${nFull} vertices.`);
-      stats.textContent = `${nFixed} fixed by Frobenius (the spine) and ${(nFull - nFixed) / 2} conjugate pairs. ` +
-        `Edges are Frobenius-orbits of edges.`;
+      stats.textContent = `${nFixed} vertices fixed by Frobenius and ${(nFull - nFixed) / 2} conjugate pairs ` +
+        "(drawn larger). Edges are Frobenius-orbits of edges.";
     } else if (view === "spine") {
-      caption.textContent = cfg.caption(p, nFull).replace(/ in characteristic/, " restricted to its spine, in characteristic")
-        .replace(/: .*$/, `: the ${n} vertices defined over F_p, of ${nFull}, and the edges between them.`);
-      stats.textContent = n === 0 ? "No vertex is fixed by Frobenius for this p (nothing is defined over F_p)." :
-        nComp === 1 ? "The spine is connected." : `The spine has ${nComp} connected components.`;
+      caption.textContent = cfg.caption(p, nFull).replace(/ in characteristic/, ", spine, in characteristic")
+        .replace(/: .*$/, `: the subgraph induced on the ${n} of ${nFull} vertices with j-invariant in F_p.`);
+      stats.textContent = n === 0 ? "The spine is empty." :
+        nComp === 1 ? "The spine is connected." :
+        nComp === n ? `The spine is totally disconnected: ${n} vertices and no edges between them.` :
+        `The spine has ${nComp} connected components.`;
     } else {
       caption.textContent = cfg.caption(p, n);
       const lam = g.lambda2;
       stats.textContent = (lam == null ? "" :
         `Second-largest eigenvalue modulus ${lam.toFixed(3)} ≤ ${cfg.bound} ≈ ${cfg.boundVal.toFixed(3)}. `) +
-        `${nFixed} of the ${n} vertices are defined over F_p (the spine).`;
+        `${(g.jfp || g.fp).filter(Boolean).length} of the ${n} vertices have j-invariant in F_p (the spine).`;
     }
     legend3.hidden = !cfg.ells.includes(3);
     if (legendFp) legendFp.hidden = !d.nodes.some((nd) => nd.fp);
     if (legendPair) legendPair.hidden = view !== "folded";
+    const nEdges = d.links.filter(([a, b]) => a !== b).length;
+    showEmpty(view === "spine" && (n === 0 || nEdges === 0)
+      ? { kind, p, n, alternative: nearestNonempty() } : null);
     const nr = entry.nonresidue;
     fieldNote.replaceChildren("Labels are j-invariants in F", sub("p"), "(i), i",
       sup("2"), ` = ${nr < 0 ? "−" + (-nr) : nr}.`);
     root.dataset.kind = kind;
+    if (eye) {
+      eye.href = `${eye.dataset.base}#graph-${kind}`;
+      eye.dataset.tip = view === "full" ? "Learn more about this graph" :
+        `Learn more about this graph and its ${view === "spine" ? "spine" : "folded version"}`;
+      eye.setAttribute("aria-label", eye.dataset.tip);
+    }
 
     const movable = nodes.filter((nd) => adj[nd.i].length);
+    root.dataset.mode = mode;
+    svg.classList.toggle("wm-ball-mode", mode === "ball");
+    ball = null;
+    ballStatus.hidden = mode !== "ball";
+    if (mode === "ball") {
+      trail = []; paintTrail();
+      if (reduced) {              // no animation: show one finished ball
+        startBall(0);
+        while (!ball.done) stepBall(0);
+      } else ballStatus.textContent = "";
+    }
     walker = { at: movable.length ? movable[Math.floor(Math.random() * movable.length)].i : 0,
                next: null, strand: null, t0: 0 };
     trail = [];
-    walkerDot.style.display = reduced || !strands.length ? "none" : "";
+    walkerDot.style.display = reduced || !strands.length || mode === "ball" ? "none" : "";
   }
 
   // The simulation runs in its own coordinates; the view scales and centres it
@@ -327,6 +397,14 @@ function init(root, index, base) {
       nd.circle.setAttribute("cx", f(nd.sx));
       nd.circle.setAttribute("cy", f(nd.sy));
     }
+    if (gLabels.style.display !== "none") {
+      const off = state.r + 2.5;
+      for (const nd of state.nodes) {
+        if (!nd.text) continue;
+        nd.text.setAttribute("x", f(nd.sx + off));
+        nd.text.setAttribute("y", f(nd.sy - off * 0.6));
+      }
+    }
     for (const st of state.strands) {
       const g = geometry(st);
       st.path.setAttribute("d", g.loop
@@ -373,10 +451,180 @@ function init(root, index, base) {
     });
     painted = trail.slice();
   }
+  // ---- "?" buttons: a small box with the relevant entries of the glossary ------
+  const gloss = root.querySelector(".wm-graph-glossary");
+  const pop = root.querySelector(".wm-graph-pop");
+  let popFor = null;
+  function closePop() {
+    if (!popFor) return;
+    popFor.setAttribute("aria-expanded", "false");
+    pop.hidden = true;
+    popFor = null;
+  }
+  function openPop(btn) {
+    if (popFor === btn) { closePop(); return; }
+    closePop();
+    const dl = document.createElement("dl");
+    for (const key of btn.dataset.terms.split(" ")) {
+      const dt = gloss.querySelector(`dt[data-term="${key}"]`);
+      if (dt) dl.append(dt.cloneNode(true), dt.nextElementSibling.cloneNode(true));
+    }
+    const close = button("×", closePop);
+    close.className = "wm-graph-pop-close";
+    close.setAttribute("aria-label", "Close");
+    const all = button("All terms ↓", () => {
+      closePop();
+      gloss.open = true;
+      gloss.scrollIntoView({ block: "nearest", behavior: reduced ? "auto" : "smooth" });
+    });
+    all.className = "wm-graph-pop-all";
+    pop.replaceChildren(close, dl, all);
+    pop.hidden = false;
+    popFor = btn;
+    btn.setAttribute("aria-expanded", "true");
+    // Just under the button, kept inside the figure.
+    const b = btn.getBoundingClientRect(), h = root.getBoundingClientRect();
+    pop.style.top = `${b.bottom - h.top + 8}px`;
+    pop.style.left = `${Math.max(0, Math.min(h.width - pop.offsetWidth, b.left - h.left - 24))}px`;
+    close.focus({ preventScroll: true });
+  }
+  root.querySelectorAll(".wm-q").forEach((btn) => btn.addEventListener("click", (ev) => {
+    ev.stopPropagation();
+    openPop(btn);
+  }));
+  document.addEventListener("click", (ev) => { if (popFor && !pop.contains(ev.target)) closePop(); });
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape" && popFor) { const b = popFor; closePop(); b.focus(); }
+  });
+
+  // ---- empty or totally disconnected spines --------------------------------
+  // With the spine induced on the vertices with j in F_p it is never empty (every p
+  // has supersingular j-invariants in F_p), but the message is kept as a safeguard.
+  const emptyBox = document.createElement("div");
+  emptyBox.className = "wm-graph-empty";
+  emptyBox.hidden = true;
+  svg.parentNode.appendChild(emptyBox);
+  function button(text, act) {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = text;
+    b.addEventListener("click", act);
+    return b;
+  }
+  function showEmpty(info) {
+    emptyBox.hidden = !info;
+    emptyBox.classList.toggle("wm-graph-empty-top", !!info && info.n > 0);
+    if (!info) return;
+    const { kind, p, n, alternative } = info;
+    const head = document.createElement("strong");
+    const text = document.createElement("div");
+    text.className = "wm-graph-empty-text";
+    if (n === 0) {
+      head.textContent = "Empty spine";
+      text.append(`No vertex of this graph has its j-invariant in F`, sub("p"), ` for p = ${p}.`);
+    } else {
+      head.textContent = "Totally disconnected spine";
+      text.append(`For p = ${p} the spine has ${n} vertices but no edges between them.`);
+    }
+    const go = document.createElement("div");
+    go.className = "wm-graph-empty-go";
+    if (alternative) {
+      go.appendChild(button(`Show p = ${alternative}`, () => {
+        state.p[state.kind] = alternative; build().then(startLoop);
+      }));
+    }
+    go.appendChild(button("Full graph", () => { viewSelect.value = "full"; build().then(startLoop); }));
+    go.appendChild(button("Folded graph", () => { viewSelect.value = "folded"; build().then(startLoop); }));
+    emptyBox.replaceChildren(head, text, go);
+  }
+
+  // ---- growing ball -------------------------------------------------------
+  // Breadth-first search from a random centre v, one layer at a time. Frobenius is
+  // an automorphism of the graph, so the ball B_r(v) contains a pair {w, w^(p)}
+  // exactly when B_r(v) and B_r(v^(p)) share a vertex w not fixed by Frobenius.
+  const shortLabel = (i) => {
+    const l = state.graph.nodes[i];
+    return Array.isArray(l) ? `(${l[0]}, ${l[1]})` : `j = ${l}`;
+  };
+  function startBall(now, at) {
+    const n = state.nodes.length;
+    const center = at ?? Math.floor(Math.random() * n);
+    ball = { center, dist: new Map([[center, 0]]), parent: new Map(), layers: [[center]],
+             r: 0, t0: now, done: null, holdUntil: 0 };
+    paintBall();
+  }
+  function stepBall(now) {
+    const b = ball, sigma = state.sigma, next = [];
+    for (const u of b.layers[b.r]) {
+      for (const { to, strand } of state.adj[u]) {
+        if (b.dist.has(to)) continue;
+        b.dist.set(to, b.r + 1);
+        b.parent.set(to, { from: u, strand });
+        next.push(to);
+      }
+    }
+    if (!next.length) {
+      b.done = { none: true };
+    } else {
+      b.layers.push(next);
+      b.r += 1;
+      // Any new pair has a member in the new layer. Prefer the one closest to the centre.
+      let best = null;
+      for (const w of next) {
+        const c = sigma[w];
+        if (c === w || !b.dist.has(c)) continue;
+        const score = b.dist.get(w) + b.dist.get(c);
+        if (!best || score < best.score) best = { w, c, score };
+      }
+      b.done = best;
+    }
+    if (b.done) b.holdUntil = now + BALL_HOLD;
+    paintBall();
+  }
+  function growBall(now) {
+    if (!state.nodes.length) return;
+    if (!ball) { startBall(now); return; }
+    if (ball.done) { if (now >= ball.holdUntil) startBall(now); return; }
+    if (now - ball.t0 >= BALL_MS[speedSelect.value]) { ball.t0 = now; stepBall(now); }
+  }
+  function paintBall() {
+    const b = ball, n = state.nodes.length;
+    const hit = b.done && !b.done.none ? [b.done.w, b.done.c] : [];
+    const geo = new Set();               // the strands of the two shortest paths
+    for (const x of hit) {
+      for (let y = x; b.parent.has(y); y = b.parent.get(y).from) geo.add(b.parent.get(y).strand);
+    }
+    for (const nd of state.nodes) {
+      const d = b.dist.get(nd.i), c = nd.circle;
+      c.classList.toggle("wm-g-out", d === undefined);
+      if (nd.text) nd.text.classList.toggle("wm-g-out", d === undefined);
+      c.classList.toggle("wm-g-front", d !== undefined && d === b.r && b.r > 0 && !b.done);
+      c.classList.toggle("wm-g-center", nd.i === b.center);
+      c.classList.toggle("wm-g-hit", hit.includes(nd.i));
+      const r0 = nd.pair ? state.r * 1.35 : state.r;
+      c.setAttribute("r", hit.includes(nd.i) || nd.i === b.center ? r0 * 1.6 : r0);
+    }
+    for (const st of state.strands) {
+      st.path.classList.toggle("wm-g-inball", b.dist.has(st.s) && b.dist.has(st.t));
+      st.path.classList.toggle("wm-g-geo", geo.has(st));
+    }
+    const size = b.dist.size, root2 = Math.sqrt(n).toFixed(1);
+    if (b.done && b.done.none) {
+      ballStatus.textContent = `The ball around ${shortLabel(b.center)} filled the graph without ` +
+        "meeting a conjugate pair (every vertex it reached is defined over F_p).";
+    } else if (b.done) {
+      ballStatus.textContent = `Radius ${b.r}: the ball around ${shortLabel(b.center)} ` +
+        `(${size} of ${n} vertices; √n ≈ ${root2}) now contains the conjugate pair ` +
+        `${shortLabel(b.done.w)} and ${shortLabel(b.done.c)}. The pair is in red; bold: shortest paths from the centre to each.`;
+    } else {
+      ballStatus.textContent = `Growing a ball around ${shortLabel(b.center)}: radius ${b.r}, ` +
+        `${size} of ${n} vertices.`;
+    }
+  }
+
   function frame(now) {
     raf = 0;
     if (!visible || document.hidden) return;
-    positionWalker(now);
+    if (mode === "ball") growBall(now); else positionWalker(now);
     raf = requestAnimationFrame(frame);
   }
   function startLoop() {
@@ -395,10 +643,13 @@ function init(root, index, base) {
     const nbrs = new Set(state.adj[nd.i].map((e) => e.to));
     nbrs.add(nd.i);
     const hot = new Set(state.adj[nd.i].map((e) => e.strand));
-    state.nodes.forEach((m) => m.circle.classList.toggle("wm-g-dim", !nbrs.has(m.i)));
+    state.nodes.forEach((m) => {
+      m.circle.classList.toggle("wm-g-dim", !nbrs.has(m.i));
+      if (m.text) m.text.classList.toggle("wm-g-dim", !nbrs.has(m.i));
+    });
     state.strands.forEach((s) => s.path.classList.toggle("wm-g-dim", !hot.has(s)));
     nd.circle.classList.add("wm-g-focus");
-    tip.replaceChildren(labelOf(nd), ...(nd.fp ? [" · defined over F", sub("p")] : []));
+    tip.replaceChildren(labelOf(nd), ...(nd.fp ? [" · j ∈ F", sub("p")] : []));
     tip.hidden = false;
     const box = svg.getBoundingClientRect(), host = root.getBoundingClientRect();
     const px = box.left - host.left + (nd.sx / W) * box.width;
@@ -408,7 +659,10 @@ function init(root, index, base) {
   }
   function hideTip() {
     tip.hidden = true;
-    state.nodes.forEach((m) => m.circle.classList.remove("wm-g-dim", "wm-g-focus"));
+    state.nodes.forEach((m) => {
+      m.circle.classList.remove("wm-g-dim", "wm-g-focus");
+      if (m.text) m.text.classList.remove("wm-g-dim");
+    });
     state.strands.forEach((s) => s.path.classList.remove("wm-g-dim"));
   }
   function attachNodeEvents(nd) {
@@ -440,6 +694,11 @@ function init(root, index, base) {
       dragging = state.dragging = false;
       nd.fx = nd.fy = null;
       if (!reduced) state.sim.alphaTarget(0);
+      if (!moved && mode === "ball") {   // in ball mode a tap grows a ball from that vertex
+        startBall(performance.now(), nd.i);
+        if (reduced) while (!ball.done) stepBall(0);
+        return;
+      }
       if (!moved) {            // a tap or click pins the label
         hideTip();
         if (state.pinned === nd.i) state.pinned = null;
@@ -467,6 +726,11 @@ function init(root, index, base) {
     paintTrail();
   });
   viewSelect.addEventListener("change", () => { build().then(startLoop); });
+  labelBox.addEventListener("change", () => {
+    gLabels.style.display = labelBox.checked && !labelBox.disabled ? "" : "none";
+    draw();
+  });
+  animSelect.addEventListener("change", () => { mode = animSelect.value; build().then(startLoop); });
   speedSelect.addEventListener("change", () => { hopMs = SPEEDS[speedSelect.value]; });
 
   // Only animate while the figure is on screen and the tab is visible.
@@ -484,10 +748,13 @@ function init(root, index, base) {
   build().then(() => { startLoop(); root.classList.add("wm-graph-ready"); });
 }
 
+// The data sits at assets/data/isogeny/, next to this script's folder, so the same
+// widget works on any page.
 const root = document.getElementById("wm-graph");
 if (root) {
-  fetch(`${root.dataset.src}/index.json`)
+  const base = new URL("../data/isogeny", import.meta.url).href;
+  fetch(`${base}/index.json`)
     .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then((index) => init(root, index, root.dataset.src))
+    .then((index) => init(root, index, base))
     .catch(() => root.classList.add("wm-graph-failed"));
 }

@@ -143,7 +143,7 @@
 <circle cx="85.3" cy="251.1" r="8.5" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/>
 <circle cx="119.5" cy="187.4" r="8.5" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/>
 <circle cx="261.9" cy="180.6" r="8.5" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/>
-<circle cx="56.6" cy="151.0" r="8.5" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/>
+<rect x="48.1" y="142.5" width="17.0" height="17.0" fill="#7A3E9D" stroke="#FFFDF7" stroke-width="1.5"/>
 <circle cx="279.4" cy="251.4" r="8.5" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/>
 <circle cx="181.5" cy="84.6" r="8.5" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/>
 <circle cx="189.2" cy="159.0" r="8.5" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/></g>
@@ -166,7 +166,7 @@
 <circle cx="190.0" cy="216.7" r="8.5" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/>
 <circle cx="107.0" cy="73.0" r="8.5" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/>
 <circle cx="107.0" cy="263.0" r="8.5" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/>
-<circle cx="230.5" cy="263.0" r="8.5" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/>
+<rect x="222.0" y="254.5" width="17.0" height="17.0" fill="#7A3E9D" stroke="#FFFDF7" stroke-width="1.5"/>
 <circle cx="190.0" cy="120.9" r="8.5" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/></g>
 <g transform="translate(0,948)"><rect x="0.75" y="0.75" width="378.5" height="298.5" rx="16" fill="#FFFDF7" stroke="#E3D9C3" stroke-width="1.5"/>
 <text x="18" y="26" font-size="14" font-weight="700" fill="#1E2430">p = 347<tspan font-weight="400" fill="#5A6070">  ·  p ≡ 11 (mod 24)</tspan></text>
@@ -208,7 +208,7 @@
 <circle cx="135.3" cy="161.7" r="8.5" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/>
 <circle cx="237.3" cy="87.7" r="8.5" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/>
 <circle cx="223.3" cy="184.3" r="8.5" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/>
-<circle cx="286.2" cy="222.8" r="8.5" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/></g>
+<rect x="277.7" y="214.3" width="17.0" height="17.0" fill="#7A3E9D" stroke="#FFFDF7" stroke-width="1.5"/></g>
 <g transform="translate(396,948)"><rect x="0.75" y="0.75" width="378.5" height="298.5" rx="16" fill="#FFFDF7" stroke="#E3D9C3" stroke-width="1.5"/>
 <text x="18" y="26" font-size="14" font-weight="700" fill="#1E2430">p = 311<tspan font-weight="400" fill="#5A6070">  ·  p ≡ 23 (mod 24)</tspan></text>
 <text x="18" y="44" font-size="12" fill="#5A6070">19 vertices, 59 edges, 1 component</text>
@@ -282,7 +282,7 @@
 <circle cx="173.5" cy="145.1" r="7.1" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/>
 <circle cx="260.9" cy="207.6" r="7.1" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/>
 <circle cx="223.5" cy="202.2" r="7.1" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/>
-<circle cx="112.2" cy="169.0" r="7.1" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/>
+<rect x="105.1" y="161.9" width="14.2" height="14.2" fill="#7A3E9D" stroke="#FFFDF7" stroke-width="1.5"/>
 <circle cx="137.6" cy="124.1" r="7.1" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/>
 <circle cx="240.9" cy="230.0" r="7.1" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/>
 <circle cx="194.4" cy="91.2" r="7.1" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.5"/>
@@ -295,7 +295,7 @@
 <line x1="113" y1="0" x2="131" y2="0" stroke="#B93A2B" stroke-width="2.4"/>
 <text x="137" y="4" font-size="12" fill="#5A6070">3-isogeny</text>
 <circle cx="223" cy="0" r="5" fill="#E5A11C"/>
-<text x="234" y="4" font-size="12" fill="#5A6070">fixed by Frobenius</text>
+<text x="234" y="4" font-size="12" fill="#5A6070">j-invariant in F_p</text>
 <circle cx="383" cy="0" r="5" fill="#2E8B57"/>
 <text x="394" y="4" font-size="12" fill="#5A6070">j = 0</text>
 <rect x="447" y="-5" width="10" height="10" fill="#7A3E9D"/>

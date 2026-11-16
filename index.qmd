@@ -37,69 +37,15 @@ I study probabilistic issues in Number Theory and Cryptography, particularly rel
 
 :::
 
-<!-- ISOGENY GRAPHS. The picture is drawn by assets/js/isogeny-hero.js from the data in
-     assets/data/isogeny/ (one small file per prime). To change the primes on offer, run
+<!-- ISOGENY GRAPHS. The markup is in _partials/isogeny-widget.qmd (shared with the
+     Animations pages); the picture is drawn by assets/js/isogeny-hero.js from the data in
+     assets/data/isogeny/. To change the primes on offer, run
          python3 _scripts/isogeny_graphs.py 101 431 1009
      (any list of primes) and commit the new files. -->
 
+{{< include /_partials/isogeny-widget.qmd >}}
+
 ```{=html}
-<figure class="wm-graph" id="wm-graph" data-src="assets/data/isogeny">
-  <div class="wm-graph-controls">
-    <div class="wm-seg" role="group" aria-label="Which isogeny graph to draw">
-      <button type="button" data-kind="2" aria-pressed="true">ℓ = 2</button>
-      <button type="button" data-kind="23" aria-pressed="false">ℓ = 2, 3</button>
-      <button type="button" data-kind="2b3" aria-pressed="false">2 · level 3</button>
-      <button type="button" data-kind="23b5" aria-pressed="false">2, 3 · level 5</button>
-    </div>
-    <div class="wm-graph-selects">
-      <label class="wm-graph-view">view
-        <select aria-label="Full graph, folded by Frobenius, or spine only">
-          <option value="full" selected>full graph</option>
-          <option value="folded">folded by Frobenius</option>
-          <option value="spine">spine only</option>
-        </select>
-      </label>
-      <label class="wm-graph-prime">p = <select aria-label="Characteristic p"></select></label>
-    </div>
-  </div>
-  <div class="wm-graph-stage">
-    <svg class="wm-graph-svg" role="img" aria-labelledby="wm-graph-caption"></svg>
-    <div class="wm-graph-tip" hidden></div>
-  </div>
-  <div class="wm-graph-walk">
-    <span class="wm-graph-walk-label">Random walk</span>
-    <label>history
-      <select class="wm-graph-trail-len" aria-label="Number of recent steps to keep highlighted">
-        <option value="10" selected>10 steps</option>
-        <option value="25">25 steps</option>
-        <option value="50">50 steps</option>
-        <option value="100">100 steps</option>
-        <option value="250">250 steps</option>
-      </select>
-    </label>
-    <label>speed
-      <select class="wm-graph-speed" aria-label="Speed of the random walk">
-        <option value="calm">calm</option>
-        <option value="fast" selected>fast</option>
-        <option value="frantic">frantic</option>
-      </select>
-    </label>
-  </div>
-  <figcaption>
-    <span class="wm-graph-caption" id="wm-graph-caption">Supersingular isogeny graphs: the objects I study.</span>
-    <span class="wm-graph-stats"></span>
-    <span class="wm-graph-legend">
-      <span><i class="wm-key wm-key-node"></i>supersingular curve</span>
-      <span class="wm-graph-legend-pair" hidden><i class="wm-key wm-key-pair"></i>conjugate pair {E, E<sup>(p)</sup>}</span>
-      <span class="wm-graph-legend-fp"><i class="wm-key wm-key-fp"></i><span>defined over F<sub>p</sub></span></span>
-      <span><i class="wm-key wm-key-2"></i>2-isogeny</span>
-      <span class="wm-graph-legend-3" hidden><i class="wm-key wm-key-3"></i>3-isogeny</span>
-      <span><i class="wm-key wm-key-walk"></i><i class="wm-key wm-key-trail"></i>random walk, last <span class="wm-trail-n">10</span> steps</span>
-    </span>
-    <span class="wm-graph-field"></span>
-    <span class="wm-graph-hint">Hover or tap a vertex for its j-invariant; drag to rearrange. <a href="graphs/index.qmd">Gallery of spines →</a></span>
-  </figcaption>
-</figure>
 <script type="module" src="assets/js/isogeny-hero.js"></script>
 ```
 

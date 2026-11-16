@@ -1,0 +1,107 @@
+---
+title: "About these graphs"
+description-meta: "Definitions behind the interactive isogeny graphs: the four graphs, Frobenius on vertices and edges, the spine, and the folded graph."
+toc: true
+---
+
+This page states exactly what the [interactive graphs](walks.qmd) draw. Everything is computed from scratch by `_scripts/isogeny_graphs.py` (arithmetic in $\mathbb{F}_{p^2}$ and Vélu's formulas), which checks the facts marked *checked* below for every prime it computes.
+
+## Conventions {#conventions}
+
+- $p \geq 5$ is prime, and $\mathbb{F}_{p^2} = \mathbb{F}_p(i)$ with $i^2 = r$ a quadratic non-residue ($r = -1$ when $p \equiv 3 \pmod 4$). Every $j$-invariant is written $a + bi$ with $a, b \in \mathbb{F}_p$.
+- $S$ is the set of supersingular $j$-invariants. Each lies in $\mathbb{F}_{p^2}$, and $\#S = \lfloor p/12 \rfloor + \{0, 1, 1, 2\}$ for $p \equiv 1, 5, 7, 11 \pmod{12}$.
+- **Edges are directed and counted by kernels.** For a prime $\ell \neq p$, each of the $\ell + 1$ subgroups $K \subset E[\ell]$ of order $\ell$ gives an edge $E \to E/K$. Write $A$ for the resulting adjacency matrix. It satisfies $A_{ij}\,\lvert\mathrm{Aut}(E_j)\rvert = A_{ji}\,\lvert\mathrm{Aut}(E_i)\rvert$ (*checked*), so it is symmetric except at $j = 0$ and $j = 1728$.
+- **Drawing.** Between two vertices the picture draws $\max(A_{ij}, A_{ji})$ undirected edges, as parallel arcs; $E/K \cong E$ is drawn as a loop. A vertex is labelled by its $j$-invariant (for level structure, by $j(E)$; hovering shows $(j(E), j(E/C))$).
+
+## The four graphs
+
+### $G_p(2)$ {#graph-2}
+
+Vertices $S$; every vertex has 3 outgoing edges. Apart from the trivial eigenvalue 3, every eigenvalue $\lambda$ of $A$ satisfies $\lvert\lambda\rvert \le 2\sqrt2$ (Pizer, using Deligne's bound): the graph is Ramanujan. The page shows the second-largest $\lvert\lambda\rvert$ (*checked* against the bound).
+
+### $G_p(\{2,3\})$ {#graph-23}
+
+The same vertices, with adjacency $A_2 + A_3$: 3 outgoing 2-isogenies and 4 outgoing 3-isogenies at each vertex. $A_2$ and $A_3$ commute, so the nontrivial eigenvalues satisfy $\lvert\lambda\rvert \le 2\sqrt2 + 2\sqrt3$.
+
+### $G_p(2)$ with Borel level-3 structure {#graph-2b3}
+
+A vertex is a pair $(E, C)$ with $C \subset E$ a subgroup of order 3, up to isomorphism: $(E, C) \cong (E', C')$ when some isomorphism $E \to E'$ carries $C$ to $C'$. A subgroup $K \subset E[2]$ of order 2, with quotient $\varphi_K\colon E \to E/K$, gives the edge $(E, C) \to (E/K, \varphi_K(C))$; this is a pair of the same kind because $\deg \varphi_K = 2$ is prime to 3. The mass is $\sum_{(E,C)} 1/\lvert\mathrm{Aut}(E,C)\rvert = (p-1)/6$, four times the Eichler–Deuring mass $(p-1)/24$ of $S$ (*checked*), because $\Gamma_0(3)$ has index 4.
+
+### $G_p(\{2,3\})$ with Borel level-5 structure {#graph-23b5}
+
+The same with $C$ of order 5, and edges from both 2-isogenies and 3-isogenies (both degrees are prime to 5). The mass is $(p-1)/4$, six times $(p-1)/24$ (*checked*). These graphs are offered for $p \le 3000$.
+
+## Frobenius {#frobenius}
+
+Let $\sigma(x) = x^p$. For $E\colon y^2 = x^3 + ax + b$ put $E^{(p)}\colon y^2 = x^3 + a^p x + b^p$, so $j(E^{(p)}) = j(E)^p$; on labels, $a + bi \mapsto a - bi$. The map $\pi_E\colon E \to E^{(p)}$, $(x, y) \mapsto (x^p, y^p)$, is an isogeny of degree $p$. Since $\ell \neq p$, it carries a subgroup $K$ of order $\ell$ to a subgroup $K^{(p)} = \pi_E(K)$ of order $\ell$. Applying $\sigma$ to the coefficients of Vélu's formulas gives
+$$(E/K)^{(p)} \cong E^{(p)}/K^{(p)}.$$
+So $\sigma$ acts on the graph:
+
+- on vertices by $E \mapsto E^{(p)}$ (with level structure, $(E, C) \mapsto (E^{(p)}, C^{(p)})$);
+- on edges by $(E \to E/K) \mapsto (E^{(p)} \to E^{(p)}/K^{(p)})$,
+
+compatibly with sources and targets. In other words, it is an automorphism of the directed multigraph. It is an involution on vertices, since $S \subset \mathbb{F}_{p^2}$. That it is an involution on edges, and respects sources and targets, is *checked*.
+
+**Fixed vertices.** In $G_p(2)$ and $G_p(\{2,3\})$, $E^{(p)} \cong E$ exactly when $j(E) \in \mathbb{F}_p$. With level structure, $(E^{(p)}, C^{(p)}) \cong (E, C)$ forces $j(E) \in \mathbb{F}_p$, but is a stronger condition (see [below](#fixed-level)).
+
+**Fixed edges.** Let $j(E) \in \mathbb{F}_p$, $j \neq 0, 1728$, and take a model of $E$ over $\mathbb{F}_p$. Then $E^{(p)} = E$, $\pi_E$ is the Frobenius endomorphism $\pi$, and $\sigma$ acts on the edges out of $E$ by $K \mapsto \pi(K)$. Changing the model to a twist replaces $\pi$ by $-\pi$, which has the same effect on subgroups. So the edge $E \to E/K$ is fixed exactly when $\pi(K) = K$, that is, when $K$ is defined over $\mathbb{F}_p$ (an $\mathbb{F}_p$-rational isogeny). For $\ell = 2$ and $K = \langle (e, 0) \rangle$ this means $e \in \mathbb{F}_p$. At $j = 0$ and $j = 1728$ the extra automorphisms enter, and the script follows the convention described in its source.
+
+## The spine {#spine}
+
+**Definition.** Let $V_{\mathrm{sp}}$ be the set of vertices whose $j$-invariant lies in $\mathbb{F}_p$; for level structure, the vertices $(E, C)$ with $j(E) \in \mathbb{F}_p$. The **spine** is the subgraph induced on $V_{\mathrm{sp}}$: these vertices and every edge of the graph (with multiplicity) whose source and target both lie in $V_{\mathrm{sp}}$.
+
+Remarks.
+
+1. Frobenius preserves $V_{\mathrm{sp}}$, so it permutes the edges of the spine. The fixed ones are the $\mathbb{F}_p$-rational isogenies; the others are swapped in pairs. **The spine keeps both kinds.** For $G_p(2)$ and $p = 431$, 41 of the 49 directed edges of the spine are fixed by Frobenius and 8 are not.
+2. For $G_p(2)$ and $G_p(\{2,3\})$, $V_{\mathrm{sp}}$ is the set of vertices fixed by Frobenius, and $\# V_{\mathrm{sp}} = \tfrac12 h(-4p)$, $h(-p)$, $2h(-p)$ for $p \equiv 1 \pmod 4$, $7 \pmod 8$, $3 \pmod 8$, where $h$ is the class number (Delfs–Galbraith; *checked*). In particular the spine is never empty.
+3. With level structure, $V_{\mathrm{sp}}$ is the set of all pairs over the $j$-invariants in $\mathbb{F}_p$, and it is larger than the set of fixed vertices: at $p = 431$ the level-3 spine has 80 vertices, 42 of them fixed by Frobenius.
+
+## The folded graph {#folded}
+
+**Definition.** The **folded graph** is the quotient by Frobenius. Its vertices are the $\sigma$-orbits of vertices, and its directed edges are the $\sigma$-orbits of directed edges, running from the orbit of the source to the orbit of the target (well defined because $\sigma$ respects sources and targets). It is drawn like the others: $\max(B_{ij}, B_{ji})$ undirected edges between two orbits.
+
+Since $\sigma$ is an involution, an orbit has one or two elements. Write $n$, $f_V$, $\lvert E\rvert$ and $f_E$ for the numbers of vertices, fixed vertices, directed edges and fixed directed edges. Then the folded graph has $(n + f_V)/2$ vertices and $(\lvert E\rvert + f_E)/2$ directed edges. Out of an orbit $\{v, \sigma v\}$ of size two there are as many edges as out of $v$. Out of a fixed vertex $v$ with $f_v$ fixed outgoing edges there are $(\deg v + f_v)/2$. For example, a vertex of $G_p(2)$ with $j \in \mathbb{F}_p$ and $p \equiv 1 \pmod 4$ has one fixed outgoing edge (Delfs–Galbraith), hence $(3 + 1)/2 = 2$ outgoing edges in the folded graph.
+
+The edge orbits need Frobenius on edges, not just on vertices, so the script computes them; the page only draws them.
+
+## Frobenius-fixed level structures {#fixed-level}
+
+**Proposition.** Let $N \in \{3, 5\}$. If $-p$ is not a square modulo $N$, then no vertex $(E, C)$ of level $N$ is fixed by Frobenius. That is, there is none when $p \equiv 1 \pmod 3$ (level 3) or $p \equiv \pm 2 \pmod 5$ (level 5).
+
+*Proof.*
+
+1. Suppose $(E^{(p)}, C^{(p)}) \cong (E, C)$. Then $j(E) \in \mathbb{F}_p$; take a model of $E$ over $\mathbb{F}_p$, with Frobenius endomorphism $\pi$. Being fixed means $\xi(\pi(C)) = C$ for some $\xi \in \mathrm{Aut}(E)$.
+2. The endomorphism $\pi' = \xi \circ \pi$ is the Frobenius endomorphism of a twist $E'$ of $E$ over $\mathbb{F}_p$. Since $E'$ is supersingular over $\mathbb{F}_p$, its trace $t$ is divisible by $p$. The Hasse bound gives $\lvert t\rvert \le 2\sqrt p < p$, so $t = 0$, and then $\pi'^2 = -p$.
+3. Since $\pi'$ preserves the cyclic group $C$ of prime order $N$, it acts on $C$ as multiplication by some $\lambda \in \mathbb{F}_N$. From $\pi'^2 = -p$ we get $\lambda^2 = -p$ in $\mathbb{F}_N$.
+4. The squares modulo 3 are $\{0, 1\}$, so this is impossible for $p \equiv 1 \pmod 3$. The squares modulo 5 are $\{0, 1, 4\}$, so it is impossible for $p \equiv 2, 3 \pmod 5$. $\square$
+
+The converse (that fixed vertices exist whenever $-p$ is a square modulo $N$) is only observed: it holds for every prime between 300 and 700 and every prime on offer.
+
+## Numbers at $p = 431$
+
+Computed by the script. "Spine edges" are the directed edges of the spine; "fixed" counts those fixed by Frobenius. Every fixed edge joins two fixed vertices, so every fixed edge lies in the spine.
+
+| graph | vertices $n$ | spine vertices | fixed vertices $f_V$ | folded vertices | directed edges $\lvert E\rvert$ | spine edges | fixed edges $f_E$ | folded edges |
+|---|--:|--:|--:|--:|--:|--:|--:|--:|
+| $G_p(2)$ | 37 | 21 | 21 | 29 | 111 | 49 | 41 | 76 |
+| $G_p(\{2,3\})$ | 37 | 21 | 21 | 29 | 259 | 107 | 83 | 171 |
+| level 3 | 144 | 80 | 42 | 93 | 432 | 184 | 84 | 258 |
+| level 5 | 216 | 120 | 42 | 129 | 1512 | 600 | 168 | 840 |
+
+## What the script checks
+
+For every prime it computes, the script stops with an error unless all of the following hold:
+
+- $\#S$ agrees with the class number formula above, and the number of $j$-invariants in $\mathbb{F}_p$ agrees with Delfs–Galbraith.
+- Every Vélu quotient is a root of the modular polynomial $\Phi_2$ or $\Phi_3$.
+- The Brandt-matrix symmetry $A_{ij}\lvert\mathrm{Aut}_j\rvert = A_{ji}\lvert\mathrm{Aut}_i\rvert$ holds.
+- For level 3 and 5: the pushed-forward level structure is again 3- or 5-torsion, every quotient by $C$ is supersingular, and the masses are $(p-1)/6$ and $(p-1)/4$.
+- Frobenius is an involution on vertices and on edges, and it respects the source and target of every edge.
+- The second-largest eigenvalue is within the Ramanujan bound.
+
+**Sources.**
+
+- Christina Delfs and Steven Galbraith, [Computing isogenies between supersingular elliptic curves over F_p](https://arxiv.org/abs/1310.7789): the count of $j$-invariants in $\mathbb{F}_p$, and rational 2-isogenies.
+- Taha Hedayat, Sarah Arpin and Renate Scheidler, [The spine of a supersingular ℓ-isogeny graph](https://arxiv.org/abs/2502.03613): the spine, as the subgraph induced on the $\mathbb{F}_p$-vertices.
+- Arnold Pizer, *Ramanujan graphs and Hecke operators*, Bull. AMS 23 (1990).
+- Joseph Silverman, *The Arithmetic of Elliptic Curves*: the Hasse bound (Ch. V) and twists (Ch. X).

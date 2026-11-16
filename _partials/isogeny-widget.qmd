@@ -1,0 +1,121 @@
+<!-- The interactive isogeny graph. Used on the home page and on the Animations pages
+     through Quarto's include shortcode (see index.qmd), followed by a <script type="module"> tag loading assets/js/isogeny-hero.js (the path
+     is relative to the page). To start in the growing-ball animation instead of the
+     random walk, wrap the include in  ::: {data-mode="ball"}  ...  :::
+     The data (assets/data/isogeny/) is made by _scripts/isogeny_graphs.py. -->
+
+```{=html}
+<figure class="wm-graph" id="wm-graph">
+  <div class="wm-graph-controls">
+    <div class="wm-graph-kinds">
+    <div class="wm-seg" role="group" aria-label="Which isogeny graph to draw">
+      <button type="button" data-kind="2" aria-pressed="true">ℓ = 2</button>
+      <button type="button" data-kind="23" aria-pressed="false">ℓ = 2, 3</button>
+      <button type="button" data-kind="2b3" aria-pressed="false">2 · level 3</button>
+      <button type="button" data-kind="23b5" aria-pressed="false">2, 3 · level 5</button>
+    </div>
+    <button type="button" class="wm-q" data-terms="supersingular isogeny graph2 level loops" aria-label="What are these graphs?" aria-expanded="false">?</button>
+    </div>
+    <div class="wm-graph-selects">
+      <label class="wm-graph-view">view
+        <select aria-label="Full graph, folded by Frobenius, or spine only">
+          <option value="full" selected>full graph</option>
+          <option value="folded">folded by Frobenius</option>
+          <option value="spine">spine only</option>
+        </select>
+      </label>
+      <button type="button" class="wm-q" data-terms="frobenius pair full folded spine" aria-label="What do full, folded and spine mean?" aria-expanded="false">?</button>
+      <label class="wm-graph-prime">p = <select aria-label="Characteristic p"></select></label>
+      <label class="wm-graph-labels"><input type="checkbox" checked> j labels</label>
+      <button type="button" class="wm-q" data-terms="p jinv fp" aria-label="What is p?" aria-expanded="false">?</button>
+    </div>
+  </div>
+  <div class="wm-graph-stage">
+    <svg class="wm-graph-svg" role="img" aria-labelledby="wm-graph-caption"></svg>
+    <a class="wm-graph-eye" href="/animations/about.html" data-base="/animations/about.html" data-tip="Learn more about this graph" aria-label="Learn more about this graph">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M1.5 12S5.5 4.5 12 4.5 22.5 12 22.5 12 18.5 19.5 12 19.5 1.5 12 1.5 12Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.4" fill="currentColor"/></svg>
+    </a>
+    <div class="wm-graph-tip" hidden></div>
+  </div>
+  <div class="wm-graph-walk">
+    <label class="wm-graph-walk-label">animation
+      <select class="wm-graph-anim" aria-label="Which animation to run">
+        <option value="walk" selected>random walk</option>
+        <option value="ball">growing ball</option>
+      </select>
+    </label>
+    <button type="button" class="wm-q" data-terms="walk ball pair" aria-label="What do the animations show?" aria-expanded="false">?</button>
+    <label class="wm-graph-history">history
+      <select class="wm-graph-trail-len" aria-label="Number of recent steps to keep highlighted">
+        <option value="10" selected>10 steps</option>
+        <option value="25">25 steps</option>
+        <option value="50">50 steps</option>
+        <option value="100">100 steps</option>
+        <option value="250">250 steps</option>
+      </select>
+    </label>
+    <label>speed
+      <select class="wm-graph-speed" aria-label="Speed of the random walk">
+        <option value="calm">calm</option>
+        <option value="fast" selected>fast</option>
+        <option value="frantic">frantic</option>
+      </select>
+    </label>
+  </div>
+  <figcaption>
+    <span class="wm-graph-caption" id="wm-graph-caption">Supersingular isogeny graphs: the objects I study.</span>
+    <span class="wm-graph-ball-status" aria-live="polite" hidden></span>
+    <span class="wm-graph-stats"></span>
+    <span class="wm-graph-legend">
+      <span><i class="wm-key wm-key-node"></i>supersingular curve</span>
+      <span class="wm-graph-legend-pair" hidden><i class="wm-key wm-key-pair"></i>conjugate pair {E, E<sup>(p)</sup>}</span>
+      <span class="wm-graph-legend-fp"><i class="wm-key wm-key-fp"></i><span>j-invariant in F<sub>p</sub></span></span>
+      <span><i class="wm-key wm-key-2"></i>2-isogeny</span>
+      <span class="wm-graph-legend-3" hidden><i class="wm-key wm-key-3"></i>3-isogeny</span>
+      <span class="wm-graph-legend-ball"><i class="wm-key wm-key-ball"></i>ball <i class="wm-key wm-key-hit"></i>shortest paths to the conjugate pair (red)</span>
+      <span class="wm-graph-legend-walk"><i class="wm-key wm-key-walk"></i><i class="wm-key wm-key-trail"></i>random walk, last <span class="wm-trail-n">10</span> steps</span>
+      <button type="button" class="wm-q" data-terms="supersingular fp pair lambda" aria-label="What do the colours and numbers mean?" aria-expanded="false">?</button>
+    </span>
+    <span class="wm-graph-field"></span>
+    <span class="wm-graph-hint">Hover or tap a vertex for its j-invariant; drag to rearrange. In the growing-ball animation, tap a vertex to grow a ball from it. <a href="/animations/">More animations →</a></span>
+  </figcaption>
+  <div class="wm-graph-pop" role="dialog" aria-label="Explanation" hidden></div>
+  <details class="wm-graph-glossary">
+    <summary>What do these terms mean?</summary>
+    <dl>
+      <dt data-term="supersingular">Supersingular curve (a vertex)</dt>
+      <dd>An elliptic curve in characteristic p with no point of order p, even over the algebraic closure. Up to isomorphism there are about p/12 of them, and all are defined over F<sub>p²</sub>.</dd>
+      <dt data-term="jinv">j-invariant</dt>
+      <dd>A number that identifies a curve up to isomorphism; it labels the vertices (switch labels off with <em>j labels</em>; on big graphs, hover instead). It lies in F<sub>p²</sub> and is written a + bi, with i as in the note under the graph; a ± bi labels a conjugate pair in the folded graph. With level structure the label is j(E).</dd>
+      <dt data-term="isogeny">ℓ-isogeny (an edge)</dt>
+      <dd>A map between two curves, given by rational functions, that respects the group law and has a kernel of ℓ points. A curve has ℓ + 1 of them, one for each subgroup of order ℓ: three 2-isogenies (blue edges) and four 3-isogenies (red edges).</dd>
+      <dt data-term="graph2">ℓ = 2 and ℓ = 2, 3</dt>
+      <dd>The 2-isogeny graph uses only 2-isogenies. The (2,3)-isogeny graph has the same vertices, joined by both 2-isogenies and 3-isogenies.</dd>
+      <dt data-term="level">Level 3, level 5 (Borel level structure)</dt>
+      <dd>Each vertex is a pair (E, C): a curve E with a chosen subgroup C of order 3 (or 5). An isogeny φ: E → E′ whose degree is prime to that order carries C to φ(C), giving the edge (E, C) → (E′, φ(C)). There are about 4 (or 6) times as many vertices as curves.</dd>
+      <dt data-term="loops">Loops and parallel edges</dt>
+      <dd>Two curves can be joined by several isogenies, drawn as parallel arcs, and an isogeny from a curve to itself is drawn as a loop.</dd>
+      <dt data-term="p">p</dt>
+      <dd>The characteristic, a prime: the curves live over finite fields with p<sup>k</sup> elements. The graph has about p/12 vertices, so a larger p gives a larger graph.</dd>
+      <dt data-term="fp">j-invariant in F<sub>p</sub> (gold)</dt>
+      <dd>A vertex whose j-invariant lies in the prime field F<sub>p</sub> (b = 0), not only in F<sub>p²</sub>. With level structure the j-invariant of a vertex (E, C) means j(E).</dd>
+      <dt data-term="frobenius">Frobenius</dt>
+      <dd>Raising every coordinate to the p-th power sends a curve E to a curve E<sup>(p)</sup> and a subgroup K of E to a subgroup K<sup>(p)</sup> of E<sup>(p)</sup>; on j-invariants it is a + bi ↦ a − bi. It sends the edge E → E/K to the edge E<sup>(p)</sup> → E<sup>(p)</sup>/K<sup>(p)</sup>, so it is a symmetry of the whole graph, on vertices and on edges, and applying it twice gives back every vertex and edge.</dd>
+      <dt data-term="pair">Conjugate pair</dt>
+      <dd>A vertex E and its Frobenius image E<sup>(p)</sup>, when the two are different.</dd>
+      <dt data-term="full">Full graph</dt>
+      <dd>Every vertex and every edge.</dd>
+      <dt data-term="folded">Folded by Frobenius</dt>
+      <dd>The quotient of the graph by Frobenius: its vertices are the orbits of vertices (a conjugate pair becomes one vertex, drawn larger with a gold ring) and its edges are the orbits of edges. An edge between two vertices with j in F<sub>p</sub> need not be fixed by Frobenius: two parallel edges with conjugate kernels are swapped, and become one edge.</dd>
+      <dt data-term="spine">Spine</dt>
+      <dd>The subgraph induced on the vertices whose j-invariant lies in F<sub>p</sub>: those vertices and every edge of the graph between them (whether or not Frobenius fixes the edge).</dd>
+      <dt data-term="walk">Random walk</dt>
+      <dd>At each step the walker moves along an edge chosen at random. <em>History</em> is how many recent steps stay highlighted (the newest boldest); <em>speed</em> is how fast it moves.</dd>
+      <dt data-term="ball">Growing ball</dt>
+      <dd>The ball of radius r around a vertex v is the set of vertices at most r steps from v. The animation grows it one layer at a time until it contains a conjugate pair, then shows shortest paths from v to the pair. Tap a vertex to start there.</dd>
+      <dt data-term="lambda">Second-largest eigenvalue</dt>
+      <dd>The largest eigenvalue of the adjacency matrix is the number of edges at each vertex; the next largest in absolute value measures how fast random walks spread out (smaller is faster). These graphs are Ramanujan graphs: it is at most 2√ℓ for each ℓ, so at most 2√2 for ℓ = 2 and 2√2 + 2√3 for ℓ = 2, 3.</dd>
+    </dl>
+  </details>
+</figure>
+```

@@ -769,3 +769,178 @@ body.quarto-dark .quarto-color-scheme-toggle .bi::before,
   body { background: #fff !important; }
   .wm-cv-item { break-inside: avoid; }
 }
+
+/* ---- Growing-ball animation (isogeny-hero.js, animation = growing ball) ---- */
+.wm-graph[data-mode="ball"] .wm-graph-history,
+.wm-graph[data-mode="ball"] .wm-graph-legend-walk,
+.wm-graph:not([data-mode="ball"]) .wm-graph-legend-ball { display: none; }
+.wm-graph-view select:disabled { opacity: 0.5; cursor: not-allowed; }
+.wm-graph-ball-status {
+  display: block;
+  font-family: var(--wm-sans);
+  font-size: 0.85rem;
+  color: var(--wm-ink);
+  min-height: 2.6em;           /* the line length changes as the ball grows */
+}
+.wm-graph-ball-status[hidden] { display: none; }
+.wm-ball-mode .wm-g-edge { opacity: 0.16; }
+.wm-ball-mode.wm-dense .wm-g-edge { opacity: 0.1; }
+.wm-ball-mode .wm-g-node { transition: opacity 0.25s ease, r 0.25s ease; }
+.wm-ball-mode .wm-g-node.wm-g-out { opacity: 0.25; }
+.wm-ball-mode .wm-g-edge.wm-g-inball { opacity: 0.85; stroke-width: 1.8; }
+.wm-ball-mode.wm-dense .wm-g-edge.wm-g-inball { opacity: 0.75; stroke-width: 1.4; }
+.wm-ball-mode .wm-g-node.wm-g-front { stroke: var(--wm-ink); stroke-width: 1.8; }
+.wm-ball-mode .wm-g-node.wm-g-center { stroke: var(--wm-ink); stroke-width: 3; }
+.wm-ball-mode .wm-g-node.wm-g-hit { fill: var(--wm-red); stroke: var(--wm-ink); stroke-width: 2.5; }
+.wm-ball-mode .wm-g-edge.wm-g-geo { stroke: var(--wm-ink); stroke-width: 3.4; opacity: 1; }
+.wm-key-ball { width: 0.75rem; height: 0.75rem; border-radius: 50%;
+  background: var(--wm-accent); border: 2px solid var(--wm-ink); }
+.wm-key-hit { width: 1rem; height: 3px; border-radius: 2px; background: var(--wm-ink); margin-left: 0.5rem; }
+.wm-ball-chart { display: block; width: 100%; height: auto; margin: 1rem 0; }
+.wm-ball-mode.wm-dense .wm-g-node.wm-g-front { stroke-width: 0.8; }
+.wm-ball-mode.wm-dense .wm-g-node.wm-g-center,
+.wm-ball-mode.wm-dense .wm-g-node.wm-g-hit { stroke-width: 1.5; }
+
+/* Message over the picture when the spine is empty or totally disconnected. */
+.wm-graph-empty {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(26rem, calc(100% - 2rem));
+  padding: 1rem 1.1rem;
+  font-family: var(--wm-sans);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--wm-ink);
+  background: var(--wm-surface);
+  border: 1.5px solid var(--wm-line);
+  border-radius: 1rem;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+  max-height: calc(100% - 1.5rem);
+  overflow-y: auto;
+}
+@media (max-width: 575px) {
+  .wm-graph-empty { font-size: 0.8rem; padding: 0.75rem 0.85rem; }
+  .wm-graph-empty-text { margin-bottom: 0.55rem; }
+  .wm-graph-empty-go button { padding: 0.4rem 0.65rem; }
+}
+.wm-graph-empty[hidden] { display: none; }
+.wm-graph-empty-top { top: 1rem; transform: translateX(-50%); }
+.wm-graph-empty strong { display: block; margin-bottom: 0.3rem; font-size: 0.95rem; }
+.wm-graph-empty-text { margin: 0 0 0.75rem; color: var(--wm-muted); }
+.wm-graph-empty details { margin-top: 0.35rem; }
+.wm-graph-empty summary { cursor: pointer; color: var(--wm-ink); font-weight: 600; }
+.wm-graph-empty-go { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.wm-graph-empty-go button {
+  font: 600 0.8rem/1.2 var(--wm-sans);
+  color: var(--wm-ink);
+  background: var(--wm-tint);
+  border: 0;
+  border-radius: 999px;
+  padding: 0.45rem 0.8rem;
+  cursor: pointer;
+}
+.wm-graph-empty-go button:first-child { background: var(--wm-accent); color: var(--wm-accent-ink); }
+.wm-graph-empty-go button:focus-visible { outline: 2px solid var(--wm-accent2); outline-offset: 2px; }
+
+/* ---- "?" buttons and the glossary under the isogeny graph ---- */
+.wm-graph-kinds { display: inline-flex; align-items: center; gap: 0.4rem; }
+.wm-q {
+  flex: none;
+  width: 1.45rem; height: 1.45rem;
+  padding: 0;
+  font: 700 0.78rem/1 var(--wm-sans);
+  color: var(--wm-accent);
+  background: var(--wm-surface);
+  border: 1.5px solid var(--wm-line);
+  border-radius: 50%;
+  cursor: pointer;
+}
+.wm-q:hover, .wm-q[aria-expanded="true"] { border-color: var(--wm-accent); }
+.wm-q:focus-visible { outline: 2px solid var(--wm-accent2); outline-offset: 2px; }
+.wm-graph-legend .wm-q { width: 1.25rem; height: 1.25rem; font-size: 0.7rem; }
+.wm-graph-pop {
+  position: absolute;
+  z-index: 5;
+  width: min(22rem, 100%);
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 0.85rem 1rem 0.75rem;
+  font-family: var(--wm-sans);
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--wm-ink);
+  background: var(--wm-surface);
+  border: 1.5px solid var(--wm-line);
+  border-radius: 1rem;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+}
+.wm-graph-pop[hidden] { display: none; }
+.wm-graph-pop dl, .wm-graph-glossary dl { margin: 0; }
+.wm-graph-pop dt, .wm-graph-glossary dt { font-weight: 700; margin-top: 0.55rem; }
+.wm-graph-pop dt:first-child { margin-top: 0; padding-right: 1.6rem; }
+.wm-graph-pop dd, .wm-graph-glossary dd { margin: 0.1rem 0 0; color: var(--wm-muted); }
+.wm-graph-pop-close {
+  position: absolute; top: 0.45rem; right: 0.55rem;
+  width: 1.6rem; height: 1.6rem; padding: 0;
+  font: 400 1.15rem/1 var(--wm-sans);
+  color: var(--wm-muted); background: none; border: 0; border-radius: 50%; cursor: pointer;
+}
+.wm-graph-pop-all {
+  margin-top: 0.7rem; padding: 0;
+  font: 600 0.8rem/1.2 var(--wm-sans);
+  color: var(--wm-accent); background: none; border: 0; cursor: pointer;
+}
+.wm-graph-glossary {
+  margin-top: 0.8rem;
+  font-family: var(--wm-sans);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+.wm-graph-glossary summary { cursor: pointer; font-weight: 600; color: var(--wm-accent); }
+.wm-graph-glossary dl { margin-top: 0.4rem; }
+.wm-graph:not(.wm-graph-ready) .wm-graph-glossary { display: none; }
+
+/* j-invariant labels on the vertices */
+.wm-g-label {
+  font: 600 9.5px/1 var(--wm-sans);
+  fill: var(--wm-ink);
+  stroke: var(--wm-surface);
+  stroke-width: 3px;
+  paint-order: stroke;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+.wm-g-label.wm-g-dim { opacity: 0.12; }
+.wm-ball-mode .wm-g-label.wm-g-out { opacity: 0.25; }
+.wm-graph-labels { display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer;
+  font: 600 0.85rem/1.2 var(--wm-sans); color: var(--wm-muted); }
+.wm-graph-labels input { accent-color: var(--wm-accent); margin: 0; }
+.wm-graph-labels:has(input:disabled) { opacity: 0.5; cursor: not-allowed; }
+
+/* The eye: "learn more about this graph", like the LMFDB's links to knowls */
+.wm-graph-eye {
+  position: absolute; top: 0.6rem; right: 0.6rem; z-index: 3;
+  display: grid; place-items: center;
+  width: 2.1rem; height: 2.1rem;
+  color: var(--wm-accent);
+  background: var(--wm-surface);
+  border: 1.5px solid var(--wm-line);
+  border-radius: 50%;
+  text-decoration: none;
+}
+.wm-graph-eye:hover, .wm-graph-eye:focus-visible { border-color: var(--wm-accent); outline: none; }
+.wm-graph-eye::after {
+  content: attr(data-tip);
+  position: absolute; right: 0; top: calc(100% + 6px);
+  white-space: nowrap;
+  padding: 0.3rem 0.6rem;
+  font: 600 0.75rem/1.2 var(--wm-sans);
+  color: var(--wm-surface);
+  background: var(--wm-ink);
+  border-radius: 0.5rem;
+  opacity: 0; pointer-events: none;
+  transform: translateY(-3px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.wm-graph-eye:hover::after, .wm-graph-eye:focus-visible::after { opacity: 1; transform: none; }
