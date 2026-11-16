@@ -48,9 +48,19 @@ I study probabilistic issues in Number Theory and Cryptography, particularly rel
     <div class="wm-seg" role="group" aria-label="Which isogeny graph to draw">
       <button type="button" data-kind="2" aria-pressed="true">ℓ = 2</button>
       <button type="button" data-kind="23" aria-pressed="false">ℓ = 2, 3</button>
-      <button type="button" data-kind="2b3" aria-pressed="false">ℓ = 2, level 3</button>
+      <button type="button" data-kind="2b3" aria-pressed="false">2 · level 3</button>
+      <button type="button" data-kind="23b5" aria-pressed="false">2, 3 · level 5</button>
     </div>
-    <label class="wm-graph-prime">p = <select aria-label="Characteristic p"></select></label>
+    <div class="wm-graph-selects">
+      <label class="wm-graph-view">view
+        <select aria-label="Full graph, folded by Frobenius, or spine only">
+          <option value="full" selected>full graph</option>
+          <option value="folded">folded by Frobenius</option>
+          <option value="spine">spine only</option>
+        </select>
+      </label>
+      <label class="wm-graph-prime">p = <select aria-label="Characteristic p"></select></label>
+    </div>
   </div>
   <div class="wm-graph-stage">
     <svg class="wm-graph-svg" role="img" aria-labelledby="wm-graph-caption"></svg>
@@ -80,13 +90,14 @@ I study probabilistic issues in Number Theory and Cryptography, particularly rel
     <span class="wm-graph-stats"></span>
     <span class="wm-graph-legend">
       <span><i class="wm-key wm-key-node"></i>supersingular curve</span>
+      <span class="wm-graph-legend-pair" hidden><i class="wm-key wm-key-pair"></i>conjugate pair {E, E<sup>(p)</sup>}</span>
       <span class="wm-graph-legend-fp"><i class="wm-key wm-key-fp"></i><span>defined over F<sub>p</sub></span></span>
       <span><i class="wm-key wm-key-2"></i>2-isogeny</span>
       <span class="wm-graph-legend-3" hidden><i class="wm-key wm-key-3"></i>3-isogeny</span>
       <span><i class="wm-key wm-key-walk"></i><i class="wm-key wm-key-trail"></i>random walk, last <span class="wm-trail-n">10</span> steps</span>
     </span>
     <span class="wm-graph-field"></span>
-    <span class="wm-graph-hint">Hover or tap a vertex for its j-invariant; drag to rearrange.</span>
+    <span class="wm-graph-hint">Hover or tap a vertex for its j-invariant; drag to rearrange. <a href="graphs/index.qmd">Gallery of spines →</a></span>
   </figcaption>
 </figure>
 <script type="module" src="assets/js/isogeny-hero.js"></script>

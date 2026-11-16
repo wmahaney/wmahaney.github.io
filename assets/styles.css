@@ -182,8 +182,9 @@ h1, h2, h3, h4, h5, h6,
 }
 .wm-seg {
   display: inline-flex;
+  flex-wrap: wrap;
   padding: 3px;
-  border-radius: 999px;
+  border-radius: 1.2rem;
   background: var(--wm-tint);
 }
 .wm-seg button {
@@ -204,6 +205,21 @@ h1, h2, h3, h4, h5, h6,
   outline: 2px solid var(--wm-accent2);
   outline-offset: 2px;
 }
+.wm-graph-selects { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; }
+.wm-graph-view select { max-width: 12.5rem; }
+.wm-graph-view select,
+.wm-graph-view {
+  font: 600 0.85rem/1.2 var(--wm-sans);
+}
+.wm-graph-view { color: var(--wm-muted); }
+.wm-graph-view select {
+  color: var(--wm-ink);
+  background: var(--wm-surface);
+  border: 1.5px solid var(--wm-line);
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+}
+.wm-graph-view select:focus-visible { outline: 2px solid var(--wm-accent2); outline-offset: 2px; }
 .wm-graph-prime {
   font-size: 0.85rem;
   font-weight: 600;
@@ -262,6 +278,8 @@ h1, h2, h3, h4, h5, h6,
   transition: opacity 0.15s ease;
 }
 .wm-g-node-fp { fill: var(--wm-accent2); }
+/* A conjugate pair {E, E^(p)} in the folded graph: a larger blue disc with an orange core ring. */
+.wm-g-node-pair { stroke: var(--wm-accent2); stroke-width: 2; }
 .wm-g-node:active { cursor: grabbing; }
 .wm-g-focus { stroke: var(--wm-ink); stroke-width: 2.5; }
 .wm-g-edge.wm-g-dim,
@@ -343,6 +361,8 @@ h1, h2, h3, h4, h5, h6,
 .wm-key-walk { width: 0.6rem; height: 0.6rem; border-radius: 50%; }
 .wm-key-node { background: var(--wm-accent); }
 .wm-key-fp { background: var(--wm-accent2); }
+.wm-key-pair { width: 0.75rem; height: 0.75rem; border-radius: 50%;
+  background: var(--wm-accent); border: 2px solid var(--wm-accent2); }
 .wm-key-walk { background: var(--wm-surface); border: 2px solid var(--wm-ink); }
 .wm-key-trail {
   width: 1.6rem;

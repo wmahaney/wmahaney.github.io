@@ -25,7 +25,60 @@ const KINDS = {
     caption: (p, n) => `The 2-isogeny graph with Borel level-3 structure in characteristic ${p}: ` +
       `${n} pairs (E, C), where C is a subgroup of E of order 3.`,
   },
+  "23b5": {
+    defaultP: 101, cap5: true, ells: [2, 3], bound: "2√2 + 2√3",
+    boundVal: 2 * Math.SQRT2 + 2 * Math.sqrt(3),
+    caption: (p, n) => `The (2,3)-isogeny graph with Borel level-5 structure in characteristic ${p}: ` +
+      `${n} pairs (E, C), where C is a subgroup of E of order 5.`,
+  },
 };
+
+// The three ways to look at each graph.
+//  full    every vertex.
+//  folded  the quotient by Frobenius (E, C) -> (E^(p), C^(p)): conjugate pairs become one vertex.
+//  spine   only the vertices fixed by Frobenius (the F_p-rational ones), and the edges among them.
+function derive(g, view) {
+  const n = g.nodes.length, sigma = g.sigma;
+  const base = (i) => ({ label: g.nodes[i], members: [i] });
+  if (view === "spine") {
+    const keep = [], at = new Map();
+    for (let i = 0; i < n; i++) if (g.fp[i]) { at.set(i, keep.length); keep.push(i); }
+    return {
+      nodes: keep.map((i) => ({ ...base(i), fp: true })),
+      links: g.links.filter(([s, t]) => at.has(s) && at.has(t))
+        .map(([s, t, ell, m]) => [at.get(s), at.get(t), ell, m]),
+    };
+  }
+  if (view === "folded") {
+    const at = new Map(), nodes = [];
+    for (let i = 0; i < n; i++) {
+      if (sigma[i] < i) continue;                    // its partner comes first
+      const pair = sigma[i] !== i;
+      at.set(i, nodes.length);
+      if (pair) at.set(sigma[i], nodes.length);
+      nodes.push({ label: g.nodes[i], members: pair ? [i, sigma[i]] : [i], fp: !pair, pair });
+    }
+    // An edge of the quotient is a Frobenius-orbit of edges of the original graph.
+    const seen = new Set(), links = [];
+    const norm = (a, b) => (a <= b ? [a, b] : [b, a]);
+    for (const [s, t, ell, m] of g.links) {
+      const [a, b] = norm(s, t), [c, d] = norm(sigma[s], sigma[t]);
+      const key = `${ell}|${a < c || (a === c && b <= d) ? `${a}-${b}` : `${c}-${d}`}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      links.push([...norm(at.get(s), at.get(t)), ell, m]);
+    }
+    return { nodes, links };
+  }
+  return { nodes: g.nodes.map((_, i) => ({ ...base(i), fp: g.fp[i] })), links: g.links };
+}
+
+function components(n, links) {
+  const parent = [...Array(n).keys()];
+  const find = (x) => { while (parent[x] !== x) x = parent[x] = parent[parent[x]]; return x; };
+  for (const [s, t] of links) parent[find(s)] = find(t);
+  return new Set(parent.map((_, i) => find(i))).size;
+}
 
 const el = (name, attrs = {}, parent) => {
   const node = document.createElementNS(SVG_NS, name);
@@ -52,6 +105,8 @@ function init(root, index, base) {
   const select = root.querySelector(".wm-graph-prime select");
   const trailSelect = root.querySelector(".wm-graph-trail-len");
   const speedSelect = root.querySelector(".wm-graph-speed");
+  const viewSelect = root.querySelector(".wm-graph-view select");
+  const legendPair = root.querySelector(".wm-graph-legend-pair");
   const trailLabel = root.querySelector(".wm-trail-n");
   const buttons = [...root.querySelectorAll("[data-kind]")];
   const legend3 = root.querySelector(".wm-graph-legend-3");
@@ -89,7 +144,8 @@ function init(root, index, base) {
   async function build() {
     const id = ++buildId;
     const kind = state.kind, cfg = KINDS[kind];
-    const primes = index.primes.filter((q) => !cfg.levelCap || q <= index.level_max_p);
+    const cap = cfg.levelCap ? index.level_max_p : cfg.cap5 ? index.level5_max_p : Infinity;
+    const primes = index.primes.filter((q) => q <= cap);
     if (!primes.includes(state.p[kind])) {
       state.p[kind] = primes.includes(cfg.defaultP) ? cfg.defaultP : primes[0];
     }
@@ -113,9 +169,11 @@ function init(root, index, base) {
     if (id !== buildId) return;        // a newer choice has been made meanwhile
     root.classList.remove("wm-graph-loading");
     const g = entry.graphs[kind];
-    const n = g.nodes.length;
-    const nodes = g.nodes.map((label, i) => ({
-      i, label, fp: g.fp[i],
+    const view = viewSelect.value;
+    const d = derive(g, view);
+    const n = d.nodes.length;
+    const nodes = d.nodes.map((nd, i) => ({
+      ...nd, i,
       x: W / 2 + (W / 3) * Math.cos((2 * Math.PI * i) / n),
       y: H / 2 + (H / 3) * Math.sin((2 * Math.PI * i) / n),
     }));
@@ -123,7 +181,7 @@ function init(root, index, base) {
     // One drawn strand per edge of the multigraph; strands between the same
     // pair of vertices fan out as curves.
     const groups = new Map();
-    for (const [s, t, ell, m] of g.links) {
+    for (const [s, t, ell, m] of d.links) {
       const key = `${s}-${t}`;
       if (!groups.has(key)) groups.set(key, []);
       for (let k = 0; k < m; k++) groups.get(key).push(ell);
@@ -141,6 +199,7 @@ function init(root, index, base) {
     }
 
     const r = n <= 20 ? 8 : n <= 45 ? 6.5 : n <= 110 ? 5 : n <= 300 ? 4 : n <= 700 ? 3 : 2.2;
+    const rOf = (nd) => (nd.pair ? r * 1.35 : r);
     gEdges.replaceChildren();
     gNodes.replaceChildren();
     for (const st of strands) {
@@ -148,11 +207,12 @@ function init(root, index, base) {
     }
     for (const nd of nodes) {
       nd.circle = el("circle", {
-        class: `wm-g-node${nd.fp ? " wm-g-node-fp" : ""}`, r, tabindex: "-1",
+        class: `wm-g-node${nd.fp ? " wm-g-node-fp" : ""}${nd.pair ? " wm-g-node-pair" : ""}`,
+        r: rOf(nd), tabindex: "-1",
       }, gNodes);
       attachNodeEvents(nd);
     }
-    Object.assign(state, { nodes, strands, adj, pinned: null, r });
+    Object.assign(state, { nodes, strands, adj, pinned: null, r, graph: g });
     painted = [];
     hideTip();
 
@@ -161,7 +221,7 @@ function init(root, index, base) {
     state.sim = forceSimulation(nodes)
       .force("link", forceLink(simLinks).distance(dist).strength(0.5))
       .force("charge", forceManyBody().strength(-Math.max(60, 5200 / n)).distanceMax(320))
-      .force("collide", forceCollide(r + (n > 300 ? 1.5 : 3)))
+      .force("collide", forceCollide((nd) => rOf(nd) + (n > 300 ? 1.5 : 3)))
       .force("x", forceX(W / 2).strength(0.06))
       .force("y", forceY(H / 2).strength(0.075))
       .alphaDecay(n > 700 ? 0.06 : n > 300 ? 0.03 : 0.035)
@@ -175,20 +235,38 @@ function init(root, index, base) {
     draw();
     if (!reduced && visible) state.sim.restart();
 
-    caption.textContent = cfg.caption(p, n);
-    const lam = g.lambda2;
-    stats.textContent = lam == null ? "" :
-      `Second-largest eigenvalue modulus ${lam.toFixed(3)} ≤ ${cfg.bound} ≈ ${cfg.boundVal.toFixed(3)}.`;
+    const nFixed = g.fp.filter(Boolean).length, nFull = g.nodes.length;
+    const nComp = components(n, d.links);
+    if (view === "folded") {
+      caption.textContent = cfg.caption(p, nFull).replace(/ in characteristic/, " folded by Frobenius, in characteristic")
+        .replace(/: .*$/, `: ${n} vertices, the orbits of Frobenius on ${nFull} vertices.`);
+      stats.textContent = `${nFixed} fixed by Frobenius (the spine) and ${(nFull - nFixed) / 2} conjugate pairs. ` +
+        `Edges are Frobenius-orbits of edges.`;
+    } else if (view === "spine") {
+      caption.textContent = cfg.caption(p, nFull).replace(/ in characteristic/, " restricted to its spine, in characteristic")
+        .replace(/: .*$/, `: the ${n} vertices defined over F_p, of ${nFull}, and the edges between them.`);
+      stats.textContent = n === 0 ? "No vertex is fixed by Frobenius for this p (nothing is defined over F_p)." :
+        nComp === 1 ? "The spine is connected." : `The spine has ${nComp} connected components.`;
+    } else {
+      caption.textContent = cfg.caption(p, n);
+      const lam = g.lambda2;
+      stats.textContent = (lam == null ? "" :
+        `Second-largest eigenvalue modulus ${lam.toFixed(3)} ≤ ${cfg.bound} ≈ ${cfg.boundVal.toFixed(3)}. `) +
+        `${nFixed} of the ${n} vertices are defined over F_p (the spine).`;
+    }
     legend3.hidden = !cfg.ells.includes(3);
-    if (legendFp) legendFp.hidden = !g.fp.some(Boolean);
+    if (legendFp) legendFp.hidden = !d.nodes.some((nd) => nd.fp);
+    if (legendPair) legendPair.hidden = view !== "folded";
     const nr = entry.nonresidue;
     fieldNote.replaceChildren("Labels are j-invariants in F", sub("p"), "(i), i",
       sup("2"), ` = ${nr < 0 ? "−" + (-nr) : nr}.`);
     root.dataset.kind = kind;
 
-    walker = { at: Math.floor(Math.random() * n), next: null, strand: null, t0: 0 };
+    const movable = nodes.filter((nd) => adj[nd.i].length);
+    walker = { at: movable.length ? movable[Math.floor(Math.random() * movable.length)].i : 0,
+               next: null, strand: null, t0: 0 };
     trail = [];
-    walkerDot.style.display = reduced ? "none" : "";
+    walkerDot.style.display = reduced || !strands.length ? "none" : "";
   }
 
   // The simulation runs in its own coordinates; the view scales and centres it
@@ -263,6 +341,7 @@ function init(root, index, base) {
     if (reduced) return;
     if (walker.next == null) {
       const options = state.adj[walker.at];
+      if (!options.length) return;          // a vertex with no edges (a tiny spine)
       const pick = options[Math.floor(Math.random() * options.length)];
       walker.next = pick.to; walker.strand = pick.strand; walker.t0 = now;
       walker.reverse = pick.strand.s !== walker.at;
@@ -306,9 +385,11 @@ function init(root, index, base) {
 
   // ---- hover, tap and drag -------------------------------------------------
   function labelOf(nd) {
-    return Array.isArray(nd.label)
-      ? `(j(E), j(E/C)) = (${nd.label[0]}, ${nd.label[1]})`
-      : `j = ${nd.label}`;
+    const one = (label) => (Array.isArray(label)
+      ? `(j(E), j(E/C)) = (${label[0]}, ${label[1]})` : `j = ${label}`);
+    if (!nd.pair) return one(nd.label);
+    const other = state.graph.nodes[nd.members[1]];
+    return `{E, E⁽ᵖ⁾}: ${one(nd.label)}  ~  ${one(other)}`;
   }
   function showTip(nd) {
     const nbrs = new Set(state.adj[nd.i].map((e) => e.to));
@@ -385,6 +466,7 @@ function init(root, index, base) {
     while (trail.length > TRAIL) trail.shift();
     paintTrail();
   });
+  viewSelect.addEventListener("change", () => { build().then(startLoop); });
   speedSelect.addEventListener("change", () => { hopMs = SPEEDS[speedSelect.value]; });
 
   // Only animate while the figure is on screen and the tab is visible.

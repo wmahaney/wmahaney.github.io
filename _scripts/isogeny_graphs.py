@@ -15,6 +15,13 @@ Three graphs are computed for each prime p:
   "2b3"  the 2-isogeny graph with Borel (Gamma_0(3)) level structure:
          vertices are pairs (E, C), C < E of order 3, up to isomorphism;
          a 2-isogeny phi: E -> E' gives an edge (E, C) -> (E', phi(C)).
+  "23b5" the (2,3)-isogeny graph with Borel (Gamma_0(5)) level structure:
+         vertices are pairs (E, C), C < E of order 5; 2- and 3-isogenies
+         push C forward.
+
+Every graph also carries "sigma", the permutation induced by Frobenius
+(E -> E^(p), C -> C^(p)). Its fixed vertices are the F_p-rational ones (the "spine");
+the page draws the folded graph (the quotient by sigma) from it.
 
 Method. Everything is done with short Weierstrass models y^2 = x^3 + ax + b
 over F_{p^2} and Velu's formulas, so only F_{p^2} arithmetic and root finding
@@ -39,6 +46,11 @@ Checks run on every prime (the script aborts if one fails):
     Phi_2 or Phi_3;
   * pushed-forward level structure is again 3-torsion (psi_3 vanishes);
   * A_ij * |Aut_j| = A_ji * |Aut_i| (the Brandt-matrix symmetry);
+  * number of F_p-rational vertices (the spine) agrees with the class number
+    formula (h(-4p)/2, h(-p), or 2 h(-p) according to p mod 8);
+  * Frobenius is an involutive automorphism of every graph;
+  * for level 5: the pushed-forward kernel polynomial is a factor of psi_5, every
+    quotient curve is supersingular, and the mass is (p - 1)/4;
   * number of level-structure vertices agrees with an orbit count giving
     total mass 4 * (p - 1) / 24.
 """
@@ -56,6 +68,8 @@ DEFAULT_PRIMES = [101, 157, 211, 307, 431, 599, 827, 1009, 1499, 1999, 2503,
 # primes up to this bound (recorded in index.json, which the page reads). It is
 # computed and checked for every prime either way.
 LEVEL_MAX_P = 5000
+# Same for the Gamma_0(5) graph, which has six times as many vertices as G_p(2).
+LEVEL5_MAX_P = 3000
 
 # j-invariants of the CM curves with class number one: discriminant -> j
 CM_J = {
@@ -230,6 +244,60 @@ def roots(F, f):
     return sorted(out)
 
 
+def pmul(F, f, g):
+    if not f or not g:
+        return []
+    out = [F.zero] * (len(f) + len(g) - 1)
+    for a, fa in enumerate(f):
+        if fa == F.zero:
+            continue
+        for b, gb in enumerate(g):
+            out[a + b] = F.add(out[a + b], F.mul(fa, gb))
+    return ptrim(F, out)
+
+
+def pmonic(F, f):
+    li = F.inv(f[-1])
+    return [F.mul(c, li) for c in f]
+
+
+def quadratic_factors(F, f):
+    """Factor a squarefree f, all of whose irreducible factors over F_{p^2} have
+    degree 1 or 2, into monic quadratics (as (s, q): x^2 - s x + q).
+
+    Linear factors cannot be paired up here (that needs the curve), so they are
+    returned separately as roots."""
+    f = pmonic(F, ptrim(F, list(f)))
+    x = [F.zero, F.one]
+    g1 = pgcd(F, psub(F, ppowmod(F, x, F.q, f), x), f)
+    lin = roots(F, g1) if len(g1) > 1 else []
+    f2 = pdivexact(F, f, g1) if len(g1) > 1 else f
+    quads = []
+
+    def split(g):
+        d = len(g) - 1
+        if d == 0:
+            return
+        if d == 2:
+            g = pmonic(F, g)
+            quads.append((F.neg(g[1]), g[0]))
+            return
+        while True:
+            delta = F.rand()
+            h = ppowmod(F, [delta, F.one], (F.q * F.q - 1) // 2, g)
+            h = pgcd(F, psub(F, h, [F.one]), g)
+            if 0 < len(h) - 1 < d:
+                break
+        split(h)
+        split(pdivexact(F, g, h))
+
+    if len(f2) > 1:
+        g2 = pgcd(F, psub(F, ppowmod(F, x, F.q * F.q, f2), x), f2)
+        assert len(g2) == len(f2), "factor of degree > 2 in the 5-division polynomial"
+        split(g2)
+    return lin, sorted(quads)
+
+
 def pdivexact(F, f, g):
     f = list(f)
     dg = len(g) - 1
@@ -343,6 +411,29 @@ def n_supersingular(p: int) -> int:
     return p // 12 + {1: 0, 5: 1, 7: 1, 11: 2}[p % 12]
 
 
+def class_number(D: int) -> int:
+    """h(D) for a negative discriminant D, by counting reduced forms."""
+    from math import gcd
+    n, a = 0, 1
+    while 3 * a * a <= -D:
+        for b in range(-a + 1, a + 1):
+            if (b * b - D) % (4 * a):
+                continue
+            c = (b * b - D) // (4 * a)
+            if c < a or gcd(gcd(a, abs(b)), c) != 1 or (a == c and b < 0):
+                continue
+            n += 1
+        a += 1
+    return n
+
+
+def n_spine(p: int) -> int:
+    """Number of F_p-rational supersingular j-invariants (Delfs-Galbraith)."""
+    if p % 4 == 1:
+        return class_number(-4 * p) // 2
+    return class_number(-p) * (1 if p % 8 == 7 else 2)
+
+
 def aut_order(F, j) -> int:
     if j == F.zero:
         return 6
@@ -448,11 +539,203 @@ def borel3_graph(F, js):
         assert sum(A[s]) == 3
         for t in range(n):
             assert A[s][t] * aut[t] == A[t][s] * aut[s], "level Brandt symmetry fails"
-    fp = [F.frob(r[3]) == r[3] and F.frob(r[4]) == r[4] and
-          all(F.frob(c) == c for c in level_invariant(F, r[0], r[1], r[2]) if c != "zero")
-          for r in reps]
+    sigma = [verts[frob_inv(F, level_invariant(F, r[0], r[1], r[2]))] for r in reps]
+    check_sigma(A, sigma)
     labels = [[F.show(r[3]), F.show(r[4])] for r in reps]
-    return A, labels, fp
+    return A, labels, sigma
+
+
+# --------------------------------------------------------------------------
+# Level 5. A subgroup C of order 5 is {O, +-P, +-2P}; it is determined by the
+# kernel polynomial x^2 - s x + q with roots x(P), x(2P) (a quadratic over F_{p^2}
+# even when x(P) is not in F_{p^2}, because Frobenius is a scalar and C is stable).
+# Isomorphisms act by (a, b, s, q) -> (t^2 a, t^3 b, t s, t^2 q).
+# --------------------------------------------------------------------------
+def psi5(F, a, b):
+    f = [b, a, F.zero, F.one]
+    g = [F.sub(F.smul(-8, F.mul(b, b)), F.mul(a, F.mul(a, a))),
+         F.smul(-4, F.mul(a, b)), F.smul(-5, F.mul(a, a)), F.smul(20, b),
+         F.smul(5, a), F.zero, F.one]
+    p3 = [F.neg(F.mul(a, a)), F.smul(12, b), F.smul(6, a), F.zero, F.el(3)]
+    t1 = [F.smul(32, c) for c in pmul(F, pmul(F, f, f), g)]
+    t2 = pmul(F, p3, pmul(F, p3, p3))
+    return psub(F, t1, t2)
+
+
+def x_double(F, a, b, x):
+    num = F.add(F.sub(F.mul(F.mul(x, x), F.mul(x, x)), F.smul(2, F.mul(a, F.mul(x, x)))),
+                F.add(F.smul(-8, F.mul(b, x)), F.mul(a, a)))
+    den = F.smul(4, F.add(F.mul(x, F.add(F.mul(x, x), a)), b))
+    return F.div(num, den)
+
+
+def five_subgroups(F, a, b):
+    """Kernel polynomials (s, q) of the six subgroups of order 5."""
+    lin, quads = quadratic_factors(F, psi5(F, a, b))
+    seen = set(lin)
+    for r in lin:
+        if r in seen and r is not None:
+            r2 = x_double(F, a, b, r)
+            assert r2 in seen and r2 != r, "5-torsion roots do not pair up"
+            seen.discard(r)
+            seen.discard(r2)
+            quads.append((F.add(r, r2), F.mul(r, r2)))
+    assert not seen
+    quads = sorted(quads)
+    assert len(quads) == 6, len(quads)
+    return quads
+
+
+class Kalg:
+    """F_{p^2}[X] / (X^2 - s X + q): elements c0 + c1 X as pairs."""
+
+    def __init__(self, F, s, q):
+        self.F, self.s, self.q = F, s, q
+
+    def mul(self, u, v):
+        F = self.F
+        c11 = F.mul(u[1], v[1])
+        return (F.sub(F.mul(u[0], v[0]), F.mul(self.q, c11)),
+                F.add(F.add(F.mul(u[0], v[1]), F.mul(u[1], v[0])), F.mul(self.s, c11)))
+
+    def add(self, u, v):
+        return (self.F.add(u[0], v[0]), self.F.add(u[1], v[1]))
+
+    def scal(self, c, u):
+        return (self.F.mul(c, u[0]), self.F.mul(c, u[1]))
+
+    def trace(self, u):
+        F = self.F
+        return F.add(F.smul(2, u[0]), F.mul(u[1], self.s))
+
+    def norm(self, u):
+        F = self.F
+        return F.add(F.add(F.mul(u[0], u[0]), F.mul(F.mul(u[0], u[1]), self.s)),
+                     F.mul(F.mul(u[1], u[1]), self.q))
+
+    def inv(self, u):
+        F = self.F
+        n = self.norm(u)
+        assert n != F.zero, "kernel meets the isogeny kernel"
+        conj = (F.add(u[0], F.mul(u[1], self.s)), F.neg(u[1]))
+        return self.scal(F.inv(n), conj)
+
+    def X(self):
+        return (self.F.zero, self.F.one)
+
+    def const(self, c):
+        return (c, self.F.zero)
+
+    def char_poly(self, u):
+        return self.trace(u), self.norm(u)
+
+
+def push2(F, a, b, e, s, q):
+    """(a', b', s', q') for the image of C under the 2-isogeny with kernel (e, 0)."""
+    a2, b2, _ = velu2(F, a, b, e)
+    t = F.add(F.smul(3, F.mul(e, e)), a)
+    K = Kalg(F, s, q)
+    inv = K.inv(K.add(K.X(), K.const(F.neg(e))))
+    img = K.add(K.X(), K.scal(t, inv))
+    return a2, b2, *K.char_poly(img)
+
+
+def push3(F, a, b, x0, s, q):
+    a2, b2 = velu3(F, a, b, x0)
+    t = F.smul(2, F.add(F.smul(3, F.mul(x0, x0)), a))
+    u = F.smul(4, F.add(F.mul(x0, F.add(F.mul(x0, x0), a)), b))
+    K = Kalg(F, s, q)
+    inv = K.inv(K.add(K.X(), K.const(F.neg(x0))))
+    img = K.add(K.add(K.X(), K.scal(t, inv)), K.scal(u, K.mul(inv, inv)))
+    return a2, b2, *K.char_poly(img)
+
+
+def kernel_vanishes(F, a, b, s, q):
+    """Does psi_5 vanish at the roots of x^2 - s x + q?"""
+    K = Kalg(F, s, q)
+    X = K.X()
+    out = (F.zero, F.zero)
+    for c in reversed(psi5(F, a, b)):
+        out = K.add(K.mul(out, X), K.const(c))
+    return out == (F.zero, F.zero)
+
+
+def velu5(F, a, b, s, q):
+    p2 = F.sub(F.mul(s, s), F.smul(2, q))
+    p3 = F.sub(F.mul(s, F.mul(s, s)), F.smul(3, F.mul(s, q)))
+    v = F.add(F.smul(6, p2), F.smul(4, a))
+    w = F.add(F.add(F.smul(10, p3), F.smul(6, F.mul(a, s))), F.smul(8, b))
+    return F.sub(a, F.smul(5, v)), F.sub(b, F.smul(7, w))
+
+
+def level5_invariant(F, a, b, s, q):
+    if s != F.zero:
+        si = F.inv(s)
+        s2 = F.mul(si, si)
+        return ("s", F.mul(a, s2), F.mul(b, F.mul(s2, si)), F.mul(q, s2))
+    qi = F.inv(q)
+    return ("q", F.mul(a, qi), F.mul(F.mul(b, b), F.mul(qi, F.mul(qi, qi))))
+
+
+def frob_inv(F, inv):
+    return tuple(F.frob(c) if isinstance(c, tuple) else c for c in inv)
+
+
+def check_sigma(A, sigma):
+    n = len(A)
+    assert sorted(sigma) == list(range(n))
+    assert all(sigma[sigma[v]] == v for v in range(n)), "Frobenius is not an involution"
+    for s_ in range(n):
+        for t_ in range(n):
+            assert A[sigma[s_]][sigma[t_]] == A[s_][t_], "Frobenius is not an automorphism"
+
+
+def borel5_graph(F, js):
+    """(2,3)-isogeny graph on pairs (E, C), C of order 5."""
+    verts, reps, orbit = {}, [], []
+    for j in js:
+        a, b = model(F, j)
+        for (s, q) in five_subgroups(F, a, b):
+            inv = level5_invariant(F, a, b, s, q)
+            if inv in verts:
+                orbit[verts[inv]] += 1
+                continue
+            verts[inv] = len(reps)
+            a5, b5 = velu5(F, a, b, s, q)
+            reps.append((a, b, s, q, j, j_inv(F, a5, b5)))
+            orbit.append(1)
+    n = len(reps)
+    aut = [Fraction(aut_order(F, r[4]), orbit[k]) for k, r in enumerate(reps)]
+    assert all(x.denominator == 1 for x in aut)
+    assert sum(1 / x for x in aut) == Fraction(F.p - 1, 4), "mass formula fails (level 5)"
+    jset = set(js)
+    assert all(r[5] in jset for r in reps), "Velu quotient by C is not supersingular"
+    A2 = [[0] * n for _ in range(n)]
+    A3 = [[0] * n for _ in range(n)]
+    for k, (a, b, s, q, j, _) in enumerate(reps):
+        assert kernel_vanishes(F, a, b, s, q)
+        for e in two_torsion(F, a, b):
+            a2, b2, s2, q2 = push2(F, a, b, e, s, q)
+            assert kernel_vanishes(F, a2, b2, s2, q2), "image is not 5-torsion"
+            inv = level5_invariant(F, a2, b2, s2, q2)
+            assert inv in verts, "unknown level-5 vertex (2-isogeny)"
+            A2[k][verts[inv]] += 1
+        for x0 in three_torsion(F, a, b):
+            a3, b3, s3, q3 = push3(F, a, b, x0, s, q)
+            assert kernel_vanishes(F, a3, b3, s3, q3), "image is not 5-torsion"
+            inv = level5_invariant(F, a3, b3, s3, q3)
+            assert inv in verts, "unknown level-5 vertex (3-isogeny)"
+            A3[k][verts[inv]] += 1
+    for A, deg in ((A2, 3), (A3, 4)):
+        for k in range(n):
+            assert sum(A[k]) == deg
+            for m in range(n):
+                assert A[k][m] * aut[m] == A[m][k] * aut[k], "level-5 Brandt symmetry fails"
+    sigma = [verts[frob_inv(F, level5_invariant(F, r[0], r[1], r[2], r[3]))] for r in reps]
+    check_sigma(A2, sigma)
+    check_sigma(A3, sigma)
+    labels = [[F.show(r[4]), F.show(r[5])] for r in reps]
+    return A2, A3, labels, sigma
 
 
 def links_from(A, ell):
@@ -483,14 +766,28 @@ def compute(p: int):
     js = supersingular_js(F)
     A2 = isogeny_adjacency(F, js, 2)
     A3 = isogeny_adjacency(F, js, 3)
-    AB, lab_b, fp_b = borel3_graph(F, js)
+    AB, lab_b, sig_b = borel3_graph(F, js)
     lab = [F.show(j) for j in js]
-    fp = [j[1] == 0 for j in js]
+    idx = {j: k for k, j in enumerate(js)}
+    sig = [idx[F.frob(j)] for j in js]
+    for A in (A2, A3):
+        check_sigma(A, sig)
+    fp = [sig[k] == k for k in range(len(js))]
+    assert fp == [j[1] == 0 for j in js]
+    if p > 3:
+        assert sum(fp) == n_spine(p), "spine size disagrees with the class number formula"
+    fp_b = [sig_b[k] == k for k in range(len(sig_b))]
+    A25 = None
+    if p != 5 and p <= LEVEL5_MAX_P:
+        A25, A35, lab_5, sig_5 = borel5_graph(F, js)
+        fp_5 = [sig_5[k] == k for k in range(len(sig_5))]
     lam = {"2": second_eigenvalue([A2]), "23": second_eigenvalue([A2, A3]),
-           "2b3": second_eigenvalue([AB])}
+           "2b3": second_eigenvalue([AB]),
+           "23b5": second_eigenvalue([A25, A35]) if A25 else None}
     # Ramanujan-type bounds, checked numerically rather than assumed.
     for key, bound in (("2", 2 * 2 ** 0.5), ("23", 2 * 2 ** 0.5 + 2 * 3 ** 0.5),
-                       ("2b3", 2 * 2 ** 0.5)):
+                       ("2b3", 2 * 2 ** 0.5),
+                       ("23b5", 2 * 2 ** 0.5 + 2 * 3 ** 0.5)):
         if lam[key] is not None:
             assert lam[key] <= bound + 1e-6, (p, key, lam[key], bound)
     out = {
@@ -498,13 +795,20 @@ def compute(p: int):
         "nonresidue": F.r if F.r != p - 1 else -1,
         "n_level": len(lab_b),
         "graphs": {
-            "2": {"nodes": lab, "fp": fp, "links": links_from(A2, 2), "lambda2": lam["2"]},
+            "2": {"nodes": lab, "fp": fp, "links": links_from(A2, 2), "sigma": sig,
+                  "lambda2": lam["2"]},
             "23": {"nodes": lab, "fp": fp,
-                   "links": links_from(A2, 2) + links_from(A3, 3), "lambda2": lam["23"]},
+                   "links": links_from(A2, 2) + links_from(A3, 3), "sigma": sig,
+                   "lambda2": lam["23"]},
             "2b3": {"nodes": lab_b, "fp": fp_b, "links": links_from(AB, 2),
-                    "lambda2": lam["2b3"]},
+                    "sigma": sig_b, "lambda2": lam["2b3"]},
         },
     }
+    if A25 is not None:
+        out["n_level5"] = len(lab_5)
+        out["graphs"]["23b5"] = {
+            "nodes": lab_5, "fp": fp_5, "sigma": sig_5,
+            "links": links_from(A25, 2) + links_from(A35, 3), "lambda2": lam["23b5"]}
     if p > LEVEL_MAX_P:
         del out["graphs"]["2b3"]
     return out
@@ -536,7 +840,7 @@ def main():
         f.write_text(json.dumps(res, separators=(",", ":")) + "\n")
         total += f.stat().st_size
     (out / "index.json").write_text(json.dumps(
-        {"primes": primes, "level_max_p": LEVEL_MAX_P}, separators=(",", ":")) + "\n")
+        {"primes": primes, "level_max_p": LEVEL_MAX_P, "level5_max_p": LEVEL5_MAX_P}, separators=(",", ":")) + "\n")
     print(f"wrote {len(primes)} files to {out} ({total} bytes in all)")
 
 
