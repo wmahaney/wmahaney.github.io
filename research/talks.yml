@@ -1,0 +1,35 @@
+# TALKS, newest first. The Research page lists them in this order.
+#
+# TO ADD A TALK: copy one entry (four lines), paste it at the top, and edit it.
+#   year    shown at the left
+#   title   the title of the talk
+#   venue   the meeting or seminar, and where it was
+#   slides  optional: the file name of the slides in files/talks/, for example
+#           "2025-mason-vii.pdf". When it is filled in, a "Slides" link appears next
+#           to the talk. Leave it as "" and nothing is shown.
+# Only talks that have been given go here.
+
+- year: 2025
+  title: "Computing isogenies at singular points of the modular polynomial"
+  venue: "MASON VII, University of Maryland"
+  slides: ""
+
+- year: 2025
+  title: "Computing isogenies at singular points of the modular polynomial"
+  venue: "AMS Southeast Sectional Meeting, Tulane University"
+  slides: ""
+
+- year: 2025
+  title: "Computing isogenies at singular points of the modular polynomial"
+  venue: "AMS Eastern Sectional Meeting, Howard University"
+  slides: ""
+
+- year: 2024
+  title: "Computing isogenies at singular points of the modular polynomial"
+  venue: "AMS Central Sectional Meeting, University of Wisconsin–Milwaukee"
+  slides: ""
+
+- year: 2024
+  title: "Computing isogenies at singular points of the modular polynomial"
+  venue: "PANTS XXXVII, Wake Forest University"
+  slides: ""

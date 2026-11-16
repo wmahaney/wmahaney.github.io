@@ -1,0 +1,134 @@
+# CODE PROJECTS. This one file drives the Code pages:
+#   code/index.qmd        the overview, with the list of repositories
+#   code/basic-tools.qmd  one section per browser tool
+# A tool's address ("url") is written here and nowhere else, so when a tool moves
+# (a renamed repository, a custom domain) this is the only file to change.
+#
+# FIELDS
+#   name     shown as the heading
+#   id       short name used in links: code/basic-tools.html#<id> (lowercase, no spaces)
+#   kind     basic-tool | research | other
+#   status   live | hidden      (hidden entries are left out of the site entirely)
+#   summary  one sentence
+#   url      where the tool runs (basic tools only)
+#   source   the repository
+#   license  e.g. CC0-1.0
+#   paper    link to the paper the code belongs to (research code; leave empty otherwise)
+# Basic tools also have:
+#   about    a short paragraph: what it does and who it is for
+#   usage    two or three steps
+#   limits   the main limits, stated plainly
+#   also     optional extra links, each with "label" and "url"
+#
+# TO ADD A REPOSITORY: copy one of the commented templates at the bottom of this file,
+# remove the "# " at the start of each line, and edit it. Set "status: live" to show it.
+#
+# TO SWITCH A TOOL ON, once its page loads at "url":
+#   1. here, change its "status: hidden" to "status: live";
+#   2. in code/basic-tools.qmd, delete the line "draft: true" (first tool only);
+#   3. in _quarto-public.yml and _quarto-private.yml, replace the plain "Code" link by the
+#      commented "Code" menu just below it, keeping one entry per live tool.
+
+- name: cropmark
+  id: cropmark
+  kind: basic-tool
+  status: hidden
+  summary: "Crop a photo and mark it up in the browser."
+  url: "https://wmahaney.github.io/cropmark-ai/"
+  source: "https://github.com/wmahaney/cropmark-ai"
+  license: "CC0-1.0"
+  paper: ""
+  about: >-
+    cropmark crops photos, draws on them and adds text: marker, highlighter, arrow,
+    box, ellipse and outlined text, with undo and redo. It is for marking up a
+    screenshot or a phone photo quickly, without installing an image editor.
+  usage:
+    - "Open a photo with the Open button, by dragging it onto the page, or by pasting it."
+    - "Crop it and draw on it with the tools in the toolbar."
+    - "Save to download the result as a PNG or JPEG."
+  limits:
+    - "JPEG and PNG only, up to 32 megapixels."
+    - "Made for a desktop browser with a mouse; touch is not supported."
+    - "Edits cannot be reopened later: the download is the only output."
+  also:
+    - label: "Desktop version and core library"
+      url: "https://github.com/wmahaney/cropmark_base-ai"
+
+- name: travel_notes
+  id: travel-notes
+  kind: basic-tool
+  status: hidden
+  summary: "Markdown notes with LaTeX math, downloadable as Markdown or PDF."
+  url: "https://wmahaney.github.io/travel_notes-ai/"
+  source: "https://github.com/wmahaney/travel_notes-ai"
+  license: "CC0-1.0"
+  paper: ""
+  about: >-
+    travel_notes is a Markdown editor with LaTeX math and a preview beside the
+    source. It is for writing mathematical notes on any computer and taking them
+    away as a file.
+  usage:
+    - "Write Markdown on the left, with math between dollar signs."
+    - "Press Compile (Ctrl+Enter) to typeset the preview on the right."
+    - "Download the source as a .md file, or print the preview to a PDF."
+  limits:
+    - "The preview is typeset by MathJax, not by a TeX engine, so LaTeX packages and TikZ are not available."
+    - "The PDF comes from the browser's print dialog."
+    - "Drafts are kept only in this browser's storage and can be lost; download what you want to keep."
+    - "A note that includes images from the web makes the browser contact those sites."
+
+# ---- TEMPLATES (copy, uncomment, edit) ----------------------------------------
+#
+# Code for a paper:
+#
+# - name: "Name of the repository"
+#   id: short-name
+#   kind: research
+#   status: live
+#   summary: "One sentence on what the code computes."
+#   url: ""
+#   source: "https://github.com/wmahaney/REPOSITORY"
+#   license: "MIT"
+#   paper: "https://arxiv.org/abs/0000.00000"
+#
+# Research code without a paper:
+#
+# - name: "Name of the repository"
+#   id: short-name
+#   kind: research
+#   status: live
+#   summary: "One sentence on what the code computes."
+#   url: ""
+#   source: "https://github.com/wmahaney/REPOSITORY"
+#   license: "MIT"
+#   paper: ""
+#
+# Anything else (teaching material, LaTeX styles, utilities):
+#
+# - name: "Name of the repository"
+#   id: short-name
+#   kind: other
+#   status: live
+#   summary: "One sentence on what it is."
+#   url: ""
+#   source: "https://github.com/wmahaney/REPOSITORY"
+#   license: "CC0-1.0"
+#   paper: ""
+#
+# A browser tool (see cropmark above for "about", "usage", "limits" and "also"):
+#
+# - name: "name-of-the-tool"
+#   id: name-of-the-tool
+#   kind: basic-tool
+#   status: hidden
+#   summary: "One sentence on what it does."
+#   url: "https://wmahaney.github.io/REPOSITORY-ai/"
+#   source: "https://github.com/wmahaney/REPOSITORY-ai"
+#   license: "CC0-1.0"
+#   paper: ""
+#   about: "A short paragraph: what it does and who it is for."
+#   usage:
+#     - "First step."
+#     - "Second step."
+#   limits:
+#     - "The main limit."

@@ -7,3 +7,25 @@ _site/
 # macOS
 .DS_Store
 _scripts/__pycache__/
+
+# Quarto adds these two itself the first time the site is rendered
+/.quarto/
+**/*.quarto_ipynb
+
+# LaTeX (the CV in cv/): intermediate files and the local build folder
+build/
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.nav
+*.out
+*.run.xml
+*.snm
+*.synctex.gz
+*.synctex(busy)
+*.toc
+*.xdv

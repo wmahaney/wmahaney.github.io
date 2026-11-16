@@ -59,7 +59,7 @@ def spine(p: int, kind: str, over: bool = False):
         sig = d["sigma"]
         G.graph["frob"] = sorted({(min(i, sig[i]), max(i, sig[i])) for i in fixed
                                   if sig[i] != i and sig[i] in keep})
-    for s, t, ell, m in d["links"]:
+    for s, t, ell, m in ((l[0], l[1], l[2], max(l[3:])) for l in d["links"]):
         if s in keep and t in keep:
             for _ in range(m):
                 G.add_edge(s, t, ell=ell)

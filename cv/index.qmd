@@ -1,205 +1,25 @@
 ---
 title: "Curriculum Vitae"
 description-meta: "Curriculum vitae of William E. Mahaney."
-date-modified: last-modified
-toc: true
-toc-title: "Sections"
 ---
 
 <!--
 HOW THIS PAGE WORKS
-Each entry is a block like this:
-
-::: {.wm-cv-item}
-[Date]{.wm-cv-when}
-
-**What**\
-Where, details
-:::
-
-Copy a block, paste it in the right section (newest first), and edit it. A backslash at
-the end of a line starts a new line inside the entry.
-
-KEEP THE PDF IN STEP. The PDF (cv_william_mahaney.pdf, in the top-level folder) is a
-separate file. When you change this page, update the PDF too.
+The CV is written once, in LaTeX, in cv/cv.tex. Pushing to GitHub compiles it to
+cv_william_mahaney.pdf, and this page shows that PDF. There is no second copy of the CV
+to keep in step: to change the CV, edit cv/cv.tex. See cv/README.md.
 -->
 
-<!-- Shown only when the page is printed, since printing drops the site header. -->
-::: {.wm-print-only}
-**William E. Mahaney** · mahaney1@vt.edu · wmahaney.github.io
-:::
-
-::: {.wm-actions}
+<!-- arXiv and ORCID buttons are added after GitHub once their ids are filled in under
+     "profile-links" in _quarto.yml. -->
+::: {.wm-actions .wm-profile-links}
 [Download PDF](../cv_william_mahaney.pdf){.wm-btn .wm-btn-fill download="cv_william_mahaney.pdf"}
-[Email](mailto:mahaney1@vt.edu){.wm-btn .wm-btn-outline}
-[GitHub](https://github.com/wmahaney){.wm-btn .wm-btn-outline}
+[Email](mailto:mahaney1@vt.edu){.wm-btn .wm-btn-outline aria-label="Email William Mahaney" title="Email William Mahaney"}
+[GitHub](https://github.com/wmahaney){.wm-btn .wm-btn-outline aria-label="William Mahaney on GitHub" title="William Mahaney on GitHub"}
 :::
 
-## Education
-
-::: {.wm-cv-item}
-[May 2027 (expected)]{.wm-cv-when}
-
-**PhD in Mathematics**\
-Virginia Polytechnic Institute and State University, Blacksburg, VA
-:::
-
-::: {.wm-cv-item}
-[May 2023]{.wm-cv-when}
-
-**Master of Science in Mathematics**\
-Virginia Polytechnic Institute and State University, Blacksburg, VA
-:::
-
-::: {.wm-cv-item}
-[May 2020]{.wm-cv-when}
-
-**Bachelor of Science in Mathematics**\
-Virginia Polytechnic Institute and State University, Blacksburg, VA
-:::
-
-## Preprints
-
-<!-- All authors, in alphabetical order by surname. -->
-
-::: {.wm-cv-item}
-[2026]{.wm-cv-when}
-
-*Generating Sets for Maximal Orders in Rational Quaternion Algebras*\
-K. Eisenträger, E. Z. Goren, A. Iezzi, H. Kir, E. Kırımlı, J. Love, W. E. Mahaney, J. Park, M. Sabitova\
-[arXiv:2610.10139](https://arxiv.org/abs/2610.10139)
-:::
-
-::: {.wm-cv-item}
-[2024]{.wm-cv-when}
-
-*Computing Isogenies at Singular Points of the Modular Polynomial*\
-W. E. Mahaney, T. Morrison\
-[arXiv:2402.02038](https://arxiv.org/abs/2402.02038)
-:::
-
-## Fellowships and Awards
-
-::: {.wm-cv-item}
-[2022–2027]{.wm-cv-when}
-
-**Julian Chin PhD Fellowship in Cybersecurity**
-:::
-
-## Talks
-
-::: {.wm-cv-item}
-[2024–2025]{.wm-cv-when}
-
-*Computing Isogenies at Singular Points of the Modular Polynomial*
-
-- 2025: MASON VII (Mid-Atlantic Seminar on Numbers), University of Maryland
-- 2025: AMS Southeast Fall Sectional Meeting, Tulane University
-- 2025: AMS Eastern Spring Sectional Meeting, Howard University
-- 2024: AMS Central Spring Sectional Meeting, University of Wisconsin–Milwaukee
-- 2024: PANTS XXXVII (Palmetto Algebraic Number Theory Seminar), Wake Forest University
-:::
-
-## Teaching
-
-::: {.wm-cv-item}
-[Fall 2026]{.wm-cv-when}
-
-**Instructor**, MATH 1214: Preparation for Calculus\
-Virginia Tech
-:::
-
-::: {.wm-cv-item}
-[2017–2020]{.wm-cv-when}
-
-**Private mathematics tutoring**\
-Tutored college undergraduates in Calculus I, II and III and Linear Algebra.
-:::
-
-## Industry Experience
-
-::: {.wm-cv-item}
-[Fall 2024]{.wm-cv-when}
-
-**Student Internship, RTX**\
-Worked with a student and an RTX mentor to benchmark implementations of the three NIST standardized cryptographic algorithms (FIPS 203, 204, and 205). Gathered implementation requirements and commercial acquisition data for FIPS 140-3 and CNSA 2.0 compliant cryptographic modules. Wrote a report comparing the performance of several libraries and outlining the FIPS 140-3 and CNSA 2.0 requirements for cryptographic modules.
-:::
-
-## Workshops and Schools
-
-::: {.wm-cv-item}
-[August 2025]{.wm-cv-when}
-
-**BIRS Isogeny Graphs in Cryptography Research Workshop**, Banff, Canada\
-Week-long research workshop; participants worked in groups on research topics in supersingular isogeny cryptography.
-:::
-
-::: {.wm-cv-item}
-[July 2025]{.wm-cv-when}
-
-**LuCaNT: LMFDB, Computation, and Number Theory**\
-Week-long research workshop on computational number theory and mathematical databases.
-:::
-
-::: {.wm-cv-item}
-[June 2025]{.wm-cv-when}
-
-**SLMath Summer School on Local Limits of Random Graphs**\
-Two-week summer school on Benjamini–Schramm (local) limits of deterministic and random graphs, and other modern topics in random graph theory.
-:::
-
-::: {.wm-cv-item}
-[March 2024]{.wm-cv-when}
-
-**Arizona Winter School: Abelian Varieties**\
-One-week lecture series on abelian varieties over finite fields, with evening problem sessions.
-:::
-
-::: {.wm-cv-item}
-[August 2023]{.wm-cv-when}
-
-**BIRS Isogeny Workshop 2023**, Bristol, UK\
-Week-long research workshop; participants worked in groups on research topics in supersingular isogeny cryptography.
-:::
-
-::: {.wm-cv-item}
-[July 2022]{.wm-cv-when}
-
-**Park City Mathematics Institute Summer School**\
-Three-week summer school on computational number theory, sponsored by the IAS.
-:::
-
-## Service and Outreach
-
-::: {.wm-cv-item}
-[2024–present]{.wm-cv-when}
-
-**Founding member, organizational committee**, Mathematics Directed Reading Program, Virginia Tech
-:::
-
-::: {.wm-cv-item}
-[2025]{.wm-cv-when}
-
-**Volunteer**, Virginia Tech Mathematics Opportunities in Research and Education\
-Helped run breakout sessions and served as a graduate student representative at Q&A events.
-:::
-
-::: {.wm-cv-item}
-[ ]{.wm-cv-when}
-
-**Volunteer science fair judge**, Roanoke Valley Governor's School Regional Science Fair
-:::
-
-## Skills
-
-::: {.wm-cv-item}
-[Working]{.wm-cv-when}
-
-Python 3, SageMath, LaTeX/Beamer, Microsoft Excel, Linux, Git
-:::
-
-::: {.wm-cv-item}
-[Basic]{.wm-cv-when}
-
-C, C++, Java, Magma
-:::
+```{=html}
+<object class="wm-cv-pdf" data="../cv_william_mahaney.pdf#view=FitH" type="application/pdf" aria-label="Curriculum vitae of William E. Mahaney (PDF)">
+  <p>This browser does not show PDF files inside a page. <a href="../cv_william_mahaney.pdf">Open the CV as a PDF</a>.</p>
+</object>
+```

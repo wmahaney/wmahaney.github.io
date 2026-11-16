@@ -23,6 +23,48 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v4
 
+      # THE CV. cv/cv.tex is the one source of the CV (see cv/README.md). When it exists,
+      # compile it and put the PDF where the site serves it, cv_william_mahaney.pdf.
+      # When it does not exist, these steps are skipped and the PDF already in the
+      # repository is used. A LaTeX error fails the build, so nothing is published.
+      - name: Is there a cv/cv.tex?
+        id: cv
+        run: |
+          if [ -f cv/cv.tex ]; then echo "present=true" >> "$GITHUB_OUTPUT"; else echo "present=false" >> "$GITHUB_OUTPUT"; fi
+
+      # TeX Live 2025 (a frozen release), through the action at a fixed commit
+      # (xu-cheng/latex-action v4.1.0). pdfLaTeX unless cv/.latexmkrc sets $pdf_mode.
+      - name: Compile the CV
+        if: steps.cv.outputs.present == 'true'
+        uses: xu-cheng/latex-action@6549dc21effb2730855a1281407ecfcececc6c1b
+        with:
+          texlive_version: "2025"
+          working_directory: cv
+          root_file: cv.tex
+          # "-e $pdf_mode||=1" means: pdfLaTeX, unless cv/.latexmkrc chose an engine.
+          # (No spaces inside it: the action splits these arguments at spaces.)
+          args: "-e $pdf_mode||=1 -file-line-error -halt-on-error -interaction=nonstopmode -outdir=build"
+
+      - name: Put the compiled CV in place
+        if: steps.cv.outputs.present == 'true'
+        run: cp cv/build/cv.pdf cv_william_mahaney.pdf
+
+      - name: Keep the LaTeX log when the CV fails to compile
+        if: failure() && steps.cv.outputs.present == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: cv-latex-log
+          path: |
+            cv/build/*.log
+            cv/*.log
+          if-no-files-found: ignore
+          retention-days: 14
+
+      # The random walk on the isogeny graphs is built by assets/js/walk.js; these tests
+      # check its transition matrix against the graph data. Node is already on the runner.
+      - name: Test the random-walk code
+        run: node --test _tests/*.test.mjs
+
       - name: Install Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 

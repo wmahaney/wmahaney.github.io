@@ -3,10 +3,9 @@ title: "Blooming"
 description-meta: "Balls in supersingular isogeny graphs grown until they contain a Frobenius conjugate pair."
 ---
 
-Two animations grow a ball $B_r(v)$ around a vertex $v$, one layer at a time ($r = 0, 1, 2, \dots$), and stop at different events. Choose one in the **animation** menu, and tap a vertex to start from it.
-
-- **Blooming for collision** stops when the ball first runs into itself: an edge reaches a vertex that is already in the ball, other than along the edge it came in by, closing a cycle. The cycle is shown in bold. It works in every view.
-- **Blooming for conjugates** stops when the ball contains a vertex $w$ together with its Frobenius conjugate $w^{(p)} \neq w$. Where it stopped is red and the shortest paths from the centre are bold. In the **quotient by Frobenius** it stops at the first **self-collision** (a vertex reached again by another lift, which is the same condition) or when it **reaches the $\mathbb{F}_p$-subgraph**, whichever comes first.
+<!-- The description of each animation is in the box at the top of the picture. Its text
+     is in _partials/isogeny-widget.qmd, one block per animation, and it changes when the
+     animation menu changes. -->
 
 ::: {data-mode="ball"}
 {{< include /_partials/isogeny-widget.qmd >}}
@@ -15,6 +14,13 @@ Two animations grow a ball $B_r(v)$ around a vertex $v$, one layer at a time ($r
 ```{=html}
 <script type="module" src="../assets/js/isogeny-hero.js"></script>
 ```
+
+## The two blooming animations
+
+Two animations grow a ball $B_r(v)$ around a vertex $v$, one layer at a time ($r = 0, 1, 2, \dots$), and stop at different events. Choose one in the **animation** menu, and tap a vertex to start from it.
+
+- **Blooming for collision** stops when the ball first runs into itself: an edge reaches a vertex that is already in the ball, other than along the edge it came in by, closing a cycle. The cycle is shown in bold. It works in every view.
+- **Blooming for conjugates** stops when the ball contains a vertex $w$ together with its Frobenius conjugate $w^{(p)} \neq w$. Where it stopped is red and the shortest paths from the centre are bold. In the **quotient by Frobenius** it stops at the first **self-collision** (a vertex reached again by another lift, which is the same condition) or when it **reaches the $\mathbb{F}_p$-subgraph**, whichever comes first.
 
 ## Blooming for conjugates: why the pair is worth finding
 

@@ -36,20 +36,34 @@ website:
     # The menu items ("left:") are set per build profile:
     #   _quarto-public.yml   the public site (the default; used for main)
     #   _quarto-private.yml  private builds (the "private" branch), with Statements
+    # The icon links at the right of the menu. "text" is what a screen reader reads and
+    # what appears when the pointer rests on the icon.
     tools:
       - icon: envelope
         href: "mailto:mahaney1@vt.edu"
-        text: Email
+        text: "Email William Mahaney"
       - icon: github
         href: "https://github.com/wmahaney"
-        text: GitHub
+        text: "William Mahaney on GitHub"
   page-footer:
     left: "William E. Mahaney · Virginia Tech"
     right: "mahaney1@vt.edu"
 
-# Drops <!-- editing notes --> from the published pages.
+# ARXIV AND ORCID LINKS. Fill in an id between the quotes and its link appears in the
+# menu bar (next to Email and GitHub), on the home page and on the CV page. While an id
+# is empty, that link is not shown anywhere.
+#   arxiv-author  your arXiv author identifier, the last part of https://arxiv.org/a/<id>
+#                 (it looks like  surname_x_1 ; set one up at arxiv.org -> your account)
+#   orcid         your ORCID iD, in the form 0000-0000-0000-0000
+profile-links:
+  arxiv-author: ""
+  orcid: ""
+
 filters:
+  # Drops <!-- editing notes --> from the published pages.
   - assets/strip-comments.lua
+  # Writes the arXiv and ORCID links set just above.
+  - assets/profile-links.lua
 
 format:
   html:

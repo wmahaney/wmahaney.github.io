@@ -11,9 +11,9 @@ Claude, an AI model made by Anthropic, was used while designing and building thi
 ## What Claude was used for
 
 - The site's design: layout, colours, typography, and the templates behind each page.
-- The interactive isogeny graphs on the home page: the script that computes them and the code that draws them.
+- The interactive isogeny graphs on the home page and the Animations pages: the script that computes them and the code that draws them.
 - Page skeletons and the editing instructions inside the source files.
-- Converting my CV from PDF into the HTML version on the [CV](../cv/index.qmd) page.
+- The [Code](../code/index.qmd) pages, and the step that builds the [CV](../cv/index.qmd) from its LaTeX source.
 
 ## What is mine
 

@@ -3,50 +3,51 @@
 Personal academic website of William E. Mahaney, built with [Quarto](https://quarto.org) and
 published with GitHub Pages. Live site: <https://wmahaney.github.io>
 
-## Where things go
+This file is the guide to editing the site. Each section says which file to open and what to
+change. Most files also carry their own instructions as comments at the top.
 
-| Folder / file | What it is | What to do |
-|---|---|---|
-| `index.qmd` | Home page: intro, isogeny graphs, news, about | Edit text, links, news items |
-| `research/index.qmd` | Research page: papers and talks | Add papers and talks (templates inside the file) |
-| `writing/index.qmd` | **Writing** page: lists every note and post together | Leave alone |
-| `blog/index.qmd`, `notes/index.qmd` | The Blog and Expository Notes pages in the Writing menu | Leave alone |
-| `notes/articles/<name>/index.qmd` | Expository notes, one folder per note | Copy `notes/_template.qmd` |
-| `blog/posts/<name>/index.qmd` | Blog posts, one folder per post | Copy `blog/_template.qmd` |
-| `teaching/index.qmd` | Teaching page | Fill in the hidden skeleton (instructions inside the file) |
-| `statements/<name>/index.qmd` | **Statements**: research, teaching, AI, culture | Empty pages for your own text; see "Statements and AI pages" |
-| `ai/index.qmd`, `ai/projects/<name>/index.qmd` | **AI** page and one folder per AI project | Copy `ai/projects/_template.qmd` |
-| `cv/index.qmd` | CV page, written out in HTML | Edit entries (templates inside the file); keep the PDF in step |
-| `cv_william_mahaney.pdf` | The CV PDF (top-level, so the old link keeps working) | Replace with a file of the same name |
-| `images/profile/` | **Upload your profile photo here** as `profile.jpg` | Upload |
-| `images/notes/`, `images/blog/` | **Upload figures** for notes and posts | Upload |
-| `files/papers/` | **Upload paper PDFs** | Upload |
-| `files/talks/` | **Upload slides** | Upload |
-| `files/teaching/` | **Upload syllabi and handouts** | Upload |
-| `files/statements/` | **Upload statement PDFs** | Upload |
-| `assets/` | Colors, fonts, and page styling | Rarely needed |
-| `assets/js/`, `assets/data/` | Script and data for the home-page isogeny graphs | See below |
-| `_scripts/isogeny_graphs.py` | Computes the isogeny graph data | Run to change the primes |
-| `images/social-card.png` | Picture shown when a link to the site is shared | Replace with a 1200 x 630 image |
-| `_quarto.yml` | Site settings: menu, footer, theme | Rarely needed |
-| `.github/workflows/publish.yml` | Builds and publishes the site automatically | Leave alone |
+- [How publishing works](#how-publishing-works)
+- [Before you edit: four things to know](#before-you-edit-four-things-to-know)
+- [Home page](#home-page)
+- [Menu bar and profile links](#menu-bar-and-profile-links)
+- [Research: papers, talks, slides](#research-papers-talks-slides)
+- [Writing: notes and blog posts](#writing-notes-and-blog-posts)
+- [Code pages](#code-pages)
+- [CV](#cv)
+- [Teaching](#teaching)
+- [Statements, the AI page, and the private branch](#statements-the-ai-page-and-the-private-branch)
+- [Animations and the isogeny graphs](#animations-and-the-isogeny-graphs)
+- [Look: colours, fonts, layout](#look-colours-fonts-layout)
+- [Where everything is](#where-everything-is)
 
-Every upload folder contains a file called `_UPLOAD_HERE.md` explaining exactly what goes there.
-Files starting with `_` (such as those notes and the templates) are never published.
+## How publishing works
 
-## Publishing
+Pushing to `main` builds the site with GitHub Actions and publishes it. Give it a minute or two.
+Pushing any other branch builds it too, without publishing, so a mistake shows up before it is live.
+The workflow is `.github/workflows/publish.yml`. On every push it:
 
-Pushing to `main` builds the site with GitHub Actions and publishes it (give it a minute or two).
-Pushing any other branch builds it too, without publishing, so mistakes show up before they go live.
+1. compiles the CV from `cv/cv.tex`, if that file exists (see [CV](#cv));
+2. runs the tests of the random-walk code (`node --test _tests/*.test.mjs`);
+3. runs `quarto render`, which writes the site to `_site/`;
+4. on `main` only, publishes `_site/`.
+
+If any step fails, nothing is published and the live site stays as it was. On a branch other than
+`main`, the built site is attached to the run as **site-preview** (Actions → the run → Artifacts);
+unzip it and open `index.html` to look at it before merging.
+
 The one-time switch for this: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 
-## Previewing on your own computer (optional)
+To preview on your own computer, install [Quarto](https://quarto.org/docs/get-started/) and run
+`quarto preview` in this folder.
 
-Install [Quarto](https://quarto.org/docs/get-started/), then run `quarto preview` in this folder.
+## Before you edit: four things to know
 
-## Filling in hidden skeletons
+**1. The site shows what exists.** Posted papers, talks that were given, tools that are live,
+released code. It does not announce work that is on the way: no "in preparation", no counts of
+forthcoming papers, no "coming soon". When in doubt, leave it out.
 
-Some pages contain ready-made pieces that are hidden until you fill them in. They look like this:
+**2. Hidden skeletons.** Some pages contain ready-made pieces that are hidden until you fill them
+in. They look like this:
 
 ```
 <!-- TO FILL IN: ... then delete this comment line and the "END" line.
@@ -55,8 +56,141 @@ END -->
 ```
 
 Edit the piece, then delete the first line (`<!-- TO FILL IN ...`) and the last line (`END -->`).
+Everything between `<!--` and `-->` is left out of the published pages.
 
-## Statements and AI pages; the private branch
+**3. Drafts.** A page whose header says `draft: true` is not published and does not appear in
+menus or listings. Delete that line to publish the page.
+
+**4. Underscores.** A file or folder whose name starts with `_` is never published: the
+`_UPLOAD_HERE.md` notes, the templates, `_partials/`, `_scripts/`, `_tests/`.
+
+## Home page
+
+File: `index.qmd`.
+
+| To change | Edit |
+|---|---|
+| The line above your name ("Number Theory · Cryptography · Probability"), your name, your position | The block near the top of `index.qmd` that starts with `<p class="wm-eyebrow">` |
+| The introduction sentence | The paragraph inside `::: {.wm-bio}` |
+| The job-search line | `_partials/seeking.qmd` holds the sentence. To remove it, delete the line `{{< include /_partials/seeking.qmd >}}` in `index.qmd` |
+| The buttons (CV, Email, GitHub) | The block `::: {.wm-actions .wm-profile-links}`. arXiv and ORCID are added automatically; see [Menu bar and profile links](#menu-bar-and-profile-links) |
+| News | The list inside `::: {.wm-news}`. Newest first, three or four items. Each item is `- [date]{.wm-news-date} text`. Delete the whole block to hide News |
+| The four cards (Research, Writing, Code, Teaching) | The `<section class="wm-cards">` block. Each card is one `<a class="wm-card" ...> ... </a>`. Icon names come from [Bootstrap Icons](https://icons.getbootstrap.com) |
+| About me | The paragraphs inside `::: {.wm-about-text}` |
+| Profile photo | Upload `images/profile/profile.jpg` (see the note in that folder). Until it exists, no photo is shown |
+| The graph next to your name | See [Animations and the isogeny graphs](#animations-and-the-isogeny-graphs) |
+
+## Menu bar and profile links
+
+**The menu entries** are in two files with the same layout:
+
+- `_quarto-public.yml`: the site everyone sees (used for `main`);
+- `_quarto-private.yml`: the private test build, which also has the Statements menu.
+
+Change both when you add, remove or reorder a menu entry. An entry is two lines, `href:` (the
+page) and `text:` (the label). A dropdown has `text:` and a `menu:` list of entries.
+
+**The Email and GitHub icons** at the right of the menu are under `tools:` in `_quarto.yml`. The
+`text:` of each is what a screen reader reads and what shows when the pointer rests on the icon.
+
+**arXiv and ORCID.** Open `_quarto.yml`, find `profile-links:` and fill in the ids:
+
+```yaml
+profile-links:
+  arxiv-author: "surname_x_1"
+  orcid: "0000-0000-0000-0000"
+```
+
+Give the id only, not the full address. A link then appears in the menu bar, on the home page
+and on the CV page. While an id is empty, its link is not shown anywhere. (The code is
+`assets/profile-links.lua`.)
+
+**The footer** is `page-footer:` in `_quarto.yml`. **The description and picture shown when a link
+to the site is shared** are `description:` and `image:` in the same file; the picture is
+`images/social-card.png` (1200 × 630).
+
+## Research: papers, talks, slides
+
+File: `research/index.qmd`.
+
+**Add a paper.** Copy the block under `PAPER TEMPLATE` (in the comment at the top of the Papers
+section), paste it at the top of the list, and edit it. List all authors alphabetically by
+surname. Link the posted paper (arXiv or ePrint); for a PDF hosted here, put it in
+`files/papers/` and link it as `[PDF](../files/papers/your-file.pdf){.wm-chip}`. Only posted
+papers go on the page.
+
+**Fill in a summary or abstract.** Each paper has a hidden `TO FILL IN` piece for each; see
+"Hidden skeletons" above.
+
+**Add a talk.** Talks are a list in `research/talks.yml`, newest first. Copy an entry (four
+lines), paste it at the top, and edit it. Only talks that have been given go in the list.
+
+**Add slides to a talk.**
+
+1. Upload the PDF to `files/talks/`, named `year-meeting.pdf` (for example `2025-mason-vii.pdf`).
+2. In `research/talks.yml`, put the file name in that talk's `slides:` line:
+   `slides: "2025-mason-vii.pdf"`.
+
+A "Slides" link then appears next to the talk. A talk with `slides: ""` shows no link.
+
+## Writing: notes and blog posts
+
+- **A new expository note:** make a folder `notes/articles/<short-name>/`, copy
+  `notes/_template.qmd` into it as `index.qmd`, and edit it.
+- **A new blog post:** the same with `blog/posts/<short-name>/` and `blog/_template.qmd`.
+
+The card for it appears automatically on the Writing, Expository Notes or Blog page. Figures go
+in `images/notes/` or `images/blog/`. To keep a half-written piece private, add `draft: true` to
+its header. Math is written as in LaTeX: `$x^2$` inline, `$$ ... $$` displayed. The listing
+pages themselves (`writing/index.qmd`, `notes/index.qmd`, `blog/index.qmd`) rarely need editing.
+
+## Code pages
+
+One data file, `code/projects.yml`, drives both Code pages:
+
+- `code/index.qmd`: the overview, with the list of repositories;
+- `code/basic-tools.qmd`: one section per browser tool.
+
+**Add a repository.** Open `code/projects.yml`, copy one of the commented templates at the
+bottom, remove the `# ` at the start of each line, and edit it. An entry with `status: live` is
+shown; one with `status: hidden` is left out of the site entirely. While no entry is live, the
+overview shows its introduction only, with no empty heading.
+
+**Switch a browser tool on**, once its page loads at its `url`:
+
+1. in `code/projects.yml`, change its `status: hidden` to `status: live`;
+2. in `code/basic-tools.qmd`, delete the line `draft: true` (needed for the first tool only);
+3. in `_quarto-public.yml` and `_quarto-private.yml`, replace the plain `Code` link by the
+   commented `Code` menu just below it, keeping one entry per live tool.
+
+**Move a tool** (a renamed repository, a custom domain): change its `url:` and `source:` in
+`code/projects.yml`. The address is written nowhere else.
+
+**Change what is said about a tool:** its `about:`, `usage:` and `limits:` in the same file. The
+layout of the pages is in `code/_tools.ejs` and `code/_repositories.ejs`. The introduction of the
+overview is the paragraph in `code/index.qmd`.
+
+## CV
+
+The CV is written once, in LaTeX. Put the source at `cv/cv.tex` (with any `.cls`, `.sty` or
+`.bib` it needs next to it). To update the CV: edit `cv/cv.tex` and push. The site rebuilds, and
+the CV page, the "Curriculum vitae" button on the home page and every link to
+`cv_william_mahaney.pdf` get the new PDF.
+
+Until `cv/cv.tex` exists, the site serves the `cv_william_mahaney.pdf` that is in the repository;
+to update the CV in the meantime, replace that file. Details, building locally and using
+another LaTeX engine: `cv/README.md`.
+
+The CV page (`cv/index.qmd`) shows the PDF and has no text of its own to keep in step.
+
+## Teaching
+
+File: `teaching/index.qmd`. Each course is a card (`::: {.wm-course}`). To add a semester, copy
+a card under a new `### Semester Year` heading. Syllabi and handouts go in `files/teaching/`.
+The page has hidden `TO FILL IN` pieces for your approach, course descriptions, materials and
+the Directed Reading Program.
+
+## Statements, the AI page, and the private branch
 
 The four statements (`statements/<name>/index.qmd`: research, teaching, culture, AI) are empty
 and marked `draft: true`. The public site leaves them out, and its menu has no Statements tab.
@@ -80,47 +214,94 @@ repository; use `quarto preview --profile private` on your own computer, or a pr
 **Publishing a statement:** delete its `draft: true`, then copy the "Statements" menu entry
 from `_quarto-private.yml` into `_quarto-public.yml` (listing only the statements that are
 published), and merge into `main`. The AI tab (`ai/index.qmd`) and the Statements overview
-page (`statements/index.qmd`) are drafts too, and work the same way. A home-page card for
-either can be added to the card row in `index.qmd` once it is public.
+page (`statements/index.qmd`) are drafts too, and work the same way. To add an AI project, copy
+`ai/projects/_template.qmd`.
 
-## The isogeny graphs on the home page
+## Animations and the isogeny graphs
 
-The home page draws three graphs for a choice of primes `p`: the supersingular 2-isogeny graph,
-the (2,3)-isogeny graph, and the 2-isogeny graph with Borel level-3 structure. The data is
-computed ahead of time by `_scripts/isogeny_graphs.py` (plain Python, no SageMath needed) and
-stored as one small file per prime in `assets/data/isogeny/` (`p431.json`, ... plus `index.json`),
-so the page only downloads the prime being viewed. The default list goes up to p = 4999; the level-3
-graph is offered up to p = 5000. The walk has "history" (10 to 250 steps) and "speed" controls. To offer different primes:
+The interactive graph on the home page and on the Animations pages is one shared piece:
+
+| Part | File |
+|---|---|
+| Markup: controls, the info panel, the legend, the glossary behind the "?" buttons | `_partials/isogeny-widget.qmd` |
+| Drawing and animation | `assets/js/isogeny-hero.js`, `assets/js/spectral.js` |
+| The random walk's transition matrix (no drawing) | `assets/js/walk.js`, tested by `_tests/walk.test.mjs` |
+| Data | `assets/data/isogeny/`, written by `_scripts/isogeny_graphs.py` |
+| The Animations pages | `animations/walks.qmd`, `balls.qmd`, `spectral.qmd`, `about.qmd` (definitions), `index.qmd` |
+
+**Change the description of an animation.** The box at the top of the picture has one block per
+entry of the animation menu, in `_partials/isogeny-widget.qmd` under `THE INFO PANEL`. Edit the
+block; the page shows the block of the animation that is running. On an Animations page the
+page title follows the menu too.
+
+**Change a definition behind a "?" button.** Edit its `<dd>` in the glossary at the bottom of
+`_partials/isogeny-widget.qmd`. The longer statements are on `animations/about.qmd`.
+
+**Text under the picture on an Animations page** is ordinary text in that page's `.qmd` file.
+Keep text about one particular animation out of the top of the page: the top belongs to the
+info panel, which changes with the menu.
+
+**Change the primes on offer.** Run
 
 ```
-python3 _scripts/isogeny_graphs.py 101 431 1009
+python3 _scripts/isogeny_graphs.py 101 431 1009      # your list of primes
+python3 _scripts/isogeny_graphs.py                    # the default list
 ```
 
-then commit the new JSON files. The (2,3)-graph with Borel level-5 structure is stored only up to p = 3000 (`LEVEL5_MAX_P` in the script), and the page offers it only for those primes.
+and commit the files it writes: one `p<prime>-<graph>.json` per prime and graph, plus
+`index.json`. It also rewrites `spectra.json` (the eigenvalue histograms for the spectral law);
+add `--skip-spectra` to leave that file alone, or `--spectra-only` to remake only it. The
+default list takes about twenty minutes. The script needs Python 3 and `numpy`, and it checks its
+own output on every prime (class number formulas, modular polynomials, mass formulas, the Brandt
+relation, the eigenvalue bounds) and stops if a check fails. The graphs it computes, and the
+largest prime for each, are listed at the top of the script.
 
-Each graph's data has `sigma` (Frobenius on vertices), `jfp` (j-invariant in F_p) and `fold` (the edges of the quotient by Frobenius, computed from Frobenius on edges). The **view** menu: the *spine* is the subgraph induced on the vertices with j in F_p; the *folded* graph is the quotient by Frobenius. Exact definitions are on `animations/about.qmd`, which the eye icon on the graph links to. The script checks its own output on every prime (class number
-formula, modular polynomials, the mass formula, Brandt-matrix symmetry, and the Ramanujan bound)
-and stops if a check fails. The method is described at the top of the script.
+**Directed edges.** Edges are counted by kernels, so the adjacency matrix is not symmetric next
+to a vertex with automorphisms other than ±1. A link in the data is `[s, t, ell, m]` (m edges
+each way) or `[s, t, ell, m, back]` where the two counts differ, and the picture draws those
+edges with arrowheads. `animations/about.qmd#directed` states the rule.
 
-## Changing the look
+**The random walk.** The walker's steps are drawn from a transition matrix `P` built in
+`assets/js/walk.js` from the adjacency matrix. It is the simple random walk (each edge out of the
+current vertex equally likely). The same file has the slot for a walk that differs from it on
+the closed 1-balls around `j = 0` and `j = 1728` (`PETERSSON_ROW`), with instructions next to it.
+After changing that file, run the tests:
 
-Colors: `assets/theme-light.scss` and `assets/theme-dark.scss` (the `--wm-*` values near the bottom).
-Layout and cards: `assets/styles.css`. Menu font: `assets/head.html`.
+```
+node --test _tests/*.test.mjs
+```
 
-## Animations tab
+**The static figures** on the Animations pages are made by `python3 _scripts/spine_diagrams.py`
+(needs `pip install networkx`) and `python3 _scripts/ball_diagrams.py`.
 
-The Animations menu has five pages in `animations/`: **Random walks** (`walks.qmd`), **Growing balls**
-(`balls.qmd`), **Spectral law** (`spectral.qmd`) and **Read more** (`about.qmd`, the definitions, with
-pictures of the F_p-subgraphs), plus the landing page `index.qmd`. The interactive graph is one shared
-piece of markup, `_partials/isogeny-widget.qmd`, used by the home page and the animation pages; its
-**animation** menu switches between the graph viewer (the default on the home page), the random walk,
-the growing ball and the spectral law, and its
-**view** menu between the full graph, the F_p-subgraph and the quotient by Frobenius.
+## Look: colours, fonts, layout
 
-- Data: `python3 _scripts/isogeny_graphs.py` writes `assets/data/isogeny/` (one file per prime, plus
-  `spectra.json` with histograms of the Hecke eigenvalues for about 100 primes; add `--skip-spectra`
-  to leave that file alone, or `--spectra-only` to remake only it). The Gamma(4) examples use their own
-  small primes (`GAMMA4_PRIMES`). The
-  graphs and their caps are listed at the top of the script.
-- Pictures: `python3 _scripts/spine_diagrams.py` (F_p-subgraphs, `assets/img/spine/`, needs
-  `pip install networkx`) and `python3 _scripts/ball_diagrams.py` (growing-ball figures).
+- Colours: `assets/theme-light.scss` and `assets/theme-dark.scss` (the `--wm-*` values near the
+  bottom of each). Change a colour in both files.
+- Layout, cards, buttons: `assets/styles.css`, which uses those `--wm-*` values so that light
+  and dark mode both work.
+- Menu font: `assets/head.html`.
+
+## Where everything is
+
+| Folder / file | What it is |
+|---|---|
+| `index.qmd` | Home page |
+| `research/index.qmd`, `research/talks.yml` | Research page: papers, and the list of talks |
+| `writing/`, `notes/`, `blog/` | Writing pages; notes in `notes/articles/`, posts in `blog/posts/` |
+| `code/` | Code pages, driven by `code/projects.yml` |
+| `animations/` | Animations pages |
+| `teaching/index.qmd` | Teaching page |
+| `cv/` | CV page, the LaTeX source of the CV (`cv/cv.tex`), and `cv/README.md` |
+| `cv_william_mahaney.pdf` | The CV PDF the site serves when there is no `cv/cv.tex` |
+| `statements/`, `ai/` | Statements and the AI page (drafts) |
+| `ai-disclosure/index.qmd` | How AI was used in building the site |
+| `files/papers/`, `files/talks/`, `files/teaching/`, `files/statements/` | Uploads: PDFs. Each folder has an `_UPLOAD_HERE.md` note |
+| `images/` | Uploads: profile photo, figures, favicon, social card |
+| `_partials/` | Shared pieces: the isogeny graph, the job-search line |
+| `assets/` | Styles, scripts, graph data, the two small Lua filters |
+| `_scripts/` | Python scripts that compute the graph data and figures |
+| `_tests/` | Tests of the random-walk code |
+| `_quarto.yml`, `_quarto-public.yml`, `_quarto-private.yml` | Site settings and the two menus |
+| `.github/workflows/publish.yml` | Builds and publishes the site |
+| `.vscode/settings.json` | Makes VS Code's LaTeX extension write its files to a `build/` folder |

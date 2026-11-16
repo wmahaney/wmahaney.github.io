@@ -250,6 +250,7 @@ h1, h2, h3, h4, h5, h6,
   fill: none;
   stroke-width: 1.4;
   stroke-linecap: round;
+  stroke-linejoin: round;      /* the arrowhead of a directed edge is part of its path */
   opacity: 0.55;
   transition: opacity 0.15s ease;
 }
@@ -316,9 +317,6 @@ h1, h2, h3, h4, h5, h6,
   outline-offset: 2px;
 }
 .wm-graph-loading .wm-graph-svg { opacity: 0.45; transition: opacity 0.2s ease; }
-@media (prefers-reduced-motion: reduce) {
-  .wm-graph-walk { display: none; }
-}
 .wm-graph-tip sub,
 .wm-graph figcaption sub { font-size: 0.75em; }
 .wm-graph-tip {
@@ -380,9 +378,6 @@ h1, h2, h3, h4, h5, h6,
 .wm-graph:not(.wm-graph-ready) .wm-graph-walk,
 .wm-graph:not(.wm-graph-ready) .wm-graph-legend,
 .wm-graph:not(.wm-graph-ready) .wm-graph-hint { visibility: hidden; }
-@media (prefers-reduced-motion: reduce) {
-  .wm-graph-legend > span:has(.wm-key-walk) { display: none; }
-}
 
 /* ---- Home page: news strip ------------------------------------------------ */
 .wm-news {
@@ -434,10 +429,15 @@ h1, h2, h3, h4, h5, h6,
 .wm-about-text p:last-child { margin-bottom: 0; }
 
 /* Section cards on the home page */
+/* Four cards: two by two, and one column on a phone. (Four across is cramped at
+   this page width, and an automatic grid leaves one card alone on a second row.) */
 .wm-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(14.5rem, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.5rem;
+}
+@media (max-width: 576px) {
+  .wm-cards { grid-template-columns: minmax(0, 1fr); }
 }
 .wm-card {
   position: relative;
@@ -998,3 +998,173 @@ body.quarto-dark .quarto-color-scheme-toggle .bi::before,
 /* Gamma(4): the second Weil-pairing class */
 .wm-g-node.wm-g-node-c1 { fill: #1E8C8C; }
 .wm-key-c1 { width: 0.75rem; height: 0.75rem; border-radius: 50%; background: #1E8C8C; margin-left: 0.15rem; }
+
+/* ---- Home page: the job-search line (text in _partials/seeking.qmd) ------- */
+.wm-seeking p {
+  margin: 0;
+  padding-left: 0.9rem;
+  border-left: 3px solid var(--wm-accent2);
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--wm-muted);
+}
+
+/* ---- arXiv and ORCID in the menu bar (assets/profile-links.lua) ---------- */
+.quarto-navbar-tools .wm-nav-id {
+  font-family: var(--wm-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  vertical-align: middle;
+}
+
+/* ---- Code pages (code/projects.yml) ---------------------------------- */
+.wm-tool,
+.wm-repo {
+  background: var(--wm-surface);
+  border: 1.5px solid var(--wm-line);
+  border-radius: 1.25rem;
+  padding: 1.4rem 1.6rem;
+  margin: 1.25rem 0;
+}
+.wm-tool { scroll-margin-top: 5rem; }
+.wm-tool:target { border-color: var(--wm-accent); }
+.wm-tool .wm-tool-title {
+  margin: 0 0 0.5rem;
+  padding: 0;
+  border: 0;
+  font-size: 1.4rem;
+}
+.wm-tool p { margin: 0; }
+.wm-tool .wm-tool-label {
+  margin: 1rem 0 0.3rem;
+  font-family: var(--wm-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--wm-accent);
+}
+.wm-tool-list {
+  margin: 0;
+  padding-left: 1.3rem;
+}
+.wm-tool .wm-tool-facts {
+  margin-top: 1rem;
+  color: var(--wm-muted);
+  font-size: 0.95rem;
+}
+.wm-tool .wm-tool-actions {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+.wm-repos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.wm-repo-meta {
+  font-family: var(--wm-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--wm-accent);
+}
+.wm-repo-name {
+  margin: 0.35rem 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.wm-repo-summary { color: var(--wm-muted); }
+.wm-repo .wm-paper-links {
+  margin-top: 0.9rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* ---- CV page: the PDF -------------------------------------------------- */
+.wm-cv-pdf {
+  display: block;
+  width: 100%;
+  height: min(85vh, 70rem);
+  border: 1.5px solid var(--wm-line);
+  border-radius: 0.75rem;
+  background: var(--wm-surface);
+}
+.wm-cv-pdf p { padding: 1.25rem 1.5rem; margin: 0; }
+
+/* ---- Isogeny graphs: the info panel, Play / Pause, arrowheads ------------- */
+/* One block per animation (see _partials/isogeny-widget.qmd); the script shows the
+   block of the animation that is running. */
+.wm-anim-info {
+  margin: 0 0 0.9rem;
+  font-family: var(--wm-sans);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--wm-muted);
+}
+.wm-anim-info section {
+  padding: 0.75rem 1rem;
+  background: var(--wm-surface);
+  border: 1.5px solid var(--wm-line);
+  border-radius: 0.9rem;
+}
+.wm-anim-info p { margin: 0; }
+.wm-anim-info p + p { margin-top: 0.45rem; }
+.wm-anim-info .wm-anim-title {
+  font-family: var(--wm-serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--wm-ink);
+}
+/* On an Animations page the page title already names the animation. */
+div[data-mode] > .wm-graph .wm-anim-title { display: none; }
+.wm-anim-which { color: var(--wm-ink); }
+.wm-anim-pi { color: var(--wm-ink); }
+.wm-anim-pi:empty { display: none; }
+.wm-anim-params > span {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--wm-accent);
+  margin-right: 0.35rem;
+}
+.wm-anim-info sub, .wm-anim-info sup { font-size: 0.75em; }
+.wm-graph:not(.wm-graph-ready) .wm-anim-info { visibility: hidden; }
+.wm-graph-play {
+  font: 600 0.8rem/1.2 var(--wm-sans);
+  color: var(--wm-accent-ink);
+  background: var(--wm-accent);
+  border: 1.5px solid var(--wm-accent);
+  border-radius: 999px;
+  padding: 0.25rem 0.85rem;
+  min-width: 4.2rem;
+  cursor: pointer;
+}
+.wm-graph-play:focus-visible { outline: 2px solid var(--wm-accent2); outline-offset: 2px; }
+.wm-graph[data-mode="view"] .wm-graph-play { display: none; }
+/* Legend key for a directed edge: a short line with an arrowhead. */
+.wm-key-arrow {
+  position: relative;
+  width: 1rem;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--wm-accent);
+}
+.wm-key-arrow::after {
+  content: "";
+  position: absolute;
+  right: -1px;
+  top: -3px;
+  width: 6px;
+  height: 6px;
+  border-top: 2px solid var(--wm-accent);
+  border-right: 2px solid var(--wm-accent);
+  transform: rotate(45deg);
+}

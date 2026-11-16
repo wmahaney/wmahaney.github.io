@@ -20,20 +20,20 @@ aliases:
 ```
 
 ::: {.wm-bio}
-I study probabilistic issues in Number Theory and Cryptography, particularly related to supersingular elliptic curves and quaternion algebras.
+I study stochastic problems in Number Theory and Cryptography, particularly related to supersingular elliptic curves and quaternion algebras.
 :::
 
-::: {.wm-actions}
+<!-- JOB SEARCH LINE. The sentence is in _partials/seeking.qmd. To change it, edit that
+     file. To remove it, delete the next line. -->
+{{< include /_partials/seeking.qmd >}}
+
+<!-- PROFILE LINKS. arXiv and ORCID buttons are added after GitHub automatically once
+     their ids are filled in under "profile-links" in _quarto.yml. -->
+::: {.wm-actions .wm-profile-links}
 [Curriculum vitae](cv_william_mahaney.pdf){.wm-btn .wm-btn-fill}
-[Email](mailto:mahaney1@vt.edu){.wm-btn .wm-btn-outline}
-[GitHub](https://github.com/wmahaney){.wm-btn .wm-btn-outline}
+[Email](mailto:mahaney1@vt.edu){.wm-btn .wm-btn-outline aria-label="Email William Mahaney" title="Email William Mahaney"}
+[GitHub](https://github.com/wmahaney){.wm-btn .wm-btn-outline aria-label="William Mahaney on GitHub" title="William Mahaney on GitHub"}
 :::
-
-<!-- MORE PROFILE LINKS: uncomment a line and put in your own ID.
-[arXiv](https://arxiv.org/a/YOUR_ARXIV_AUTHOR_ID){.wm-btn .wm-btn-outline}
-[Google Scholar](https://scholar.google.com/citations?user=YOUR_ID){.wm-btn .wm-btn-outline}
-[ORCID](https://orcid.org/0000-0000-0000-0000){.wm-btn .wm-btn-outline}
--->
 
 :::
 
@@ -76,6 +76,12 @@ I study probabilistic issues in Number Theory and Cryptography, particularly rel
     <h2 class="wm-card-title">Writing</h2>
     <p class="wm-card-text">Expository notes and shorter, informal posts.</p>
     <span class="wm-card-cta">Read the writing →</span>
+  </a>
+  <a class="wm-card" href="code/index.html">
+    <span class="wm-card-icon"><i class="bi bi-code-slash"></i></span>
+    <h2 class="wm-card-title">Code</h2>
+    <p class="wm-card-text">Software for my research, and small tools.</p>
+    <span class="wm-card-cta">See the code →</span>
   </a>
   <a class="wm-card" href="teaching/index.html">
     <span class="wm-card-icon"><i class="bi bi-easel2"></i></span>

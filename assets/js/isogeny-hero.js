@@ -6,6 +6,9 @@ import {
   forceSimulation, forceLink, forceManyBody, forceCollide, forceX, forceY,
 } from "./vendor/d3-force.min.js";
 import { createSpectral } from "./spectral.js";
+import {
+  adjacency, linkCounts, walkFor, stationary, relativeStationary, sampleStep,
+} from "./walk.js";
 
 const W = 600, H = 500, PAD = 40;
 const SVG_NS = "http://www.w3.org/2000/svg";
@@ -111,7 +114,7 @@ function derive(g, view) {
     return {
       nodes: keep.map((i) => ({ label: g.nodes[i], members: [i], fp: true })),
       links: g.links.filter(([s, t]) => at.has(s) && at.has(t))
-        .map(([s, t, ell, m]) => [at.get(s), at.get(t), ell, m]),
+        .map(([s, t, ...rest]) => [at.get(s), at.get(t), ...rest]),
     };
   }
   if (view === "over") {
@@ -129,7 +132,7 @@ function derive(g, view) {
     return {
       nodes: keep.map((i) => ({ label: g.nodes[i], members: [i], fp: fixed[i] })),
       links: g.links.filter(([s, t]) => at.has(s) && at.has(t))
-        .map(([s, t, ell, m]) => [at.get(s), at.get(t), ell, m]),
+        .map(([s, t, ...rest]) => [at.get(s), at.get(t), ...rest]),
       frob,
     };
   }
@@ -141,7 +144,7 @@ function derive(g, view) {
       for (const m of cyc) at.set(m, nodes.length);
       nodes.push({ label: g.nodes[cyc[0]], members: cyc, fp: cyc.length === 1, pair: cyc.length > 1 });
     }
-    return { nodes, links: g.fold.map(([s, t, ell, m]) => [at.get(s), at.get(t), ell, m]) };
+    return { nodes, links: g.fold.map(([s, t, ...rest]) => [at.get(s), at.get(t), ...rest]) };
   }
   return { nodes: g.nodes.map((label, i) => ({ label, members: [i], fp: fixed[i] })), links: g.links };
 }
@@ -199,6 +202,16 @@ const html = (tag) => (text) => {
   return node;
 };
 const sub = html("sub"), sup = html("sup");
+const fx = (v) => v.toFixed(1);
+
+// A weight of the stationary vector, as a fraction when it is one with a small denominator.
+function weight(x) {
+  for (let q = 1; q <= 24; q++) {
+    const pnum = Math.round(x * q);
+    if (Math.abs(x - pnum / q) < 1e-6) return q === 1 ? String(pnum) : `${pnum}/${q}`;
+  }
+  return x.toFixed(3);
+}
 
 // How long one step of the random walk takes, in milliseconds.
 const SPEEDS = { calm: 700, fast: 220, frantic: 90 };
@@ -232,7 +245,14 @@ function init(root, index, base) {
   const legend3 = root.querySelector(".wm-graph-legend-3");
   const legendFp = root.querySelector(".wm-graph-legend-fp");
   const fieldNote = root.querySelector(".wm-graph-field");
+  const legendArrow = root.querySelector(".wm-graph-legend-arrow");
+  const playBtn = root.querySelector(".wm-graph-play");
+  const piBox = root.querySelector(".wm-anim-pi");
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Whether the animation is running. With "reduce motion" set, the page starts with a
+  // still picture and the Play button starts the animation; otherwise it starts playing
+  // and the button pauses it.
+  let playing = !reduced;
 
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   // A glow for the laser: blur the shape and lay the sharp shape on top. The filter
@@ -252,7 +272,7 @@ function init(root, index, base) {
   const beamCore = el("path", { class: "wm-g-beam-core" }, svg);
   const walkerDot = el("circle", { class: "wm-g-walker", r: 5 }, svg);
   const spectral = createSpectral({
-    svg, base, W, H, reduced,
+    svg, base, W, H, still: () => !playing,
     onStatus: (msg) => { if (mode === "spectral") stats.textContent = msg; },
   });
 
@@ -285,15 +305,46 @@ function init(root, index, base) {
     return cache.get(key);
   }
 
+  // Stop whatever is running: the frame loop, the layout simulation, and every mark an
+  // animation leaves on the picture. Every rebuild starts with this, so switching
+  // animation (or graph, prime or view) never leaves the previous loop or its state.
+  function stopAnimation() {
+    if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    if (state.sim) state.sim.stop();
+    spectral.hide();
+    ball = null; walker = null;
+    trail = []; paintTrail();
+    beamGlow.removeAttribute("d"); beamCore.removeAttribute("d");
+    beamGlow.style.display = beamCore.style.display = walkerDot.style.display = "none";
+    if (piBox) piBox.textContent = "";
+  }
+
+  // The info panel. Each animation has its own block in the widget's markup
+  // (.wm-anim-info [data-anim]); only the block of the running animation is shown.
+  // On an Animations page the page title changes with it, and comes back when the
+  // page's own animation is chosen again.
+  const infoBlocks = [...root.querySelectorAll(".wm-anim-info [data-anim]")];
+  const pageTitle = host ? document.querySelector("#title-block-header h1.title") : null;
+  const ownTitle = pageTitle ? pageTitle.textContent : "", ownDocTitle = document.title;
+  const ownMode = mode;
+  function showInfo() {
+    let block = null;
+    for (const b of infoBlocks) { b.hidden = b.dataset.anim !== mode; if (!b.hidden) block = b; }
+    if (!pageTitle || !block) return;
+    const title = mode === ownMode ? ownTitle : block.dataset.title;
+    pageTitle.textContent = title;
+    document.title = mode === ownMode ? ownDocTitle : ownDocTitle.replace(ownTitle, title);
+  }
+
   let buildId = 0;
   async function build() {
     const id = ++buildId;
+    stopAnimation();
     root.dataset.mode = mode;
+    showInfo();
     svg.classList.toggle("wm-spec-mode", mode === "spectral");
     if (mode === "spectral") {        // the spectral law: no graph is drawn
-      if (state.sim) state.sim.stop();
       hideTip(); showEmpty(null);
-      beamGlow.style.display = beamCore.style.display = walkerDot.style.display = "none";
       ballStatus.hidden = true;
       caption.textContent = "Eigenvalues of the Hecke operator T_ℓ on weight-2 cusp forms " +
         "S₂(Γ₀(p)), for growing p, against the Kesten–McKay law (red).";
@@ -306,7 +357,6 @@ function init(root, index, base) {
       await spectral.show(ellSelect.value);
       return;
     }
-    spectral.hide();
     const kind = state.kind, cfg = KINDS[kind];
     const cap = (index.caps && index.caps[kind]) || Infinity;
     const offered = (index.kind_primes && index.kind_primes[kind]) || index.primes;
@@ -361,13 +411,24 @@ function init(root, index, base) {
 
     // One drawn strand per edge of the multigraph; strands between the same
     // pair of vertices fan out as curves.
-    // Directed graphs (Gamma_1(5)) list arcs s -> t; the walk only follows them forwards.
+    // A strand is [s, t, ell, both]. Where the numbers of edges s -> t and t -> s
+    // agree, each pair of opposite edges is one plain strand ("both"), which can be
+    // walked either way. Where they differ (next to a vertex with automorphisms other
+    // than +-1, and everywhere in the directed Gamma_1(5) graph), every edge is its own
+    // strand s -> t, drawn with an arrowhead and walked only forwards.
     const directed = !!g.directed;
     const groups = new Map();
-    for (const [s, t, ell, m] of d.links) {
+    for (const link of d.links) {
+      const { s, t, ell, out, back } = linkCounts(link, directed);
       const key = s <= t ? `${s}-${t}` : `${t}-${s}`;
       if (!groups.has(key)) groups.set(key, []);
-      for (let k = 0; k < m; k++) groups.get(key).push([s, t, ell]);
+      const list = groups.get(key);
+      if (s !== t && out === back) {
+        for (let k = 0; k < out; k++) list.push([s, t, ell, true]);
+      } else {
+        for (let k = 0; k < out; k++) list.push([s, t, ell, false]);
+        for (let k = 0; k < back; k++) list.push([t, s, ell, false]);
+      }
     }
     const strands = [], simLinks = [], adj = nodes.map(() => []);
     // Frobenius as dashed links (the "over" view); they also pull orbits together.
@@ -379,17 +440,24 @@ function init(root, index, base) {
     for (const [key, list] of groups) {
       const [u, v] = key.split("-").map(Number);
       if (u !== v) simLinks.push({ source: u, target: v });
-      list.forEach(([s, t, ell], k) => {
-        // u, v: the endpoints in a fixed order, for drawing; s -> t: the direction
-        const strand = { s, t, u, v, ell, k, total: list.length };
+      list.forEach(([s, t, ell, both], k) => {
+        // u, v: the endpoints in a fixed order, for drawing; s -> t: the direction;
+        // arrow: drawn with an arrowhead at t (a loop has none)
+        const strand = { s, t, u, v, ell, k, total: list.length, arrow: !both && s !== t };
         strands.push(strand);
         adj[s].push({ to: t, strand });
-        if (s !== t && !directed) adj[t].push({ to: s, strand });
+        if (both) adj[t].push({ to: s, strand });
       });
     }
 
     const r = n <= 20 ? 8 : n <= 45 ? 6.5 : n <= 110 ? 5 : n <= 300 ? 4 : n <= 700 ? 3 : 2.2;
     const rOf = (nd) => (nd.pair ? r * 1.35 : r);
+    const arrowSize = n <= 45 ? 6 : n <= 110 ? 5 : n <= 300 ? 4.2 : 3;
+    // The walk: its transition matrix, from the adjacency matrix of the graph shown.
+    // "centres" are the vertices with automorphisms other than +-1, j = 0 and j = 1728,
+    // known for the full graphs without level structure (see walk.js).
+    const centres = view === "full" && g.aut ? Object.keys(g.aut).map(Number) : [];
+    const P = walkFor(adjacency(n, d.links, directed), centres, g.aut);
     gEdges.replaceChildren();
     gNodes.replaceChildren();
     gLabels.replaceChildren();
@@ -412,8 +480,8 @@ function init(root, index, base) {
       }
     }
     gLabels.style.display = labelled && labelBox.checked ? "" : "none";
-    Object.assign(state, { frobs, nodes, strands, adj, pinned: null, r, graph: g, sigma: g.sigma,
-                           shownView: view, ballGraph: null });
+    Object.assign(state, { frobs, nodes, strands, adj, pinned: null, r, rOf, arrowSize, P,
+                           graph: g, sigma: g.sigma, shownView: view, ballGraph: null });
     painted = [];
     hideTip();
 
@@ -478,6 +546,8 @@ function init(root, index, base) {
     if (legendPair) legendPair.hidden = view !== "folded";
     if (legendFrob) legendFrob.hidden = view !== "over";
     if (legendCls) legendCls.hidden = !g.cls || view === "folded";
+    if (legendArrow) legendArrow.hidden = !strands.some((st) => st.arrow);
+    state.nComp = nComp;
     const nEdges = d.links.filter(([a, b]) => a !== b).length;
     showEmpty(view === "spine" && (n === 0 || nEdges === 0)
       ? { kind, p, n, alternative: nearestNonempty() } : null);
@@ -498,8 +568,7 @@ function init(root, index, base) {
     ball = null;
     ballStatus.hidden = !bloom;
     if (bloom) {
-      trail = []; paintTrail();
-      if (reduced) {              // no animation: show one finished ball
+      if (!playing) {             // no animation: show one finished ball
         startBloom(0);
         while (!ball.done) stepBloom(0);
       } else ballStatus.textContent = "";
@@ -509,10 +578,46 @@ function init(root, index, base) {
     crypto.getRandomValues(seed);
     walker = { at: movable.length ? movable[seed[0] % movable.length].i : 0,
                next: null, strand: null, t0: 0 };
-    trail = []; paintTrail();
-    const walkOn = !reduced && strands.length && mode === "walk" && !state.walkOff;
+    const walkOn = strands.length && mode === "walk" && !state.walkOff;
     walkerDot.style.display = walkOn ? "" : "none";
     beamGlow.style.display = beamCore.style.display = walkOn ? "" : "none";
+    if (walkOn) { parkWalker(); showStationary(); }
+  }
+
+  // The walker at rest on its vertex: the still picture before Play is pressed.
+  function parkWalker() {
+    const nd = walker && walker.next == null ? state.nodes[walker.at] : null;
+    if (!nd || nd.sx === undefined) return;
+    walkerDot.setAttribute("cx", fx(nd.sx));
+    walkerDot.setAttribute("cy", fx(nd.sy));
+  }
+
+  // The stationary vector pi of the walk (pi P = pi), computed numerically and shown
+  // in the info panel scaled so that most vertices have weight 1.
+  function showStationary() {
+    if (!piBox) return;
+    piBox.textContent = "";
+    if (state.nComp !== 1 || state.nodes.length > 6000) return;
+    const pi = stationary(state.P, { maxIter: 4000 });
+    if (!pi) return;
+    const { values, special } = relativeStationary(pi);
+    const name = (v) => {
+      const nd = state.nodes[v], j = shortJ(state.graph.nodes, nd);
+      const order = state.shownView === "full" && state.graph.aut ? state.graph.aut[v] : 0;
+      return `j = ${j}${order === 4 && j !== "1728" ? " (that is, 1728)" : ""}`;
+    };
+    if (!special.length) {
+      piBox.textContent = "Stationary distribution: uniform. In the long run every vertex is visited equally often.";
+    } else if (special.length <= 6) {
+      piBox.textContent = "Stationary distribution, with the weight of an ordinary vertex set to 1: " +
+        special.map((v) => `${weight(values[v])} at ${name(v)}`).join(", ") + ".";
+    } else {
+      let lo = Infinity, hi = -Infinity;
+      for (const x of values) { lo = Math.min(lo, x); hi = Math.max(hi, x); }
+      piBox.textContent = `Stationary distribution, with the most common weight set to 1: ` +
+        `${special.length} of the ${values.length} vertices have another weight, between ` +
+        `${weight(lo)} and ${weight(hi)}.`;
+    }
   }
 
   // The simulation runs in its own coordinates; the view scales and centres it
@@ -590,17 +695,43 @@ function init(root, index, base) {
       const g = geometry(st);
       st.path.setAttribute("d", g.loop
         ? `M${f(g.a.sx)},${f(g.a.sy)}C${f(g.c1[0])},${f(g.c1[1])} ${f(g.c2[0])},${f(g.c2[1])} ${f(g.a.sx)},${f(g.a.sy)}`
-        : `M${f(g.a.sx)},${f(g.a.sy)}Q${f(g.c[0])},${f(g.c[1])} ${f(g.b.sx)},${f(g.b.sy)}`);
+        : `M${f(g.a.sx)},${f(g.a.sy)}Q${f(g.c[0])},${f(g.c[1])} ${f(g.b.sx)},${f(g.b.sy)}` +
+          (st.arrow ? arrowHead(st, g) : ""));
     }
+    parkWalker();
+  }
+
+  // An open arrowhead at the target end of a directed strand, just outside the target's
+  // circle. It is part of the strand's own path, so it is coloured, dimmed and
+  // highlighted together with it.
+  function arrowHead(st, g) {
+    const { a, b, c } = g, toB = st.t === st.v;       // the head is at b, or at a
+    const len = Math.hypot(b.sx - a.sx, b.sy - a.sy) || 1;
+    const gap = state.rOf(toB ? b : a) + 1.5;
+    const t = toB ? 1 - Math.min(0.45, gap / len) : Math.min(0.45, gap / len);
+    const [x, y] = pointOn(g, t);
+    let dx = 2 * (1 - t) * (c[0] - a.sx) + 2 * t * (b.sx - c[0]);   // direction of travel
+    let dy = 2 * (1 - t) * (c[1] - a.sy) + 2 * t * (b.sy - c[1]);
+    if (!toB) { dx = -dx; dy = -dy; }
+    const norm = Math.hypot(dx, dy) || 1, h = state.arrowSize, w = 0.5 * h;
+    dx /= norm; dy /= norm;
+    const bx = x - dx * h, by = y - dy * h;
+    return `M${fx(bx - dy * w)},${fx(by + dx * w)}L${fx(x)},${fx(y)}L${fx(bx + dy * w)},${fx(by - dx * w)}`;
   }
 
   // ---- random walk -------------------------------------------------------
   function positionWalker(now) {
     if (!walker || !state.nodes.length || state.walkOff) return;
-    if (reduced) return;
+    if (!playing) return;
     if (walker.next == null) {
-      const options = state.adj[walker.at];
-      if (!options.length) return;          // a vertex with no edges (a tiny spine)
+      // The next vertex is drawn from the walker's row of the transition matrix P, and
+      // from nothing else. Among parallel strands to that vertex, which one lights up
+      // is a matter of drawing only.
+      const row = state.P[walker.at];
+      if (!row || !row.size) return;        // a vertex with no edge out (a tiny spine)
+      const to = sampleStep(row, Math.random());
+      const options = state.adj[walker.at].filter((o) => o.to === to);
+      if (!options.length) return;
       const pick = options[Math.floor(Math.random() * options.length)];
       walker.next = pick.to; walker.strand = pick.strand; walker.t0 = now;
       walker.reverse = pick.strand.u !== walker.at;
@@ -991,14 +1122,29 @@ function init(root, index, base) {
 
   function frame(now) {
     raf = 0;
-    if (!visible || document.hidden) return;
+    if (!playing || !visible || document.hidden) return;
     if (mode === "ball" || mode === "cycle") growBall(now);
     else if (mode === "spectral") spectral.step(now, SPEC_MS[speedSelect.value]);
     else if (mode === "walk") positionWalker(now);
     raf = requestAnimationFrame(frame);
   }
+  // The frame loop runs only while something moves: not in the plain graph viewer, not
+  // when paused, and (see frame) not off screen or in a hidden tab.
   function startLoop() {
-    if (!reduced && !raf) raf = requestAnimationFrame(frame);
+    if (playing && mode !== "view" && !raf) raf = requestAnimationFrame(frame);
+  }
+  function setPlaying(on) {
+    playing = on;
+    if (playBtn) {
+      playBtn.textContent = on ? "Pause" : "Play";
+      playBtn.setAttribute("aria-label", on ? "Pause the animation" : "Play the animation");
+    }
+    if (!on) { if (raf) { cancelAnimationFrame(raf); raf = 0; } return; }
+    // Starting from a still picture: the blooming and the spectral law begin again.
+    if (mode === "ball" || mode === "cycle") { if (ball && ball.done) ball = null; }
+    else if (mode === "spectral") spectral.restart();
+    else if (walker && walker.next != null) walker.t0 = performance.now();
+    startLoop();
   }
 
   // ---- hover, tap and drag -------------------------------------------------
@@ -1066,7 +1212,7 @@ function init(root, index, base) {
       if (!reduced) state.sim.alphaTarget(0);
       if (!moved && (mode === "ball" || mode === "cycle")) {   // a tap grows a ball from that vertex
         startBloom(performance.now(), nd.i);
-        if (reduced) while (!ball.done) stepBloom(0);
+        if (!playing) while (!ball.done) stepBloom(0);
         return;
       }
       if (!moved) {            // a tap or click pins the label
@@ -1103,6 +1249,10 @@ function init(root, index, base) {
   });
   animSelect.addEventListener("change", () => { mode = animSelect.value; build().then(startLoop); });
   speedSelect.addEventListener("change", () => { hopMs = SPEEDS[speedSelect.value]; });
+  if (playBtn) {
+    playBtn.addEventListener("click", () => setPlaying(!playing));
+    setPlaying(playing);
+  }
 
   // Only animate while the figure is on screen and the tab is visible.
   if ("IntersectionObserver" in window) {

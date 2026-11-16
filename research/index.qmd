@@ -3,6 +3,12 @@ title: "Research"
 description-meta: "Research of William E. Mahaney: supersingular isogeny graphs, quaternion orders, and post-quantum cryptography."
 aliases:
   - /publications/index.html
+listing:
+  # The talks come from research/talks.yml, in the order written there.
+  id: talks-list
+  contents: talks.yml
+  template: _talks.ejs
+  sort: false
 ---
 
 I work on supersingular isogeny graphs: their spectra, the quaternion orders behind them via the Deuring correspondence, and their role in post-quantum cryptography.
@@ -119,19 +125,12 @@ END -->
 
 :::
 
-::: {.wm-note}
-Four further papers are in preparation. Advance review copies are available on request; please [email me](mailto:mahaney1@vt.edu).
-:::
-
-<!-- PAPERS IN PREPARATION. When one is ready to be named publicly, add it to the list above
-     with the paper template, using a status such as "In revision" or "In preparation", and
-     lower the count in the sentence above.
-
-     Another paper from the old site, uncomment once public:
+<!-- A PAPER FROM THE OLD SITE. Uncomment it once it is posted, and give it its links
+     with the paper template above. Only posted papers are listed on this page.
 
 ::: {.wm-paper}
 ::: {.wm-paper-meta}
-In revision
+Preprint
 :::
 ::: {.wm-paper-title}
 *Asymptotic Spectral Approximation for L-Isogeny Graphs*
@@ -141,52 +140,8 @@ In revision
 
 ## Talks
 
-<!--
-HOW TO ADD A TALK
-Copy one "<li> ... </li>" block, paste it at the top of the list (newest first), and edit it.
-To link slides, put the PDF in files/talks/ and add inside the venue line, e.g.
-    <a class="wm-chip" href="../files/talks/mason-vii-2025.pdf">Slides</a>
-A recording or poster works the same way with a different label.
+<!-- The talks are in research/talks.yml; the instructions for adding one, and for
+     linking its slides, are at the top of that file. Slides go in files/talks/. -->
 
-For talks that have not happened yet, add a list headed "### Upcoming" above this one.
--->
-
-```{=html}
-<ul class="wm-talks">
-  <li>
-    <span class="wm-talk-year">2025</span>
-    <div class="wm-talk-body">
-      <div class="wm-talk-title">Computing isogenies at singular points of the modular polynomial</div>
-      <div class="wm-talk-venue">MASON VII, University of Maryland</div>
-    </div>
-  </li>
-  <li>
-    <span class="wm-talk-year">2025</span>
-    <div class="wm-talk-body">
-      <div class="wm-talk-title">Computing isogenies at singular points of the modular polynomial</div>
-      <div class="wm-talk-venue">AMS Southeast Sectional Meeting, Tulane University</div>
-    </div>
-  </li>
-  <li>
-    <span class="wm-talk-year">2025</span>
-    <div class="wm-talk-body">
-      <div class="wm-talk-title">Computing isogenies at singular points of the modular polynomial</div>
-      <div class="wm-talk-venue">AMS Eastern Sectional Meeting, Howard University</div>
-    </div>
-  </li>
-  <li>
-    <span class="wm-talk-year">2024</span>
-    <div class="wm-talk-body">
-      <div class="wm-talk-title">Computing isogenies at singular points of the modular polynomial</div>
-      <div class="wm-talk-venue">AMS Central Sectional Meeting, University of Wisconsin–Milwaukee</div>
-    </div>
-  </li>
-  <li>
-    <span class="wm-talk-year">2024</span>
-    <div class="wm-talk-body">
-      <div class="wm-talk-title">Computing isogenies at singular points of the modular polynomial</div>
-      <div class="wm-talk-venue">PANTS XXXVII, Wake Forest University</div>
-    </div>
-  </li>
-</ul>
-```
+::: {#talks-list}
+:::

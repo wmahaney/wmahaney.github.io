@@ -47,7 +47,8 @@ for polynomials of degree <= 4 are needed.
   * Edges are *directed* and counted by kernels, so every vertex has
     out-degree the sum of ell + 1 over the ells used. At vertices with
     extra automorphisms (j = 0, 1728 and their lifts) the adjacency matrix is
-    not symmetric; the drawing shows max(A_ij, A_ji) undirected edges.
+    not symmetric; there both counts A_ij and A_ji are stored, and the drawing
+    shows the edges in each direction with arrowheads.
 
 Checks run on every prime (the script aborts if one fails):
   * number of supersingular j-invariants agrees with the class number formula;
@@ -742,8 +743,8 @@ def borel5_graph(F, js):
 # an automorphism of the model, x -> c x with c = u^2 (c = -1 needs j = 1728,
 # c a cube root of unity needs j = 0); the kernel is moved by the same c.
 # The folded graph is the quotient by Frobenius: its vertices are the orbits of
-# vertices, its directed edges the orbits of directed edges. It is drawn, like the
-# others, with max(B_ij, B_ji) undirected edges between two vertices.
+# vertices, its directed edges the orbits of directed edges. It is drawn like the
+# others: undirected where B_ij = B_ji, with arrowheads where they differ.
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
 # F_{p^4} = F_{p^2}[t] / (t^2 - c), c a non-square in F_{p^2}: needed for points of
@@ -1158,8 +1159,8 @@ def edge_sigma(F, edges, sig_v, transport):
 
 
 def fold_links(edges, sig_v, sig_e, directed=False):
-    """Undirected links of the quotient graph, with vertices named by the smaller
-    member of each Frobenius orbit."""
+    """Links of the quotient graph, in the format of links_from, with vertices named
+    by the smaller member of each Frobenius orbit."""
     name = {}
     for cyc in orbits(sig_v):
         for v in cyc:
@@ -1173,8 +1174,8 @@ def fold_links(edges, sig_v, sig_e, directed=False):
         return [[a, b, ell, m] for (a, b, ell), m in sorted(B.items())]
     out = []
     for a, b, ell in sorted({(min(a, b), max(a, b), ell) for a, b, ell in B}):
-        m = B.get((a, b, ell), 0) if a == b else max(B.get((a, b, ell), 0), B.get((b, a, ell), 0))
-        out.append([a, b, ell, m])
+        m, back = B.get((a, b, ell), 0), B.get((b, a, ell), 0)
+        out.append([a, b, ell, m] if a == b or m == back else [a, b, ell, m, back])
     return out
 
 
@@ -1274,15 +1275,19 @@ def level5_edges(F, reps, sig_v, A2, A3):
 
 
 def links_from(A, ell):
+    """Links [s, t, ell, m] with s <= t: m edges from s to t and m from t to s (for a
+    loop, m edges from s to itself). Where the two counts differ, which happens only
+    at a vertex with automorphisms other than +-1, the link is
+    [s, t, ell, A[s][t], A[t][s]]."""
     n = len(A)
     out = []
     for s in range(n):
         if A[s][s]:
             out.append([s, s, ell, A[s][s]])
         for t in range(s + 1, n):
-            m = max(A[s][t], A[t][s])
-            if m:
-                out.append([s, t, ell, m])
+            a, b = A[s][t], A[t][s]
+            if a or b:
+                out.append([s, t, ell, a] if a == b else [s, t, ell, a, b])
     return out
 
 
@@ -1332,6 +1337,8 @@ def compute(p: int, level5: bool = True):
     for key, ells in (("2", (2,)), ("23", (2, 3)), ("235", (2, 3, 5))):
         edges, se = join_edges(*((E[ell][0], E[ell][2]) for ell in ells))
         add(key, lab, fp, fp, sig, [(ell, A[ell]) for ell in ells], edges, se)
+        # |Aut(E)| where it is not 2: {vertex: 4 or 6}, i.e. j = 1728 and j = 0.
+        graphs[key]["aut"] = {str(k): a for k, a in enumerate(aut) if a != 2}
     out = {"p": p, "nonresidue": F.r if F.r != p - 1 else -1, "graphs": graphs}
     jset_fp = {j for j in js if j[1] == 0}
     if level5 and p <= CAPS["2g15"]:

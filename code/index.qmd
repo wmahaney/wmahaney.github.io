@@ -1,0 +1,17 @@
+---
+title: "Code"
+description-meta: "Software written by William E. Mahaney."
+listing:
+  id: code-overview
+  contents: projects.yml
+  template: _repositories.ejs
+---
+
+<!-- This page is built from code/projects.yml (the list) and code/_repositories.ejs
+     (the layout). To add a repository or switch a tool on, edit code/projects.yml;
+     the instructions are at the top of that file. -->
+
+I write the software for my research and a few small tools, some of them with Claude. Code that belongs to a paper is linked next to the paper on the [Research](../research/index.qmd) page, and my repositories are on [GitHub](https://github.com/wmahaney).
+
+::: {#code-overview}
+:::

@@ -39,7 +39,7 @@ def load(p, kind):
     g = json.loads(f.read_text())["graph"]
     n = len(g["nodes"])
     adj = [dict() for _ in range(n)]          # neighbour -> list of ells
-    for s, t, ell, m in g["links"]:
+    for s, t, ell, m in ((l[0], l[1], l[2], max(l[3:])) for l in g["links"]):
         if s == t:
             continue
         adj[s].setdefault(t, []).append(ell)
