@@ -413,6 +413,52 @@ function init(root, index, base) {
     });
     painted = trail.slice();
   }
+  // ---- "?" buttons: a small box with the relevant entries of the glossary ------
+  const gloss = root.querySelector(".wm-graph-glossary");
+  const pop = root.querySelector(".wm-graph-pop");
+  let popFor = null;
+  function closePop() {
+    if (!popFor) return;
+    popFor.setAttribute("aria-expanded", "false");
+    pop.hidden = true;
+    popFor = null;
+  }
+  function openPop(btn) {
+    if (popFor === btn) { closePop(); return; }
+    closePop();
+    const dl = document.createElement("dl");
+    for (const key of btn.dataset.terms.split(" ")) {
+      const dt = gloss.querySelector(`dt[data-term="${key}"]`);
+      if (dt) dl.append(dt.cloneNode(true), dt.nextElementSibling.cloneNode(true));
+    }
+    const close = button("×", closePop);
+    close.className = "wm-graph-pop-close";
+    close.setAttribute("aria-label", "Close");
+    const all = button("All terms ↓", () => {
+      closePop();
+      gloss.open = true;
+      gloss.scrollIntoView({ block: "nearest", behavior: reduced ? "auto" : "smooth" });
+    });
+    all.className = "wm-graph-pop-all";
+    pop.replaceChildren(close, dl, all);
+    pop.hidden = false;
+    popFor = btn;
+    btn.setAttribute("aria-expanded", "true");
+    // Just under the button, kept inside the figure.
+    const b = btn.getBoundingClientRect(), h = root.getBoundingClientRect();
+    pop.style.top = `${b.bottom - h.top + 8}px`;
+    pop.style.left = `${Math.max(0, Math.min(h.width - pop.offsetWidth, b.left - h.left - 24))}px`;
+    close.focus({ preventScroll: true });
+  }
+  root.querySelectorAll(".wm-q").forEach((btn) => btn.addEventListener("click", (ev) => {
+    ev.stopPropagation();
+    openPop(btn);
+  }));
+  document.addEventListener("click", (ev) => { if (popFor && !pop.contains(ev.target)) closePop(); });
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape" && popFor) { const b = popFor; closePop(); b.focus(); }
+  });
+
   // ---- empty or totally disconnected spines --------------------------------
   // Why a spine can be empty: a supersingular curve over F_p (p > 3) has trace 0, so
   // its Frobenius pi satisfies pi^2 = -p. A subgroup of order N (N = 3 or 5, prime)

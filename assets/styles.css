@@ -842,3 +842,61 @@ body.quarto-dark .quarto-color-scheme-toggle .bi::before,
 }
 .wm-graph-empty-go button:first-child { background: var(--wm-accent); color: var(--wm-accent-ink); }
 .wm-graph-empty-go button:focus-visible { outline: 2px solid var(--wm-accent2); outline-offset: 2px; }
+
+/* ---- "?" buttons and the glossary under the isogeny graph ---- */
+.wm-graph-kinds { display: inline-flex; align-items: center; gap: 0.4rem; }
+.wm-q {
+  flex: none;
+  width: 1.45rem; height: 1.45rem;
+  padding: 0;
+  font: 700 0.78rem/1 var(--wm-sans);
+  color: var(--wm-accent);
+  background: var(--wm-surface);
+  border: 1.5px solid var(--wm-line);
+  border-radius: 50%;
+  cursor: pointer;
+}
+.wm-q:hover, .wm-q[aria-expanded="true"] { border-color: var(--wm-accent); }
+.wm-q:focus-visible { outline: 2px solid var(--wm-accent2); outline-offset: 2px; }
+.wm-graph-legend .wm-q { width: 1.25rem; height: 1.25rem; font-size: 0.7rem; }
+.wm-graph-pop {
+  position: absolute;
+  z-index: 5;
+  width: min(22rem, 100%);
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 0.85rem 1rem 0.75rem;
+  font-family: var(--wm-sans);
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--wm-ink);
+  background: var(--wm-surface);
+  border: 1.5px solid var(--wm-line);
+  border-radius: 1rem;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+}
+.wm-graph-pop[hidden] { display: none; }
+.wm-graph-pop dl, .wm-graph-glossary dl { margin: 0; }
+.wm-graph-pop dt, .wm-graph-glossary dt { font-weight: 700; margin-top: 0.55rem; }
+.wm-graph-pop dt:first-child { margin-top: 0; padding-right: 1.6rem; }
+.wm-graph-pop dd, .wm-graph-glossary dd { margin: 0.1rem 0 0; color: var(--wm-muted); }
+.wm-graph-pop-close {
+  position: absolute; top: 0.45rem; right: 0.55rem;
+  width: 1.6rem; height: 1.6rem; padding: 0;
+  font: 400 1.15rem/1 var(--wm-sans);
+  color: var(--wm-muted); background: none; border: 0; border-radius: 50%; cursor: pointer;
+}
+.wm-graph-pop-all {
+  margin-top: 0.7rem; padding: 0;
+  font: 600 0.8rem/1.2 var(--wm-sans);
+  color: var(--wm-accent); background: none; border: 0; cursor: pointer;
+}
+.wm-graph-glossary {
+  margin-top: 0.8rem;
+  font-family: var(--wm-sans);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+.wm-graph-glossary summary { cursor: pointer; font-weight: 600; color: var(--wm-accent); }
+.wm-graph-glossary dl { margin-top: 0.4rem; }
+.wm-graph:not(.wm-graph-ready) .wm-graph-glossary { display: none; }
