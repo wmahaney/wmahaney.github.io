@@ -773,7 +773,9 @@ body.quarto-dark .quarto-color-scheme-toggle .bi::before,
 /* ---- Growing-ball animation (isogeny-hero.js, animation = growing ball) ---- */
 .wm-graph[data-mode="ball"] .wm-graph-history,
 .wm-graph[data-mode="ball"] .wm-graph-legend-walk,
-.wm-graph:not([data-mode="ball"]) .wm-graph-legend-ball { display: none; }
+.wm-graph[data-mode="cycle"] .wm-graph-history,
+.wm-graph[data-mode="cycle"] .wm-graph-legend-walk,
+.wm-graph:not([data-mode="ball"]):not([data-mode="cycle"]) .wm-graph-legend-ball { display: none; }
 .wm-graph-view select:disabled { opacity: 0.5; cursor: not-allowed; }
 .wm-graph-ball-status {
   display: block;
@@ -988,3 +990,11 @@ body.quarto-dark .quarto-color-scheme-toggle .bi::before,
 .wm-g-frob { stroke: #7A3E9D; stroke-width: 1.4; stroke-dasharray: 4 4; opacity: 0.75; }
 .wm-key-frob { width: 1rem; height: 0; border-top: 2px dashed #7A3E9D; background: none !important; }
 .wm-spec-mode .wm-g-frobs { display: none; }
+
+/* Graph viewer: no animation controls */
+.wm-graph[data-mode="view"] .wm-graph-history,
+.wm-graph[data-mode="view"] .wm-graph-speed-label,
+.wm-graph[data-mode="view"] .wm-graph-legend-walk { display: none; }
+/* Gamma(4): the second Weil-pairing class */
+.wm-g-node.wm-g-node-c1 { fill: #1E8C8C; }
+.wm-key-c1 { width: 0.75rem; height: 0.75rem; border-radius: 50%; background: #1E8C8C; margin-left: 0.15rem; }

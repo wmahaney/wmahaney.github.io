@@ -52,6 +52,24 @@ const KINDS = {
       "Legendre invariants λ, and there are (p − 1)/2 of them.",
     tip: (l) => `j(E) = ${l[0]}, λ = ${l[1]}`,
   },
+  "3g4": {
+    defaultP: 43, level: true, ells: [3], bound: null,
+    caption: (p, n) => `The 3-isogeny graph with full level-4 structure in characteristic ${p}: ` +
+      `${n} = 4(p − 1) pairs (E, (P, Q)), (P, Q) an ordered basis of E[4]. Colours: the two ` +
+      "values ±i of the Weil pairing e₄(P, Q).",
+    spectrum: () => "Connected and bipartite: a 3-isogeny sends e₄(P, Q) to its cube, so every edge " +
+      "joins the two Weil-pairing classes, and −4 is an eigenvalue.",
+    tip: (l) => `j(E) = ${l[0]}, Weil-pairing class ${l[1]}`,
+  },
+  "5g4": {
+    defaultP: 43, level: true, ells: [5], bound: null,
+    caption: (p, n) => `The 5-isogeny graph with full level-4 structure in characteristic ${p}: ` +
+      `${n} = 4(p − 1) pairs (E, (P, Q)), (P, Q) an ordered basis of E[4]. Colours: the two ` +
+      "values ±i of the Weil pairing e₄(P, Q).",
+    spectrum: () => "Disconnected: a 5-isogeny sends e₄(P, Q) to its fifth power, which is itself, " +
+      "so the two Weil-pairing classes are the two components, and the eigenvalue 6 appears twice.",
+    tip: (l) => `j(E) = ${l[0]}, Weil-pairing class ${l[1]}`,
+  },
 };
 // Why the F_p-subgraph (the vertices fixed by Frobenius) is empty, when the reason is a
 // theorem. Write pi for the Frobenius of a model of E over F_p (or of a twist): it has
@@ -68,6 +86,9 @@ const EMPTY_WHY = {
     "endomorphism; since π² = −p that needs p ≡ 3 (mod 4), and here p ≡ 1 (mod 4)." : null,
 };
 EMPTY_WHY["23b5"] = EMPTY_WHY["2b5"];
+EMPTY_WHY["3g4"] = EMPTY_WHY["5g4"] = () =>
+  "Frobenius sends e₄(P, Q) to e₄(P, Q)^p = e₄(P, Q)⁻¹ (here p ≡ 3 mod 4), so it swaps the two " +
+  "Weil-pairing classes and fixes no vertex: for Γ(4) this subgraph is always empty.";
 
 // The view menu's names for the three views.
 const VIEW_NAME = { full: "full graph", spine: "F_p-subgraph", folded: "quotient by Frobenius",
@@ -182,7 +203,7 @@ const sub = html("sub"), sup = html("sup");
 // How long one step of the random walk takes, in milliseconds.
 const SPEEDS = { calm: 700, fast: 220, frantic: 90 };
 // How long the spectral-law animation shows each prime.
-const SPEC_MS = { calm: 1900, fast: 950, frantic: 420 };
+const SPEC_MS = { calm: 900, fast: 450, frantic: 200 };
 // How long the growing ball waits between layers, and how long it rests once it has
 // found a conjugate pair before starting again somewhere else.
 const BALL_MS = { calm: 1400, fast: 750, frantic: 330 };
@@ -203,6 +224,7 @@ function init(root, index, base) {
   const ellSelect = root.querySelector(".wm-graph-ell select");
   const legend5 = root.querySelector(".wm-graph-legend-5");
   const legendFrob = root.querySelector(".wm-graph-legend-frob");
+  const legendCls = root.querySelector(".wm-graph-legend-cls");
   const eye = root.querySelector(".wm-graph-eye");
   const legendPair = root.querySelector(".wm-graph-legend-pair");
   const trailLabel = root.querySelector(".wm-trail-n");
@@ -287,7 +309,8 @@ function init(root, index, base) {
     spectral.hide();
     const kind = state.kind, cfg = KINDS[kind];
     const cap = (index.caps && index.caps[kind]) || Infinity;
-    const primes = index.primes.filter((q) => q <= cap);
+    const offered = (index.kind_primes && index.kind_primes[kind]) || index.primes;
+    const primes = offered.filter((q) => q <= cap);
     if (!primes.includes(state.p[kind])) {
       state.p[kind] = primes.includes(cfg.defaultP) ? cfg.defaultP : primes[0];
     }
@@ -378,7 +401,8 @@ function init(root, index, base) {
     }
     for (const nd of nodes) {
       nd.circle = el("circle", {
-        class: `wm-g-node${nd.fp ? " wm-g-node-fp" : ""}${nd.pair ? " wm-g-node-pair" : ""}`,
+        class: `wm-g-node${nd.fp ? " wm-g-node-fp" : ""}${nd.pair ? " wm-g-node-pair" : ""}` +
+          `${g.cls && view !== "folded" && g.cls[nd.members[0]] ? " wm-g-node-c1" : ""}`,
         r: rOf(nd), tabindex: "-1",
       }, gNodes);
       attachNodeEvents(nd);
@@ -444,7 +468,7 @@ function init(root, index, base) {
     } else {
       caption.textContent = cfg.caption(p, n);
       const lam = g.lambda2;
-      stats.textContent = (lam == null ? "" :
+      stats.textContent = (cfg.spectrum ? cfg.spectrum() + " " : lam == null ? "" :
         `Second-largest eigenvalue modulus ${lam.toFixed(3)} ≤ ${cfg.bound} ≈ ${cfg.boundVal.toFixed(3)}. `) +
         `${g.fp.filter(Boolean).length} of the ${n} vertices are fixed by Frobenius (the F_p-subgraph).`;
     }
@@ -453,6 +477,7 @@ function init(root, index, base) {
     if (legendFp) legendFp.hidden = !d.nodes.some((nd) => nd.fp);
     if (legendPair) legendPair.hidden = view !== "folded";
     if (legendFrob) legendFrob.hidden = view !== "over";
+    if (legendCls) legendCls.hidden = !g.cls || view === "folded";
     const nEdges = d.links.filter(([a, b]) => a !== b).length;
     showEmpty(view === "spine" && (n === 0 || nEdges === 0)
       ? { kind, p, n, alternative: nearestNonempty() } : null);
@@ -468,14 +493,15 @@ function init(root, index, base) {
     }
 
     const movable = nodes.filter((nd) => adj[nd.i].length);
-    svg.classList.toggle("wm-ball-mode", mode === "ball");
+    const bloom = mode === "ball" || mode === "cycle";
+    svg.classList.toggle("wm-ball-mode", bloom);
     ball = null;
-    ballStatus.hidden = mode !== "ball";
-    if (mode === "ball") {
+    ballStatus.hidden = !bloom;
+    if (bloom) {
       trail = []; paintTrail();
       if (reduced) {              // no animation: show one finished ball
-        startBall(0);
-        while (!ball.done) stepBall(0);
+        startBloom(0);
+        while (!ball.done) stepBloom(0);
       } else ballStatus.textContent = "";
     }
     // A fresh, uniformly random starting vertex every time a graph is drawn.
@@ -797,11 +823,115 @@ function init(root, index, base) {
     if (b.done) b.holdUntil = now + BALL_HOLD;
     paintBall();
   }
+  // The two kinds of blooming share the clock: "ball" = blooming for conjugates,
+  // "cycle" = blooming for collision.
+  const startBloom = (now, at) => (mode === "cycle" ? startCycle(now, at) : startBall(now, at));
+  const stepBloom = (now) => (mode === "cycle" ? stepCycle(now) : stepBall(now));
   function growBall(now) {
     if (!state.nodes.length) return;
-    if (!ball) { startBall(now); return; }
-    if (ball.done) { if (now >= ball.holdUntil) startBall(now); return; }
-    if (now - ball.t0 >= BALL_MS[speedSelect.value]) { ball.t0 = now; stepBall(now); }
+    if (!ball) { startBloom(now); return; }
+    if (ball.done) { if (now >= ball.holdUntil) startBloom(now); return; }
+    if (now - ball.t0 >= BALL_MS[speedSelect.value]) { ball.t0 = now; stepBloom(now); }
+  }
+
+  // ---- blooming for collision ----------------------------------------------
+  // Breadth-first search in the graph shown, one layer at a time, until an edge reaches
+  // a vertex already in the ball other than along the edge it came in by: the ball
+  // has closed a cycle (a loop is a cycle of length 1, two parallel edges one of
+  // length 2). In the directed Gamma_1(5) graph the search follows arcs forwards, and
+  // stops when two shortest paths from the centre meet.
+  const nodeLabel = (i) => {
+    const nd = state.nodes[i], l = shortJ(state.graph.nodes, nd);
+    return Array.isArray(nd.label) && !nd.pair ? `(${nd.label[0]}, ${nd.label[1]})` : `j = ${l}`;
+  };
+  function startCycle(now, at) {
+    const n = state.nodes.length;
+    let center = at;
+    if (center == null) {
+      const seed = new Uint32Array(1);
+      crypto.getRandomValues(seed);
+      center = seed[0] % n;
+    }
+    ball = { kind: "cycle", center, dist: new Map([[center, 0]]), parent: new Map(),
+             pstrand: new Map(), layers: [[center]], r: 0, t0: now, done: null, holdUntil: 0 };
+    const loop = state.adj[center].find(({ to }) => to === center);
+    if (loop) {
+      ball.done = { u: center, w: center, strand: loop.strand, len: 1 };
+      ball.holdUntil = now + BALL_HOLD;
+    }
+    paintCycle();
+  }
+  function cycleOf(b, u, w) {
+    // the tree paths from u and w back to their last common ancestor
+    const up = (x) => { const out = [x]; while (b.parent.has(x)) { x = b.parent.get(x); out.push(x); } return out; };
+    const pu = up(u), pw = up(w), onW = new Set(pw);
+    const lca = pu.find((x) => onW.has(x));
+    const vs = [...pu.slice(0, pu.indexOf(lca) + 1), ...pw.slice(0, pw.indexOf(lca))];
+    const ss = [];
+    for (const x of [...pu.slice(0, pu.indexOf(lca)), ...pw.slice(0, pw.indexOf(lca))]) ss.push(b.pstrand.get(x));
+    return { vs, ss, len: pu.indexOf(lca) + pw.indexOf(lca) + 1 };
+  }
+  function stepCycle(now) {
+    const b = ball, next = [];
+    let best = null;
+    for (const u of b.layers[b.r]) {
+      for (const { to: w, strand } of state.adj[u]) {
+        if (strand === b.pstrand.get(u)) continue;          // the edge it came in by
+        if (!b.dist.has(w)) {
+          b.dist.set(w, b.r + 1);
+          b.parent.set(w, u);
+          b.pstrand.set(w, strand);
+          next.push(w);
+          continue;
+        }
+        if (strand === b.pstrand.get(w)) continue;          // the tree edge, seen from above
+        const c = cycleOf(b, u, w);
+        if (!best || c.len < best.len) best = { u, w, strand, len: c.len };
+      }
+    }
+    if (next.length) { b.layers.push(next); b.r += 1; }
+    if (best) b.done = best;
+    else if (!next.length) b.done = { none: true };
+    if (b.done) b.holdUntil = now + BALL_HOLD;
+    paintCycle();
+  }
+  function paintCycle() {
+    const b = ball, n = state.nodes.length;
+    let cyc = { vs: [], ss: [] };
+    if (b.done && !b.done.none) {
+      cyc = b.done.len === 1 ? { vs: [b.center], ss: [] } : cycleOf(b, b.done.u, b.done.w);
+      cyc.ss.push(b.done.strand);
+    }
+    const hit = new Set(b.done && !b.done.none ? [b.done.u, b.done.w] : []);
+    const geo = new Set(cyc.ss);
+    for (const nd of state.nodes) {
+      const d = b.dist.get(nd.i), c = nd.circle;
+      c.classList.toggle("wm-g-out", d === undefined);
+      if (nd.text) nd.text.classList.toggle("wm-g-out", d === undefined);
+      c.classList.toggle("wm-g-front", d !== undefined && d === b.r && b.r > 0 && !b.done);
+      c.classList.toggle("wm-g-center", nd.i === b.center);
+      c.classList.toggle("wm-g-hit", hit.has(nd.i));
+      const r0 = nd.pair ? state.r * 1.35 : state.r;
+      c.setAttribute("r", hit.has(nd.i) || nd.i === b.center ? r0 * 1.6 : r0);
+    }
+    for (const st of state.strands) {
+      st.path.classList.toggle("wm-g-inball", b.dist.has(st.s) && b.dist.has(st.t));
+      st.path.classList.toggle("wm-g-geo", geo.has(st));
+    }
+    const size = `${b.dist.size} of ${n} vertices`, start = nodeLabel(b.center);
+    if (b.done && b.done.none) {
+      ballStatus.textContent = `The ball around ${start} filled its component (${size}) without closing a cycle.`;
+    } else if (b.done) {
+      const what = b.done.len === 1 ? "a loop (a cycle of length 1)" :
+        b.done.len === 2 ? "two parallel edges (a cycle of length 2)" : `a cycle of length ${b.done.len}`;
+      ballStatus.textContent = state.graph.directed
+        ? `Radius ${b.r}: two shortest paths from ${start} meet at ${nodeLabel(b.done.w)} (${size}), ` +
+          `closing ${what} if directions are ignored. Bold: the two paths.`
+        : `Radius ${b.r}: the ball around ${start} (${size}) collides with itself and closes ${what}. ` +
+          "Red: where it closed; bold: the cycle.";
+    } else {
+      ballStatus.textContent = `Blooming around ${start}: radius ${b.r}, ${size}.`;
+    }
   }
   function paintBall() {
     const b = ball, G = ballGraph(), o = G.orbitOf, n = state.nodes.length;
@@ -839,7 +969,7 @@ function init(root, index, base) {
     const start = shortLabel(b.center);
     let msg;
     if (b.done && b.done.none) {
-      msg = `The ball around ${start} filled the graph without stopping.`;
+      msg = `The ball around ${start} filled its connected component (${size}) without stopping.`;
     } else if (b.done && b.r === 0) {
       msg = `The centre ${start} is already in the F_p-subgraph. Tap another vertex.`;
     } else if (b.done) {
@@ -862,9 +992,9 @@ function init(root, index, base) {
   function frame(now) {
     raf = 0;
     if (!visible || document.hidden) return;
-    if (mode === "ball") growBall(now);
+    if (mode === "ball" || mode === "cycle") growBall(now);
     else if (mode === "spectral") spectral.step(now, SPEC_MS[speedSelect.value]);
-    else positionWalker(now);
+    else if (mode === "walk") positionWalker(now);
     raf = requestAnimationFrame(frame);
   }
   function startLoop() {
@@ -934,9 +1064,9 @@ function init(root, index, base) {
       dragging = state.dragging = false;
       nd.fx = nd.fy = null;
       if (!reduced) state.sim.alphaTarget(0);
-      if (!moved && mode === "ball") {   // in ball mode a tap grows a ball from that vertex
-        startBall(performance.now(), nd.i);
-        if (reduced) while (!ball.done) stepBall(0);
+      if (!moved && (mode === "ball" || mode === "cycle")) {   // a tap grows a ball from that vertex
+        startBloom(performance.now(), nd.i);
+        if (reduced) while (!ball.done) stepBloom(0);
         return;
       }
       if (!moved) {            // a tap or click pins the label

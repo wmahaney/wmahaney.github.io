@@ -79,9 +79,21 @@ DEFAULT_PRIMES = [101, 157, 211, 307, 431, 599, 827, 1009, 1499, 1999, 2503,
 # G_p(2); the full level-2 graph is a small example.
 CAPS = {"2": None, "23": None, "235": None, "2b5": 5000, "23b5": 5000, "2g15": 5000, "3g2": 431}
 LEVEL5_MAX_P = 5000
-# Primes for the spectral-law animation (spectra.json): roughly geometric up to 20000.
-SPECTRA_PRIMES = [101, 131, 173, 227, 293, 383, 499, 653, 853, 1109, 1447, 1889, 2459,
-                  3203, 4177, 5443, 7079, 9221, 12007, 15641, 20369]
+# Primes for the spectral-law animation (spectra.json): about 100 primes, roughly
+# geometric from 101 to 20011, so the animation moves in small steps.
+def _spectra_primes(lo=101, hi=20011, count=100):
+    out, r = [], (hi / lo) ** (1 / (count - 1))
+    for k in range(count):
+        q = max(lo, round(lo * r ** k))
+        while not all(q % d for d in range(2, int(q ** 0.5) + 1)):
+            q += 1
+        if not out or q > out[-1]:
+            out.append(q)
+    return out
+
+
+SPECTRA_PRIMES = _spectra_primes()
+SPECTRA_BINS = 60       # histogram bins over [-2 sqrt l, 2 sqrt l]
 
 # j-invariants of the CM curves with class number one: discriminant -> j
 CM_J = {
@@ -939,6 +951,185 @@ def full2_graph(F, js):
     return A, labels, sig, reps, edges, se
 
 
+# --------------------------------------------------------------------------
+# Full level-4 structure Gamma(4), for primes p = 3 (mod 4).
+#
+# Every supersingular curve has a model over F_{p^2} whose p^2-Frobenius is -p; on it
+# E[N] is defined over F_{p^2} whenever N | p + 1, so for p = 3 (mod 4) all of E[4] is,
+# and everything below happens in F_{p^2}. A vertex is (E, (P, Q)) with (P, Q) an
+# ordered basis of E[4], up to isomorphism; there are exactly 4(p - 1) of them
+# (automorphisms act freely on bases when N >= 3). The Weil pairing e_4(P, Q) is +-i,
+# and an l-isogeny sends it to its l-th power: 3-isogenies swap the two classes (the
+# graph is connected and bipartite), 5-isogenies keep them (the graph has two
+# components). Both facts are checked.
+# --------------------------------------------------------------------------
+GAMMA4_PRIMES = [11, 19, 23, 31, 43, 47, 59, 67, 71, 79, 83, 103]
+
+
+def is_square(F, z):
+    return z == F.zero or F.pow(z, (F.q - 1) // 2) == F.one
+
+
+def gamma4_model(F, j):
+    """A model of j over F_{p^2} with all of E[4] defined over F_{p^2}."""
+    a0, b0 = model(F, j)
+    rng = random.Random(7)
+    for attempt in range(400):
+        if attempt == 0:
+            a, b = a0, b0
+        else:
+            t = (rng.randrange(F.p), rng.randrange(F.p))
+            if t == F.zero:
+                continue
+            if b0 == F.zero:                         # j = 1728: quartic twists
+                a, b = F.mul(t, a0), F.zero
+            elif a0 == F.zero:                       # j = 0: sextic twists
+                a, b = F.zero, F.mul(t, b0)
+            else:                                    # quadratic twists
+                a, b = F.mul(F.mul(t, t), a0), F.mul(F.mul(t, F.mul(t, t)), b0)
+        g = [F.sub(F.smul(-8, F.mul(b, b)), F.mul(a, F.mul(a, a))),
+             F.smul(-4, F.mul(a, b)), F.smul(-5, F.mul(a, a)), F.smul(20, b),
+             F.smul(5, a), F.zero, F.one]            # psi_4 / (4y): x-coordinates of order 4
+        xs = roots(F, g)
+        if len(xs) != 6:
+            continue
+        fx = [F.add(F.add(F.mul(x, F.mul(x, x)), F.mul(a, x)), b) for x in xs]
+        if all(is_square(F, v) for v in fx):
+            pts = []
+            for x, v in zip(xs, fx):
+                for y in roots(F, [F.neg(v), F.zero, F.one]):
+                    pts.append((x, y))
+            assert len(pts) == 12
+            return a, b, pts
+    raise AssertionError("no model with rational 4-torsion")
+
+
+def gamma4_invariant(F, a, b, P, Q):
+    """Complete invariant of (E, (P, Q)): isomorphisms act by
+    (a, b, x, y) -> (u^4 a, u^6 b, u^2 x, u^3 y)."""
+    (xp, yp), (xq, yq) = P, Q
+    if xp != F.zero:
+        xi = F.inv(xp)
+        return ("p", F.mul(a, F.mul(xi, xi)), F.mul(b, F.mul(xi, F.mul(xi, xi))),
+                F.mul(xq, xi), F.div(yq, yp))
+    xi = F.inv(xq)
+    return ("q", F.mul(a, F.mul(xi, xi)), F.mul(b, F.mul(xi, F.mul(xi, xi))), F.div(yp, yq))
+
+
+def push_point(F, a, b, ell, key, P):
+    """The image of P under the l-isogeny with the given kernel (Velu), l = 3 or 5."""
+    x, y = P
+    if ell == 3:
+        x0 = key
+        t = F.smul(2, F.add(F.smul(3, F.mul(x0, x0)), a))
+        u = F.smul(4, F.add(F.mul(x0, F.add(F.mul(x0, x0), a)), b))
+        d = F.inv(F.sub(x, x0))
+        d2 = F.mul(d, d)
+        X = F.add(F.add(x, F.mul(t, d)), F.mul(u, d2))
+        Y = F.mul(y, F.sub(F.sub(F.one, F.mul(t, d2)), F.smul(2, F.mul(u, F.mul(d2, d)))))
+        return X, Y
+    s_, q_ = key                              # kernel polynomial X^2 - s X + q
+    K = Kalg(F, s_, q_)
+    R = K.X()
+    v = K.scal(F.el(2), K.add(K.scal(F.el(3), K.mul(R, R)), K.const(a)))
+    u = K.scal(F.el(4), K.add(K.mul(R, K.add(K.mul(R, R), K.const(a))), K.const(b)))
+    d = K.inv(K.add(K.const(x), K.scal(F.neg(F.one), R)))
+    d2 = K.mul(d, d)
+    X = F.add(x, K.trace(K.add(K.mul(v, d), K.mul(u, d2))))
+    Y = F.mul(y, F.sub(F.sub(F.one, K.trace(K.mul(v, d2))), F.smul(2, K.trace(K.mul(u, K.mul(d2, d))))))
+    return X, Y
+
+
+def gamma4_graphs(F, js):
+    """G_p(3) and G_p(5) with Gamma(4) structure."""
+    assert F.p % 4 == 3
+    verts, reps = {}, []
+    for j in js:
+        a, b, pts = gamma4_model(F, j)
+        for P in pts:
+            for Q in pts:
+                if x_double(F, a, b, P[0]) == x_double(F, a, b, Q[0]):
+                    continue                     # 2P = 2Q: not a basis
+                inv = gamma4_invariant(F, a, b, P, Q)
+                if inv not in verts:
+                    verts[inv] = len(reps)
+                    reps.append((a, b, P, Q, j))
+    n = len(reps)
+    assert n == 4 * (F.p - 1), "Gamma(4) does not have 4(p - 1) vertices"
+    conj = lambda inv: (inv[0],) + tuple(F.frob(c) for c in inv[1:])
+    sig = [verts[conj(gamma4_invariant(F, *r[:4]))] for r in reps]
+    assert all(sig[sig[v]] == v for v in range(n)), "Frobenius is not an involution on Gamma(4)"
+    # u^2 for the isomorphism from the conjugate representative to the stored one
+    cs = []
+    for v, (a, b, P, Q, _) in enumerate(reps):
+        a2, b2, P2, Q2, _ = reps[sig[v]]
+        fP = (F.frob(P[0]), F.frob(P[1]))
+        fQ = (F.frob(Q[0]), F.frob(Q[1]))
+        src, dst = (fP, P2) if fP[0] != F.zero else (fQ, Q2)
+        c = F.div(dst[0], src[0])
+        assert F.mul(F.mul(c, c), F.frob(a)) == a2 and F.mul(F.mul(c, F.mul(c, c)), F.frob(b)) == b2
+        cs.append(c)
+    out = {}
+    for ell in (3, 5):
+        edges = []
+        for v, (a, b, P, Q, _) in enumerate(reps):
+            keys = three_torsion(F, a, b) if ell == 3 else five_subgroups(F, a, b)
+            for key in keys:
+                a2, b2 = velu3(F, a, b, key) if ell == 3 else velu5(F, a, b, *key)
+                P2, Q2 = push_point(F, a, b, ell, key, P), push_point(F, a, b, ell, key, Q)
+                for X, Y in (P2, Q2):
+                    assert F.mul(Y, Y) == F.add(F.add(F.mul(X, F.mul(X, X)), F.mul(a2, X)), b2), \
+                        "pushed point is not on the image curve"
+                edges.append((v, verts[gamma4_invariant(F, a2, b2, P2, Q2)], ell, key))
+        A = [[0] * n for _ in range(n)]
+        for s_, t_, _, _ in edges:
+            A[s_][t_] += 1
+        assert A == [list(r) for r in zip(*A)], "Gamma(4) adjacency is not symmetric"
+        assert all(sum(r) == ell + 1 for r in A)
+        check_sigma(A, sig)
+        if ell == 3:
+            transport = lambda v, key: F.mul(cs[v], F.frob(key))
+        else:
+            transport = lambda v, key: (F.mul(cs[v], F.frob(key[0])),
+                                        F.mul(F.mul(cs[v], cs[v]), F.frob(key[1])))
+        se = edge_sigma(F, edges, sig, transport)
+        out[ell] = (A, edges, se)
+    # The Weil-pairing classes: the 3-graph is bipartite, and its two sides are exactly
+    # the two components of the 5-graph.
+    A3, A5 = out[3][0], out[5][0]
+    side = [None] * n
+    for s0 in range(n):
+        if side[s0] is not None:
+            continue
+        side[s0], stack = 0, [s0]
+        while stack:
+            v = stack.pop()
+            for w in range(n):
+                if A3[v][w]:
+                    if side[w] is None:
+                        side[w] = 1 - side[v]
+                        stack.append(w)
+                    assert side[w] != side[v], "the 3-isogeny graph is not bipartite"
+    comp = [None] * n
+    ncomp = 0
+    for s0 in range(n):
+        if comp[s0] is not None:
+            continue
+        comp[s0], stack = ncomp, [s0]
+        while stack:
+            v = stack.pop()
+            for w in range(n):
+                if A5[v][w] and comp[w] is None:
+                    comp[w] = ncomp
+                    stack.append(w)
+        ncomp += 1
+    assert ncomp == 2 and all((comp[v] == comp[0]) == (side[v] == side[0]) for v in range(n)), \
+        "the 5-isogeny components are not the Weil-pairing classes"
+    labels = [[F.show(r[4]), F.show(r[0]), F.show(r[1])] for r in reps]
+    jfp = [r[4][1] == 0 for r in reps]
+    return labels, sig, jfp, side, out
+
+
 def scalings(F, a, b):
     """The values c = u^2 for automorphisms (x, y) -> (u^2 x, u^3 y) of y^2 = x^3 + ax + b."""
     out = [F.one]
@@ -1125,10 +1316,10 @@ def compute(p: int, level5: bool = True):
     assert sum(fp) == n_spine(p), "number of j in F_p disagrees with the class number formula"
     graphs = {}
 
-    def add(key, nodes, fixed, jfp, sigma, mats, edges, sig_e, directed=False):
+    def add(key, nodes, fixed, jfp, sigma, mats, edges, sig_e, directed=False, ramanujan=True):
         lam = second_eigenvalue([M for _, M in mats])
         bound = sum(RAMANUJAN[ell] for ell, _ in mats)
-        if lam is not None:
+        if lam is not None and ramanujan:
             assert lam <= bound + 1e-6, (p, key, lam, bound)
         lf = arcs_from if directed else links_from
         graphs[key] = {
@@ -1162,6 +1353,22 @@ def compute(p: int, level5: bool = True):
     return out
 
 
+def compute_gamma4(p: int):
+    """G_p(3) and G_p(5) with full level-4 structure (p = 3 mod 4): kinds "3g4", "5g4"."""
+    F = Fp2(p)
+    js = supersingular_js(F)
+    labels, sig, jfp, side, g = gamma4_graphs(F, js)
+    labels = [[lab[0], "AB"[side[k]]] for k, lab in enumerate(labels)]
+    fixed = [sig[k] == k for k in range(len(sig))]
+    graphs = {}
+    for ell, (A, edges, se) in g.items():
+        graphs[f"{ell}g4"] = {
+            "nodes": labels, "fp": fixed, "jfp": jfp, "sigma": sig, "cls": side,
+            "links": links_from(A, ell), "fold": fold_links(edges, sig, se),
+            "lambda2": second_eigenvalue([A]), "components": 1 if ell == 3 else 2}
+    return {"p": p, "nonresidue": F.r if F.r != p - 1 else -1, "graphs": graphs}
+
+
 def hecke_spectra(p: int):
     """Eigenvalues of T_l on S_2(Gamma_0(p)) for l = 2, 3, 5: the eigenvalues of the
     Brandt matrix (the adjacency matrix of G_p(l)) with the eigenvalue l + 1 of the
@@ -1182,8 +1389,24 @@ def hecke_spectra(p: int):
         assert abs(ev[-1] - (ell + 1)) < 1e-8, "the top eigenvalue is not l + 1"
         cusp = ev[:-1]
         assert np.all(np.abs(cusp) <= 2 * ell ** 0.5 + 1e-8), "an eigenvalue exceeds 2 sqrt(l)"
-        out[str(ell)] = [round(float(x), 4) for x in cusp]
-    return {"p": p, "dim": n - 1, "eigenvalues": out}
+        out[str(ell)] = cusp
+    # Store a fine histogram and the Kolmogorov distance to the Kesten-McKay law, not the
+    # eigenvalues themselves, so the file stays small with many primes.
+    hist, ks = {}, {}
+    for ell, cusp in out.items():
+        q = int(ell)
+        a = 2 * q ** 0.5
+        counts, _ = np.histogram(np.clip(cusp, -a, a), bins=SPECTRA_BINS, range=(-a, a))
+        hist[ell] = [int(c) for c in counts]
+        xs = np.linspace(-a, a, 20001)
+        dens = (q + 1) / (2 * np.pi) * np.sqrt(np.maximum(4 * q - xs ** 2, 0)) / ((q + 1) ** 2 - xs ** 2)
+        cdf = np.concatenate([[0], np.cumsum((dens[1:] + dens[:-1]) / 2 * np.diff(xs))])
+        cdf /= cdf[-1]
+        F_at = np.interp(np.sort(cusp), xs, cdf)
+        m = len(cusp)
+        i = np.arange(m)
+        ks[ell] = round(float(max(np.max(np.abs((i + 1) / m - F_at)), np.max(np.abs(i / m - F_at)))), 4)
+    return {"p": p, "dim": n - 1, "hist": hist, "ks": ks}
 
 
 def is_prime(n: int) -> bool:
@@ -1199,6 +1422,9 @@ def main():
         sys.exit(f"not primes >= 5: {bad}")
     out = Path(__file__).resolve().parent.parent / "assets" / "data" / "isogeny"
     out.mkdir(parents=True, exist_ok=True)
+    if "--spectra-only" in sys.argv:
+        write_spectra(out)
+        return
     for old in out.glob("p*.json"):      # drop old files
         old.unlink()
     total = 0
@@ -1209,14 +1435,25 @@ def main():
               f"{res.get('n_level5', '-'):>4} level-5 vertices, "
               f"lambda2 = {g['2']['lambda2']}, {g['23']['lambda2']}, {g['235']['lambda2']}")
         total += write_prime(out, res)
+    for p in GAMMA4_PRIMES:
+        res = compute_gamma4(p)
+        print(f"p = {p:5d}: Gamma(4), {len(res['graphs']['3g4']['nodes'])} vertices")
+        total += write_prime(out, res)
     write_index(out, primes)
-    print(f"wrote {len(primes)} files to {out} ({total} bytes in all)")
+    print(f"wrote the files to {out} ({total} bytes in all)")
     if "--skip-spectra" not in sys.argv:
-        spectra = []
-        for p in SPECTRA_PRIMES:
-            spectra.append(hecke_spectra(p))
-            print(f"spectra: p = {p}, dim S_2 = {spectra[-1]['dim']}")
-        (out / "spectra.json").write_text(json.dumps(spectra, separators=(",", ":")) + "\n")
+        write_spectra(out)
+
+
+def write_spectra(out: Path) -> None:
+    """spectra.json: for each prime in SPECTRA_PRIMES, histograms of the eigenvalues of
+    T_2, T_3, T_5 on S_2(Gamma_0(p)) and their Kolmogorov distances to Kesten-McKay."""
+    spectra = []
+    for p in SPECTRA_PRIMES:
+        spectra.append(hecke_spectra(p))
+        print(f"spectra: p = {p}, dim S_2 = {spectra[-1]['dim']}", flush=True)
+    (out / "spectra.json").write_text(json.dumps(
+        {"bins": SPECTRA_BINS, "primes": spectra}, separators=(",", ":")) + "\n")
 
 
 def write_prime(out: Path, res) -> int:
@@ -1233,13 +1470,14 @@ def write_prime(out: Path, res) -> int:
 def write_index(out: Path, primes) -> None:
     """index.json: the primes on offer, the caps, and the size of each F_p-subgraph
     (the number of vertices fixed by Frobenius)."""
-    spine = {}
-    for p in primes:
-        spine[str(p)] = {}
-        for f in out.glob(f"p{p}-*.json"):
-            spine[str(p)][f.stem.split("-", 1)[1]] = sum(json.loads(f.read_text())["graph"]["fp"])
+    spine, kind_primes = {}, {}
+    for f in sorted(out.glob("p*-*.json")):
+        p_, kind = f.stem[1:].split("-", 1)
+        spine.setdefault(p_, {})[kind] = sum(json.loads(f.read_text())["graph"]["fp"])
+        kind_primes.setdefault(kind, []).append(int(p_))
+    kind_primes = {k: sorted(v) for k, v in kind_primes.items()}
     (out / "index.json").write_text(json.dumps(
-        {"primes": primes, "caps": CAPS, "spine": spine},
+        {"primes": primes, "caps": CAPS, "kind_primes": kind_primes, "spine": spine},
         separators=(",", ":")) + "\n")
 
 

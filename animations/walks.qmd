@@ -3,12 +3,14 @@ title: "Random walks"
 description-meta: "A random walk on supersingular isogeny graphs: the full graph, the F_p-subgraph, or the quotient by Frobenius."
 ---
 
-A random walk on a supersingular isogeny graph, starting at a random vertex. The laser shows the step being taken and the trail its recent history. Choose the graph and the prime $p$ above the picture. The **view** menu shows the **full graph**, the **$\mathbb{F}_p$-subgraph** (the subgraph induced on the vertices fixed by Frobenius, which acts on the level structure too; the walk is switched off when it is not connected), or the **quotient by Frobenius** (vertices and edges are Frobenius-orbits). Vertices are labelled by $j$-invariants on graphs of up to 60 vertices; hover for the others. The **animation** menu switches to the [growing ball](balls.qmd) or the [spectral law](spectral.qmd), and the eye in the corner links to [exact definitions](about.qmd).
+A random walk on a supersingular isogeny graph, starting at a random vertex. The laser shows the step being taken and the trail its recent history. Choose the graph and the prime $p$ above the picture. The **view** menu shows the **full graph**, the **$\mathbb{F}_p$-subgraph** (the subgraph induced on the vertices fixed by Frobenius, which acts on the level structure too; the walk is switched off when it is not connected), or the **quotient by Frobenius** (vertices and edges are Frobenius-orbits). Vertices are labelled by $j$-invariants on graphs of up to 60 vertices; hover for the others. The **animation** menu switches to the [blooming](balls.qmd) animations or the [spectral law](spectral.qmd), and the eye in the corner links to [exact definitions](about.qmd).
 
+::: {data-mode="walk"}
 {{< include /_partials/isogeny-widget.qmd >}}
+:::
 
 ```{=html}
 <script type="module" src="../assets/js/isogeny-hero.js"></script>
 ```
 
-The graph tabs: **2**, **2, 3** and **2, 3, 5** are $G_p(\ell)$ with those isogenies. **2 · Γ₀(5)** and **2, 3 · Γ₀(5)** carry a subgroup of order 5, **2 · Γ₁(5)** a point of order 5 up to sign (a directed graph), and **3 · Γ(2)** a basis of the 2-torsion (the supersingular Legendre invariants). The "?" buttons explain each control.
+The graph tabs: **2**, **2, 3** and **2, 3, 5** are $G_p(\ell)$ with those isogenies. **2 · Γ₀(5)** and **2, 3 · Γ₀(5)** carry a subgroup of order 5, **2 · Γ₁(5)** a point of order 5 up to sign (a directed graph), **3 · Γ(2)** a basis of the 2-torsion (the supersingular Legendre invariants), and **3 · Γ(4)**, **5 · Γ(4)** a basis of the 4-torsion: the first is connected and bipartite, the second has two components (the two values of the Weil pairing, coloured differently). How unbalanced and directed edges are drawn is explained on [Read more](about.qmd#directed). The "?" buttons explain each control.
