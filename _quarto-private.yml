@@ -21,10 +21,10 @@ website:
             text: Random walks
           - href: animations/balls.qmd
             text: Growing balls
-          - href: animations/spines.qmd
-            text: Spines
+          - href: animations/spectral.qmd
+            text: Spectral law
           - href: animations/about.qmd
-            text: About these graphs
+            text: Read more
       - text: Statements
         menu:
           - href: statements/research/index.qmd

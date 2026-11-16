@@ -20,10 +20,10 @@ website:
             text: Random walks
           - href: animations/balls.qmd
             text: Growing balls
-          - href: animations/spines.qmd
-            text: Spines
+          - href: animations/spectral.qmd
+            text: Spectral law
           - href: animations/about.qmd
-            text: About these graphs
+            text: Read more
       # STATEMENTS: hidden from the public for now. To show it, copy the "Statements"
       # entry from _quarto-private.yml to this spot, and delete "draft: true" in each
       # statement you list.

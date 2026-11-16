@@ -3,7 +3,9 @@ title: "Growing balls"
 description-meta: "Balls in supersingular isogeny graphs grown until they contain a Frobenius conjugate pair."
 ---
 
-Pick a vertex $v$ of a supersingular isogeny graph and grow the ball $B_r(v)$ around it one layer at a time, $r = 0, 1, 2, \dots$, until it contains a vertex $w$ together with its Frobenius conjugate $w^{(p)} \neq w$. The animation does this from a random vertex, shows the pair it finds in red and the shortest paths from the centre to each in bold, then starts again elsewhere. Tap a vertex to grow a ball from it.
+Pick a vertex $v$ of a supersingular isogeny graph and grow the ball $B_r(v)$ around it one layer at a time, $r = 0, 1, 2, \dots$, until it contains a vertex $w$ together with its Frobenius conjugate $w^{(p)} \neq w$. The animation does this from a random vertex, shows where it stopped in red and the shortest paths from the centre in bold, then starts again elsewhere. Tap a vertex to grow a ball from it.
+
+Switch the **view** to the **quotient by Frobenius** for a second version. There the ball remembers which lift it reached each vertex by, and it stops at the first **self-collision** (a vertex reached again by the other lift, which is the condition above) or when it **reaches the $\mathbb{F}_p$-subgraph**, whichever comes first.
 
 ::: {data-mode="ball"}
 {{< include /_partials/isogeny-widget.qmd >}}
@@ -17,17 +19,17 @@ Pick a vertex $v$ of a supersingular isogeny graph and grow the ball $B_r(v)$ ar
 
 Frobenius $\sigma\colon E \mapsto E^{(p)}$ is an automorphism of the graph, so it preserves distances. Hence $w$ and $\sigma(w)$ both lie in $B_r(v)$ exactly when $w$ lies in $B_r(v) \cap B_r(\sigma(v))$. Write $E$ for the curve at $v$. The conjugate of a shortest path from $v$ to $\sigma(w)$ runs from $\sigma(v)$ to $w$; following the path from $v$ to $w$ and then that conjugate path backwards gives a path from $E$ to $E^{(p)}$ of length at most $2r$. Composing it with the Frobenius isogeny $E^{(p)} \to E^{(p^2)} \cong E$ gives an endomorphism of $E$.
 
-So the ball stops growing when the two balls $B_r(v)$ and $B_r(\sigma(v))$ first meet off the spine, much as in a meet-in-the-middle search. Because these graphs are good expanders, one expects that to happen once the balls have about $\sqrt{n}$ vertices, by a birthday-paradox heuristic, where $n$ is the number of vertices.
+So the ball stops growing when the two balls $B_r(v)$ and $B_r(\sigma(v))$ first meet off the $\mathbb{F}_p$-subgraph, much as in a meet-in-the-middle search. Because these graphs are good expanders, one expects that to happen once the balls have about $\sqrt{n}$ vertices, by a birthday-paradox heuristic, where $n$ is the number of vertices.
 
 ## Four examples
 
-Each picture is one ball, drawn by layer: the start in the middle, the vertices at distance $r$ on the $r$-th circle, and the edges between vertices of the ball (loops and repeated edges are not shown). Vertices with $j$-invariant in $\mathbb{F}_p$ are gold.
+Each picture is one ball, drawn by layer: the start in the middle, the vertices at distance $r$ on the $r$-th circle, and the edges between vertices of the ball (loops and repeated edges are not shown). Vertices with $j$-invariant in $\mathbb{F}_p$ are gold. The examples are on the full graph.
 
 ![Balls grown until they contain a conjugate pair, in four graphs.](../assets/img/ball/ball-examples.svg){fig-alt="Four panels. Each shows a ball drawn in concentric layers around a starting vertex, with the conjugate pair in red and the shortest paths to it in black. In all four examples the pair appears at radius 2."}
 
 ## How big the ball gets
 
-For each graph and each prime, the ball is grown from every vertex in turn. The chart shows the mean size of the ball when it first contains a conjugate pair. Every graph follows the slope of $\sqrt{n}$, between about $\sqrt{n}$ and $2.5\sqrt{n}$ for the primes here. Hover a point for its numbers.
+For each graph and each prime, the ball is grown from every vertex in turn. The chart shows the mean size of the ball when it first contains a conjugate pair. Every graph follows the slope of $\sqrt{n}$, between about $0.8\sqrt{n}$ and $3\sqrt{n}$ for the primes here (up to $p = 20011$ without level structure). Hover a point for its numbers.
 
 {{< include _ball-chart.qmd >}}
 

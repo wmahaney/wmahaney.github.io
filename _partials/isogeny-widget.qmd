@@ -10,21 +10,24 @@
     <div class="wm-graph-kinds">
     <div class="wm-seg" role="group" aria-label="Which isogeny graph to draw">
       <button type="button" data-kind="2" aria-pressed="true">ℓ = 2</button>
-      <button type="button" data-kind="23" aria-pressed="false">ℓ = 2, 3</button>
-      <button type="button" data-kind="2b3" aria-pressed="false">2 · level 3</button>
-      <button type="button" data-kind="23b5" aria-pressed="false">2, 3 · level 5</button>
+      <button type="button" data-kind="23" aria-pressed="false">2, 3</button>
+      <button type="button" data-kind="235" aria-pressed="false">2, 3, 5</button>
+      <button type="button" data-kind="2b5" aria-pressed="false">2 · Γ₀(5)</button>
+      <button type="button" data-kind="23b5" aria-pressed="false">2, 3 · Γ₀(5)</button>
+      <button type="button" data-kind="2g15" aria-pressed="false">2 · Γ₁(5)</button>
+      <button type="button" data-kind="3g2" aria-pressed="false">3 · Γ(2)</button>
     </div>
     <button type="button" class="wm-q" data-terms="supersingular isogeny graph2 level loops" aria-label="What are these graphs?" aria-expanded="false">?</button>
     </div>
     <div class="wm-graph-selects">
       <label class="wm-graph-view">view
-        <select aria-label="Full graph, folded by Frobenius, or spine only">
+        <select aria-label="Full graph, F_p-subgraph, or quotient by Frobenius">
           <option value="full" selected>full graph</option>
-          <option value="folded">folded by Frobenius</option>
-          <option value="spine">spine only</option>
+          <option value="spine">𝔽ₚ-subgraph</option>
+          <option value="folded">quotient by Frobenius</option>
         </select>
       </label>
-      <button type="button" class="wm-q" data-terms="frobenius pair full folded spine" aria-label="What do full, folded and spine mean?" aria-expanded="false">?</button>
+      <button type="button" class="wm-q" data-terms="full spine folded frobenius pair" aria-label="What do full graph, F_p-subgraph and quotient by Frobenius mean?" aria-expanded="false">?</button>
       <label class="wm-graph-prime">p = <select aria-label="Characteristic p"></select></label>
       <label class="wm-graph-labels"><input type="checkbox" checked> j labels</label>
       <button type="button" class="wm-q" data-terms="p jinv fp" aria-label="What is p?" aria-expanded="false">?</button>
@@ -42,9 +45,17 @@
       <select class="wm-graph-anim" aria-label="Which animation to run">
         <option value="walk" selected>random walk</option>
         <option value="ball">growing ball</option>
+        <option value="spectral">spectral law (Kesten–McKay)</option>
       </select>
     </label>
-    <button type="button" class="wm-q" data-terms="walk ball pair" aria-label="What do the animations show?" aria-expanded="false">?</button>
+    <label class="wm-graph-ell">ℓ =
+      <select aria-label="Which Hecke operator T_ℓ">
+        <option value="2" selected>2</option>
+        <option value="3">3</option>
+        <option value="5">5</option>
+      </select>
+    </label>
+    <button type="button" class="wm-q" data-terms="walk ball spectral km" aria-label="What do the animations show?" aria-expanded="false">?</button>
     <label class="wm-graph-history">history
       <select class="wm-graph-trail-len" aria-label="Number of recent steps to keep highlighted">
         <option value="10" selected>10 steps</option>
@@ -72,8 +83,10 @@
       <span class="wm-graph-legend-fp"><i class="wm-key wm-key-fp"></i><span>j-invariant in F<sub>p</sub></span></span>
       <span><i class="wm-key wm-key-2"></i>2-isogeny</span>
       <span class="wm-graph-legend-3" hidden><i class="wm-key wm-key-3"></i>3-isogeny</span>
+      <span class="wm-graph-legend-5" hidden><i class="wm-key wm-key-5"></i>5-isogeny</span>
+      <span class="wm-graph-legend-spec"><i class="wm-key wm-key-bar"></i>eigenvalues (histogram) <i class="wm-key wm-key-3"></i>Kesten–McKay density</span>
       <span class="wm-graph-legend-ball"><i class="wm-key wm-key-ball"></i>ball <i class="wm-key wm-key-hit"></i>shortest paths to the conjugate pair (red)</span>
-      <span class="wm-graph-legend-walk"><i class="wm-key wm-key-walk"></i><i class="wm-key wm-key-trail"></i>random walk, last <span class="wm-trail-n">10</span> steps</span>
+      <span class="wm-graph-legend-walk"><i class="wm-key wm-key-walk"></i><i class="wm-key wm-key-trail"></i>laser walker; trail of the last <span class="wm-trail-n">10</span> steps</span>
       <button type="button" class="wm-q" data-terms="supersingular fp pair lambda" aria-label="What do the colours and numbers mean?" aria-expanded="false">?</button>
     </span>
     <span class="wm-graph-field"></span>
@@ -86,13 +99,13 @@
       <dt data-term="supersingular">Supersingular curve (a vertex)</dt>
       <dd>An elliptic curve in characteristic p with no point of order p, even over the algebraic closure. Up to isomorphism there are about p/12 of them, and all are defined over F<sub>p²</sub>.</dd>
       <dt data-term="jinv">j-invariant</dt>
-      <dd>A number that identifies a curve up to isomorphism; it labels the vertices (switch labels off with <em>j labels</em>; on big graphs, hover instead). It lies in F<sub>p²</sub> and is written a + bi, with i as in the note under the graph; a ± bi labels a conjugate pair in the folded graph. With level structure the label is j(E).</dd>
+      <dd>A number that identifies a curve up to isomorphism; it labels the vertices (switch labels off with <em>j labels</em>; on big graphs, hover instead). It lies in F<sub>p²</sub> and is written a + bi, with i as in the note under the graph; a ± bi labels a conjugate pair in the quotient by Frobenius. With level structure the label is j(E).</dd>
       <dt data-term="isogeny">ℓ-isogeny (an edge)</dt>
-      <dd>A map between two curves, given by rational functions, that respects the group law and has a kernel of ℓ points. A curve has ℓ + 1 of them, one for each subgroup of order ℓ: three 2-isogenies (blue edges) and four 3-isogenies (red edges).</dd>
-      <dt data-term="graph2">ℓ = 2 and ℓ = 2, 3</dt>
-      <dd>The 2-isogeny graph uses only 2-isogenies. The (2,3)-isogeny graph has the same vertices, joined by both 2-isogenies and 3-isogenies.</dd>
-      <dt data-term="level">Level 3, level 5 (Borel level structure)</dt>
-      <dd>Each vertex is a pair (E, C): a curve E with a chosen subgroup C of order 3 (or 5). An isogeny φ: E → E′ whose degree is prime to that order carries C to φ(C), giving the edge (E, C) → (E′, φ(C)). There are about 4 (or 6) times as many vertices as curves.</dd>
+      <dd>A map between two curves, given by rational functions, that respects the group law and has a kernel of ℓ points. A curve has ℓ + 1 of them, one for each subgroup of order ℓ: three 2-isogenies (blue), four 3-isogenies (red), six 5-isogenies (green).</dd>
+      <dt data-term="graph2">ℓ = 2; ℓ = 2, 3; ℓ = 2, 3, 5</dt>
+      <dd>The same vertices, joined by the ℓ-isogenies for the ℓ listed: G<sub>p</sub>(2), G<sub>p</sub>({2,3}) and G<sub>p</sub>({2,3,5}).</dd>
+      <dt data-term="level">Level structure: Γ<sub>0</sub>(5), Γ<sub>1</sub>(5), Γ(2)</dt>
+      <dd>A vertex is a curve E with extra data, which an isogeny φ: E → E′ of degree prime to the level carries along. <strong>Γ<sub>0</sub>(5)</strong>: a subgroup C of order 5, edge (E, C) → (E′, φ(C)); about 6 vertices per curve. <strong>Γ<sub>1</sub>(5)</strong>: a point P of order 5 up to sign, edge (E, ±P) → (E′, ±φ(P)); about 12 vertices per curve. This graph is directed, because the dual isogeny leads back to (E, ±2P). <strong>Γ(2)</strong> (full level 2): an ordered basis (P, Q) of E[2]; these are the Legendre invariants λ, (p − 1)/2 of them. The label before the · says which isogenies are edges.</dd>
       <dt data-term="loops">Loops and parallel edges</dt>
       <dd>Two curves can be joined by several isogenies, drawn as parallel arcs, and an isogeny from a curve to itself is drawn as a loop.</dd>
       <dt data-term="p">p</dt>
@@ -105,16 +118,20 @@
       <dd>A vertex E and its Frobenius image E<sup>(p)</sup>, when the two are different.</dd>
       <dt data-term="full">Full graph</dt>
       <dd>Every vertex and every edge.</dd>
-      <dt data-term="folded">Folded by Frobenius</dt>
-      <dd>The quotient of the graph by Frobenius: its vertices are the orbits of vertices (a conjugate pair becomes one vertex, drawn larger with a gold ring) and its edges are the orbits of edges. An edge between two vertices with j in F<sub>p</sub> need not be fixed by Frobenius: two parallel edges with conjugate kernels are swapped, and become one edge.</dd>
-      <dt data-term="spine">Spine</dt>
-      <dd>The subgraph induced on the vertices whose j-invariant lies in F<sub>p</sub>: those vertices and every edge of the graph between them (whether or not Frobenius fixes the edge).</dd>
+      <dt data-term="spine">F<sub>p</sub>-subgraph (the spine)</dt>
+      <dd>The subgraph induced on the vertices whose j-invariant lies in F<sub>p</sub>: those vertices and every edge of the graph between them, whether or not Frobenius fixes the edge. When it is not connected the random walk is switched off.</dd>
+      <dt data-term="folded">Quotient by Frobenius</dt>
+      <dd>Its vertices are the orbits of Frobenius on vertices (a conjugate pair becomes one vertex, drawn larger with a gold ring) and its edges are the orbits of Frobenius on edges. Two parallel edges with conjugate kernels between two vertices with j in F<sub>p</sub> are swapped by Frobenius and become one edge.</dd>
       <dt data-term="walk">Random walk</dt>
-      <dd>At each step the walker moves along an edge chosen at random. <em>History</em> is how many recent steps stay highlighted (the newest boldest); <em>speed</em> is how fast it moves.</dd>
+      <dd>At each step the walker moves along an edge chosen at random, starting from a random vertex. The laser beam shows the step being taken; <em>history</em> is how many recent steps stay highlighted; <em>speed</em> is how fast it moves.</dd>
       <dt data-term="ball">Growing ball</dt>
       <dd>The ball of radius r around a vertex v is the set of vertices at most r steps from v. The animation grows it one layer at a time until it contains a conjugate pair, then shows shortest paths from v to the pair. Tap a vertex to start there.</dd>
+      <dt data-term="spectral">Spectral law</dt>
+      <dd>The eigenvalues of the Hecke operator T<sub>ℓ</sub> on S<sub>2</sub>(Γ<sub>0</sub>(p)), the weight-2 cusp forms of level p, are the eigenvalues of the adjacency matrix of G<sub>p</sub>(ℓ) other than ℓ + 1. The animation shows their histogram for larger and larger p, against the Kesten–McKay density, and the Kolmogorov distance between the two.</dd>
+      <dt data-term="km">Kesten–McKay law</dt>
+      <dd>The distribution with density (ℓ+1)√(4ℓ − x²) / (2π((ℓ+1)² − x²)) on [−2√ℓ, 2√ℓ]: the spectral measure of the infinite (ℓ+1)-regular tree. Serre proved that the eigenvalues of T<sub>ℓ</sub> on S<sub>2</sub>(Γ<sub>0</sub>(p)) become distributed according to it as p → ∞.</dd>
       <dt data-term="lambda">Second-largest eigenvalue</dt>
-      <dd>The largest eigenvalue of the adjacency matrix is the number of edges at each vertex; the next largest in absolute value measures how fast random walks spread out (smaller is faster). These graphs are Ramanujan graphs: it is at most 2√ℓ for each ℓ, so at most 2√2 for ℓ = 2 and 2√2 + 2√3 for ℓ = 2, 3.</dd>
+      <dd>The largest eigenvalue of the adjacency matrix is the number of edges at each vertex; the next largest in absolute value measures how fast random walks spread out (smaller is faster). These graphs are Ramanujan graphs: it is at most 2√ℓ for each ℓ, so at most 2√2 for ℓ = 2, 2√2 + 2√3 for ℓ = 2, 3, and 2√2 + 2√3 + 2√5 for ℓ = 2, 3, 5.</dd>
     </dl>
   </details>
 </figure>
