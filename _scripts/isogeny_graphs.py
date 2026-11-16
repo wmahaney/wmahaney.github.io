@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Compute the supersingular isogeny graphs drawn on the home page.
 
-Writes assets/data/isogeny-graphs.json. Pure Python, no dependencies
+Writes assets/data/isogeny/: one small file p<prime>.json per prime (the page loads
+only the prime you pick) and an index.json listing them. Pure Python, no dependencies
 (numpy is used only for the optional spectral statistics).
 
     python3 _scripts/isogeny_graphs.py            # the default list of primes
-    python3 _scripts/isogeny_graphs.py 431 1009   # your own primes
+    python3 _scripts/isogeny_graphs.py 431 1009   # your own primes (any primes >= 5)
 
 Three graphs are computed for each prime p:
 
@@ -49,11 +50,12 @@ import sys
 from fractions import Fraction
 from pathlib import Path
 
-DEFAULT_PRIMES = [101, 157, 211, 307, 431, 599, 827, 1009]
-# The level-structure graph has about four times as many vertices, so it is only
-# drawn (and only stored) up to this prime. Keep in step with maxP in
-# assets/js/isogeny-hero.js. It is still computed and checked for every prime.
-LEVEL_MAX_P = 431
+DEFAULT_PRIMES = [101, 157, 211, 307, 431, 599, 827, 1009, 1499, 1999, 2503,
+                  2999, 3511, 4001, 4507, 4999]
+# The level-structure graph has about four times as many vertices. It is stored for
+# primes up to this bound (recorded in index.json, which the page reads). It is
+# computed and checked for every prime either way.
+LEVEL_MAX_P = 5000
 
 # j-invariants of the CM curves with class number one: discriminant -> j
 CM_J = {
@@ -508,21 +510,34 @@ def compute(p: int):
     return out
 
 
+def is_prime(n: int) -> bool:
+    return n > 1 and all(n % d for d in range(2, int(n ** 0.5) + 1))
+
+
 def main():
     random.seed(0)
-    primes = [int(a) for a in sys.argv[1:]] or DEFAULT_PRIMES
-    data = {"primes": primes, "by_prime": {}}
+    primes = sorted({int(a) for a in sys.argv[1:]} or DEFAULT_PRIMES)
+    bad = [p for p in primes if not is_prime(p) or p < 5]
+    if bad:
+        sys.exit(f"not primes >= 5: {bad}")
+    out = Path(__file__).resolve().parent.parent / "assets" / "data" / "isogeny"
+    out.mkdir(parents=True, exist_ok=True)
+    for old in out.glob("p*.json"):      # drop files for primes no longer listed
+        if old.stem[1:].isdigit():
+            old.unlink()
+    total = 0
     for p in primes:
         res = compute(p)
-        data["by_prime"][str(p)] = res
         g = res["graphs"]
         print(f"p = {p:5d}: {len(g['2']['nodes']):4d} curves, "
               f"{res['n_level']:4d} level-structure vertices, "
               f"lambda2 = {g['2']['lambda2']}, {g['23']['lambda2']}")
-    out = Path(__file__).resolve().parent.parent / "assets" / "data" / "isogeny-graphs.json"
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(data, separators=(",", ":")) + "\n")
-    print(f"wrote {out} ({out.stat().st_size} bytes)")
+        f = out / f"p{p}.json"
+        f.write_text(json.dumps(res, separators=(",", ":")) + "\n")
+        total += f.stat().st_size
+    (out / "index.json").write_text(json.dumps(
+        {"primes": primes, "level_max_p": LEVEL_MAX_P}, separators=(",", ":")) + "\n")
+    print(f"wrote {len(primes)} files to {out} ({total} bytes in all)")
 
 
 if __name__ == "__main__":

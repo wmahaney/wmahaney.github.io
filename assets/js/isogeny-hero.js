@@ -1,5 +1,6 @@
 // Interactive supersingular isogeny graphs for the home page.
-// Data: assets/data/isogeny-graphs.json, produced by _scripts/isogeny_graphs.py.
+// Data: assets/data/isogeny/ (index.json plus one p<prime>.json per prime, loaded when
+// chosen), produced by _scripts/isogeny_graphs.py.
 // Colours come from the --wm-* variables, so light and dark mode both work.
 import {
   forceSimulation, forceLink, forceManyBody, forceCollide, forceX, forceY,
@@ -9,18 +10,18 @@ const W = 600, H = 500, PAD = 40;
 const SVG_NS = "http://www.w3.org/2000/svg";
 const KINDS = {
   "2": {
-    defaultP: 431, maxP: Infinity, ells: [2], bound: "2√2", boundVal: 2 * Math.SQRT2,
+    defaultP: 431, ells: [2], bound: "2√2", boundVal: 2 * Math.SQRT2,
     caption: (p, n) => `The supersingular 2-isogeny graph in characteristic ${p}: ` +
       `${n} curves, each with three outgoing 2-isogenies.`,
   },
   "23": {
-    defaultP: 211, maxP: Infinity, ells: [2, 3], bound: "2√2 + 2√3",
+    defaultP: 211, ells: [2, 3], bound: "2√2 + 2√3",
     boundVal: 2 * Math.SQRT2 + 2 * Math.sqrt(3),
     caption: (p, n) => `The (2,3)-isogeny graph in characteristic ${p}: the same ${n} curves, ` +
       `joined by 2-isogenies and 3-isogenies.`,
   },
   "2b3": {
-    defaultP: 157, maxP: 431, ells: [2], bound: "2√2", boundVal: 2 * Math.SQRT2,
+    defaultP: 157, levelCap: true, ells: [2], bound: "2√2", boundVal: 2 * Math.SQRT2,
     caption: (p, n) => `The 2-isogeny graph with Borel level-3 structure in characteristic ${p}: ` +
       `${n} pairs (E, C), where C is a subgroup of E of order 3.`,
   },
@@ -40,12 +41,18 @@ const html = (tag) => (text) => {
 };
 const sub = html("sub"), sup = html("sup");
 
-function init(root, data) {
+// How long one step of the random walk takes, in milliseconds.
+const SPEEDS = { calm: 700, fast: 220, frantic: 90 };
+
+function init(root, index, base) {
   const svg = root.querySelector("svg");
   const tip = root.querySelector(".wm-graph-tip");
   const caption = root.querySelector(".wm-graph-caption");
   const stats = root.querySelector(".wm-graph-stats");
-  const select = root.querySelector("select");
+  const select = root.querySelector(".wm-graph-prime select");
+  const trailSelect = root.querySelector(".wm-graph-trail-len");
+  const speedSelect = root.querySelector(".wm-graph-speed");
+  const trailLabel = root.querySelector(".wm-trail-n");
   const buttons = [...root.querySelectorAll("[data-kind]")];
   const legend3 = root.querySelector(".wm-graph-legend-3");
   const legendFp = root.querySelector(".wm-graph-legend-fp");
@@ -64,12 +71,25 @@ function init(root, data) {
   let visible = true, raf = 0, walker = null;
   // The walk's recent history: the strands of the last TRAIL steps, oldest first.
   // The newest is drawn boldest; older steps fade out.
-  const TRAIL = 10;
-  let trail = [];
+  let TRAIL = Number(trailSelect.value), hopMs = SPEEDS[speedSelect.value];
+  let trail = [], painted = [];
 
-  function build() {
+  // Each prime's data is a separate small file, fetched the first time it is chosen.
+  const cache = new Map();
+  function load(p) {
+    if (!cache.has(p)) {
+      cache.set(p, fetch(`${base}/p${p}.json`)
+        .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .catch((e) => { cache.delete(p); throw e; }));
+    }
+    return cache.get(p);
+  }
+
+  let buildId = 0;
+  async function build() {
+    const id = ++buildId;
     const kind = state.kind, cfg = KINDS[kind];
-    const primes = data.primes.filter((q) => q <= cfg.maxP);
+    const primes = index.primes.filter((q) => !cfg.levelCap || q <= index.level_max_p);
     if (!primes.includes(state.p[kind])) {
       state.p[kind] = primes.includes(cfg.defaultP) ? cfg.defaultP : primes[0];
     }
@@ -81,7 +101,18 @@ function init(root, data) {
     }));
     buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.kind === kind)));
 
-    const entry = data.by_prime[p], g = entry.graphs[kind];
+    root.classList.add("wm-graph-loading");
+    let entry;
+    try { entry = await load(p); } catch {
+      if (id === buildId) {
+        root.classList.remove("wm-graph-loading");
+        caption.textContent = "Could not load this graph. Please try again.";
+      }
+      return;
+    }
+    if (id !== buildId) return;        // a newer choice has been made meanwhile
+    root.classList.remove("wm-graph-loading");
+    const g = entry.graphs[kind];
     const n = g.nodes.length;
     const nodes = g.nodes.map((label, i) => ({
       i, label, fp: g.fp[i],
@@ -109,7 +140,7 @@ function init(root, data) {
       });
     }
 
-    const r = n <= 20 ? 8 : n <= 45 ? 6.5 : n <= 110 ? 5 : 4;
+    const r = n <= 20 ? 8 : n <= 45 ? 6.5 : n <= 110 ? 5 : n <= 300 ? 4 : n <= 700 ? 3 : 2.2;
     gEdges.replaceChildren();
     gNodes.replaceChildren();
     for (const st of strands) {
@@ -122,6 +153,7 @@ function init(root, data) {
       attachNodeEvents(nd);
     }
     Object.assign(state, { nodes, strands, adj, pinned: null, r });
+    painted = [];
     hideTip();
 
     if (state.sim) state.sim.stop();
@@ -129,13 +161,16 @@ function init(root, data) {
     state.sim = forceSimulation(nodes)
       .force("link", forceLink(simLinks).distance(dist).strength(0.5))
       .force("charge", forceManyBody().strength(-Math.max(60, 5200 / n)).distanceMax(320))
-      .force("collide", forceCollide(r + 3))
+      .force("collide", forceCollide(r + (n > 300 ? 1.5 : 3)))
       .force("x", forceX(W / 2).strength(0.06))
       .force("y", forceY(H / 2).strength(0.075))
-      .alphaDecay(0.035)
+      .alphaDecay(n > 700 ? 0.06 : n > 300 ? 0.03 : 0.035)
       .on("tick", draw)
       .stop();
-    state.sim.tick(reduced ? 300 : 40);
+    // Large graphs do most of their layout up front, so they settle in a moment.
+    if (n > 700 && !reduced) state.sim.alpha(0.4);
+    state.sim.tick(reduced ? 300 : n > 700 ? 160 : n > 300 ? 120 : 40);
+    svg.classList.toggle("wm-dense", n > 300);
     state.view = null;          // snap the view to the new graph
     draw();
     if (!reduced && visible) state.sim.restart();
@@ -223,7 +258,6 @@ function init(root, data) {
   }
 
   // ---- random walk -------------------------------------------------------
-  const HOP_MS = 850;
   function positionWalker(now) {
     if (!walker || !state.nodes.length) return;
     if (reduced) return;
@@ -236,27 +270,29 @@ function init(root, data) {
       if (trail.length > TRAIL) trail.shift();
       paintTrail();
     }
-    let t = (now - walker.t0) / HOP_MS;
+    let t = (now - walker.t0) / hopMs;
     if (t >= 1) {
       walker.at = walker.next; walker.next = null;
       t = 1;
     }
-    const ease = t * t * (3 - 2 * t);
+    const ease = 0.5 * t + 0.5 * t * t * (3 - 2 * t);   // quick, with a slight pause at each curve
     const [x, y] = pointOn(geometry(walker.strand), ease, walker.reverse);
     walkerDot.setAttribute("cx", x.toFixed(1));
     walkerDot.setAttribute("cy", y.toFixed(1));
   }
-  // Strength 1 for the step being taken now, down to 1/TRAIL for the oldest.
+  // Strength 1 for the step being taken now, fading to 0.15 for the oldest in the window.
   // A strand walked more than once shows its most recent step.
   function paintTrail() {
-    for (const st of state.strands) {
+    for (const st of painted) {
       st.path.classList.remove("wm-g-trail");
       st.path.style.removeProperty("--trail");
     }
     trail.forEach((st, k) => {
+      const lin = (k + 1 + TRAIL - trail.length) / TRAIL;
       st.path.classList.add("wm-g-trail");
-      st.path.style.setProperty("--trail", ((k + 1 + TRAIL - trail.length) / TRAIL).toFixed(2));
+      st.path.style.setProperty("--trail", (0.15 + 0.85 * lin).toFixed(2));
     });
+    painted = trail.slice();
   }
   function frame(now) {
     raf = 0;
@@ -338,31 +374,38 @@ function init(root, data) {
 
   // ---- controls ---------------------------------------------------------------
   buttons.forEach((b) => b.addEventListener("click", () => {
-    state.kind = b.dataset.kind; build(); startLoop();
+    state.kind = b.dataset.kind; build().then(startLoop);
   }));
   select.addEventListener("change", () => {
-    state.p[state.kind] = Number(select.value); build(); startLoop();
+    state.p[state.kind] = Number(select.value); build().then(startLoop);
   });
+  trailSelect.addEventListener("change", () => {
+    TRAIL = Number(trailSelect.value);
+    trailLabel.textContent = TRAIL;
+    while (trail.length > TRAIL) trail.shift();
+    paintTrail();
+  });
+  speedSelect.addEventListener("change", () => { hopMs = SPEEDS[speedSelect.value]; });
 
   // Only animate while the figure is on screen and the tab is visible.
   if ("IntersectionObserver" in window) {
     new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
+      if (!state.sim) return;
       if (visible) { if (!reduced && state.sim.alpha() > 0.02) state.sim.restart(); startLoop(); }
       else state.sim.stop();
     }, { threshold: 0.05 }).observe(root);
   }
   document.addEventListener("visibilitychange", () => { if (!document.hidden) startLoop(); });
 
-  build();
-  startLoop();
-  root.classList.add("wm-graph-ready");
+  trailLabel.textContent = TRAIL;
+  build().then(() => { startLoop(); root.classList.add("wm-graph-ready"); });
 }
 
 const root = document.getElementById("wm-graph");
 if (root) {
-  fetch(root.dataset.src)
+  fetch(`${root.dataset.src}/index.json`)
     .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then((data) => init(root, data))
+    .then((index) => init(root, index, root.dataset.src))
     .catch(() => root.classList.add("wm-graph-failed"));
 }
