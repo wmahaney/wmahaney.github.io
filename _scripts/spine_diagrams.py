@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Draw the spines of the isogeny graphs, for the Spines page (animations/spines.qmd).
+"""Draw the F_p-subgraphs (spines) of the isogeny graphs, for animations/about.qmd.
 
-The spine of a graph is the subgraph induced on the vertices whose j-invariant
-(of E, with level structure) lies in F_p: those vertices and every edge between them. This script computes each graph with
+The spine (F_p-subgraph) of a graph is the subgraph induced on the vertices fixed by
+Frobenius (which acts on the level structure too): those vertices and every edge
+between them. This script computes each graph with
 _scripts/isogeny_graphs.py (all of its consistency checks run), restricts to the
 spine, and writes static SVG files to assets/img/spine/.
 
@@ -32,22 +33,22 @@ PW, PH = 380, 300          # panel size
 # --------------------------------------------------------------------------
 # data
 # --------------------------------------------------------------------------
-_cache: dict[int, dict] = {}
+_cache: dict = {}
 
 
-def graphs(p: int) -> dict:
-    if p not in _cache:
+def graphs(p: int, level5: bool) -> dict:
+    if (p, level5) not in _cache:
         random.seed(0)
         ig.LEVEL5_MAX_P = max(ig.LEVEL5_MAX_P, p)
-        _cache[p] = ig.compute(p)["graphs"]
-    return _cache[p]
+        _cache[(p, level5)] = ig.compute(p, level5=level5)["graphs"]
+    return _cache[(p, level5)]
 
 
 def spine(p: int, kind: str):
     """(multigraph on the fixed vertices, set of special vertices) for G_p(kind)."""
-    d = graphs(p)[kind]
-    # The spine: the subgraph induced on the vertices whose j-invariant (of E) is in F_p.
-    fixed = [i for i, f in enumerate(d["jfp"]) if f]
+    d = graphs(p, kind.endswith("b5"))[kind]
+    # The spine: the subgraph induced on the vertices fixed by Frobenius.
+    fixed = [i for i, f in enumerate(d["fp"]) if f]
     keep = set(fixed)
     G = nx.MultiGraph()
     G.add_nodes_from(fixed)
@@ -164,7 +165,7 @@ def panel(p: int, kind: str, note: str) -> str:
         seen.setdefault(key, []).append(data["ell"])
     for (s, t), ells in sorted(seen.items()):
         for idx, ell in enumerate(sorted(ells)):
-            col = BLUE if ell == 2 else RED
+            col = BLUE if ell == 2 else RED if ell == 3 else GREEN
             (x1, y1), (x2, y2) = pos[s], pos[t]
             if s == t:
                 ux, uy = x1 - PW / 2, y1 - PH / 2
@@ -189,19 +190,21 @@ def panel(p: int, kind: str, note: str) -> str:
             out.append(f'<rect x="{x - r:.1f}" y="{y - r:.1f}" width="{2 * r:.1f}" height="{2 * r:.1f}" '
                        f'fill="{PURPLE}" stroke="{PAPER}" stroke-width="1.5"/>')
         else:
-            fill = GREEN if tag == "0" else GOLD
+            fill = INK if tag == "0" else GOLD
             out.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r:.1f}" fill="{fill}" '
                        f'stroke="{PAPER}" stroke-width="1.5"/>')
     return "\n".join(out)
 
 
-def legend(has3: bool, has_special: bool, y: int) -> str:
+def legend(ells, has_special: bool, y: int) -> str:
     items = [(BLUE, "line", "2-isogeny")]
-    if has3:
+    if 3 in ells:
         items.append((RED, "line", "3-isogeny"))
-    items.append((GOLD, "dot", "j-invariant in F_p"))
+    if 5 in ells:
+        items.append((GREEN, "line", "5-isogeny"))
+    items.append((GOLD, "dot", "fixed by Frobenius"))
     if has_special:
-        items += [(GREEN, "dot", "j = 0"), (PURPLE, "sq", "j = 1728")]
+        items += [(INK, "dot", "j = 0"), (PURPLE, "sq", "j = 1728")]
     out, x = [], 8
     for col, shape, text in items:
         if shape == "line":
@@ -218,7 +221,7 @@ def legend(has3: bool, has_special: bool, y: int) -> str:
     return "\n".join(out)
 
 
-def figure(name: str, kind: str, cases, cols=2, has3=False, has_special=True):
+def figure(name: str, kind: str, cases, cols=2, ells=(2,), has_special=True):
     """cases: list of (prime, note). Writes assets/img/spine/<name>.svg."""
     rows = math.ceil(len(cases) / cols)
     gap = 16
@@ -228,7 +231,7 @@ def figure(name: str, kind: str, cases, cols=2, has3=False, has_special=True):
     for k, (p, note) in enumerate(cases):
         x, y = (k % cols) * (PW + gap), (k // cols) * (PH + gap)
         body.append(f'<g transform="translate({x},{y})">{panel(p, kind, note)}</g>')
-    body.append(f'<g transform="translate(0,{H - 14})">{legend(has3, has_special, 0)}</g>')
+    body.append(f'<g transform="translate(0,{H - 14})">{legend(ells, has_special, 0)}</g>')
     svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" '
            f'font-family="Inter, system-ui, -apple-system, Segoe UI, sans-serif" role="img">\n'
            + "\n".join(body) + "\n</svg>\n")
@@ -238,24 +241,23 @@ def figure(name: str, kind: str, cases, cols=2, has3=False, has_special=True):
 
 
 def main():
-    # 1. the 2-isogeny graph, by p mod 8
+    for old in OUT.glob("spine-*.svg"):
+        old.unlink()
+    # the 2-isogeny graph, by p mod 8
     cases = [(pick("2", lambda p, r=r: p % 8 == r, lo=6, hi=30), f"p ≡ {r} (mod 8)")
              for r in (1, 5, 3, 7)]
     figure("spine-2", "2", cases)
-    # 2. the (2,3)-isogeny graph, by p mod 24
     classes = (1, 13, 5, 17, 7, 19, 11, 23)
-    cases = [(pick("23", lambda p, r=r: p % 24 == r, lo=6, hi=30), f"p ≡ {r} (mod 24)")
-             for r in classes]
-    figure("spine-23", "23", cases, has3=True)
-    # 3. the 2-isogeny graph with level 3, by p mod 24
-    cases = [(pick("2b3", lambda p, r=r: p % 24 == r, lo=10, hi=60, start=100), f"p ≡ {r} (mod 24)")
-             for r in classes]
-    figure("spine-2b3", "2b3", cases)
-    # 4. the (2,3)-isogeny graph with level 5, by p mod 24 (smaller primes: six times
-    #    as many vertices)
-    cases = [(pick("23b5", lambda p, r=r: p % 24 == r, lo=8, hi=60, start=60), f"p ≡ {r} (mod 24)")
-             for r in classes]
-    figure("spine-23b5", "23b5", cases, has3=True)
+    # the (2,3)- and (2,3,5)-isogeny graphs, by p mod 24
+    for kind, ells in (("23", (2, 3)), ("235", (2, 3, 5))):
+        cases = [(pick(kind, lambda p, r=r: p % 24 == r, lo=6, hi=30), f"p ≡ {r} (mod 24)")
+                 for r in classes]
+        figure(f"spine-{kind}", kind, cases, ells=ells)
+    # level 5 (six times as many vertices, so smaller primes)
+    for kind, ells in (("2b5", (2,)), ("23b5", (2, 3))):
+        cases = [(pick(kind, lambda p, r=r: p % 24 == r, lo=8, hi=60, start=60), f"p ≡ {r} (mod 24)")
+                 for r in classes]
+        figure(f"spine-{kind}", kind, cases, ells=ells)
 
 
 if __name__ == "__main__":

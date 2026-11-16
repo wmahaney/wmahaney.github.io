@@ -25,15 +25,18 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "assets" / "data" / "isogeny"
 INK, MUTED, BLUE, RED, GOLD, PAPER, LINE, FAINT = (
     "#1E2430", "#5A6070", "#2B4FB8", "#B93A2B", "#E5A11C", "#FFFDF7", "#E3D9C3", "#F3EBD8")
-NAMES = {"2": "G_p(2)", "23": "G_p({2,3})", "2b3": "G_p(2), level 3", "23b5": "G_p({2,3}), level 5"}
-LONG = {"2": "2-isogeny graph", "23": "(2,3)-isogeny graph",
-        "2b3": "2-isogeny graph, level 3", "23b5": "(2,3)-isogeny graph, level 5"}
+NAMES = {"2": "G_p(2)", "23": "G_p({2,3})", "235": "G_p({2,3,5})",
+         "2b5": "G_p(2), level 5", "23b5": "G_p({2,3}), level 5"}
+LONG = {"2": "2-isogeny graph", "23": "(2,3)-isogeny graph", "235": "(2,3,5)-isogeny graph",
+        "2b5": "2-isogeny graph, level 5", "23b5": "(2,3)-isogeny graph, level 5"}
+GREEN = "#2E8B57"
 
 
 def load(p, kind):
-    g = json.loads((DATA / f"p{p}.json").read_text())["graphs"].get(kind)
-    if g is None:
+    f = DATA / f"p{p}-{kind}.json"
+    if not f.exists():
         return None
+    g = json.loads(f.read_text())["graph"]
     n = len(g["nodes"])
     adj = [dict() for _ in range(n)]          # neighbour -> list of ells
     for s, t, ell, m in g["links"]:
@@ -146,7 +149,7 @@ def example_panel(p, kind, seed):
             drawn.add(frozenset((u, x)))
             if frozenset((u, x)) in geo:
                 continue
-            col = BLUE if 2 in ells else RED
+            col = BLUE if 2 in ells else RED if 3 in ells else GREEN
             (x1, y1), (x2, y2) = pos[u], pos[x]
             out.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" '
                        f'stroke="{col}" stroke-width="1.3" opacity="0.55"/>')
@@ -156,7 +159,7 @@ def example_panel(p, kind, seed):
         out.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" '
                    f'stroke="{INK}" stroke-width="3.4" stroke-linecap="round"/>')
     for u, (x, y) in pos.items():
-        fill = RED if u in (w, c) else GOLD if g["jfp"][u] else BLUE
+        fill = RED if u in (w, c) else GOLD if g["fp"][u] else BLUE
         big = u in (w, c) or u == v
         r = 7.5 if big else 4.6
         ring = INK if big else PAPER
@@ -175,7 +178,7 @@ def example_panel(p, kind, seed):
 
 
 def examples():
-    cases = [("2", 1009, 3), ("23", 431, 1), ("2b3", 431, 2), ("23b5", 211, 5)]
+    cases = [("2", 1009, 3), ("23", 431, 1), ("2b5", 211, 2), ("23b5", 211, 5)]
     cols, gap = 2, 16
     W = cols * PW + gap
     H = 2 * PH + gap + 36
@@ -185,7 +188,7 @@ def examples():
         body.append(f'<g transform="translate({x},{y})">{example_panel(p, kind, seed)}</g>')
     y = H - 14
     items = [("line", BLUE, "2-isogeny"), ("line", RED, "3-isogeny"), ("dot", BLUE, "curve"),
-             ("dot", GOLD, "j-invariant in F_p"), ("dot", RED, "the conjugate pair"),
+             ("dot", GOLD, "fixed by Frobenius"), ("dot", RED, "the conjugate pair"),
              ("thick", INK, "shortest paths")]
     x, leg = 6, []
     for shape, col, text in items:
@@ -211,8 +214,8 @@ def examples():
 # the chart: mean ball size over all starting vertices, against n
 # --------------------------------------------------------------------------
 SERIES = [  # kind, colour, marker (secondary encoding: shape as well as colour)
-    ("2", "#2B4FB8", "circle"), ("23", "#B93A2B", "square"),
-    ("2b3", "#C88A0E", "triangle"), ("23b5", "#2E8B57", "diamond")]
+    ("2", "#2B4FB8", "circle"), ("23", "#B93A2B", "square"), ("235", "#7A3E9D", "ring"),
+    ("2b5", "#C88A0E", "triangle"), ("23b5", "#2E8B57", "diamond")]
 
 
 def stats():
@@ -240,6 +243,9 @@ def marker(shape, x, y, col):
     s = 4.6
     if shape == "circle":
         return f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{s}" fill="{col}" stroke="{PAPER}" stroke-width="2"/>'
+    if shape == "ring":
+        return (f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{s}" fill="{PAPER}" stroke="{col}" '
+                f'stroke-width="2.6"/>')
     if shape == "square":
         return (f'<rect x="{x - s:.1f}" y="{y - s:.1f}" width="{2 * s:.1f}" height="{2 * s:.1f}" rx="1.5" '
                 f'fill="{col}" stroke="{PAPER}" stroke-width="2"/>')

@@ -1,9 +1,9 @@
 ---
 title: "Random walks"
-description-meta: "A random walk on supersingular isogeny graphs, whole, folded by Frobenius, or on the spine."
+description-meta: "A random walk on supersingular isogeny graphs: the full graph, the F_p-subgraph, or the quotient by Frobenius."
 ---
 
-A random walk on a supersingular isogeny graph, with its recent steps highlighted. Choose the graph and the prime $p$ above the picture. The **view** menu shows the whole graph; the **spine**, the subgraph induced on the vertices whose $j$-invariant lies in $\mathbb{F}_p$; or the graph **folded** by Frobenius, the quotient whose vertices are the Frobenius-orbits of vertices (a conjugate pair is drawn larger) and whose edges are the Frobenius-orbits of edges. Vertices are labelled by their $j$-invariants on graphs of up to 60 vertices; hover for the others. The eye in the corner links to [exact definitions](about.qmd). Switch the **animation** to *growing ball* for the [growing-ball animation](balls.qmd).
+A random walk on a supersingular isogeny graph, starting at a random vertex. The laser shows the step being taken and the trail its recent history. Choose the graph and the prime $p$ above the picture. The **view** menu shows the **full graph**, the **$\mathbb{F}_p$-subgraph** (the subgraph induced on the vertices fixed by Frobenius, which acts on the level structure too; the walk is switched off when it is not connected), or the **quotient by Frobenius** (vertices and edges are Frobenius-orbits). Vertices are labelled by $j$-invariants on graphs of up to 60 vertices; hover for the others. The **animation** menu switches to the [growing ball](balls.qmd) or the [spectral law](spectral.qmd), and the eye in the corner links to [exact definitions](about.qmd).
 
 {{< include /_partials/isogeny-widget.qmd >}}
 
@@ -11,4 +11,4 @@ A random walk on a supersingular isogeny graph, with its recent steps highlighte
 <script type="module" src="../assets/js/isogeny-hero.js"></script>
 ```
 
-The level-3 graph has pairs $(E, C)$ with $C$ a subgroup of order 3 as vertices, and a 2-isogeny $\varphi\colon E\to E'$ gives an edge $(E, C)\to(E', \varphi(C))$; the level-5 graph is the same with subgroups of order 5 and both 2- and 3-isogenies. There are pictures of the spines on the [Spines](spines.qmd) page.
+The graph tabs: **2**, **2, 3** and **2, 3, 5** are $G_p(\ell)$ with those isogenies. **2 · Γ₀(5)** and **2, 3 · Γ₀(5)** carry a subgroup of order 5, **2 · Γ₁(5)** a point of order 5 up to sign (a directed graph), and **3 · Γ(2)** a basis of the 2-torsion (the supersingular Legendre invariants). The "?" buttons explain each control.

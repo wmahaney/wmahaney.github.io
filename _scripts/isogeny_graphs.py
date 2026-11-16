@@ -1,30 +1,36 @@
 #!/usr/bin/env python3
 """Compute the supersingular isogeny graphs drawn on the home page.
 
-Writes assets/data/isogeny/: one small file p<prime>.json per prime (the page loads
-only the prime you pick) and an index.json listing them. Pure Python, no dependencies
-(numpy is used only for the optional spectral statistics).
+Writes assets/data/isogeny/: one file p<prime>-<graph>.json per prime and graph (the
+page loads only the one you pick), an index.json listing them, and spectra.json. Pure Python, no dependencies
+(numpy is needed for the eigenvalues).
 
     python3 _scripts/isogeny_graphs.py            # the default list of primes
     python3 _scripts/isogeny_graphs.py 431 1009   # your own primes (any primes >= 5)
+    python3 _scripts/isogeny_graphs.py --skip-spectra   # leave spectra.json alone
 
-Three graphs are computed for each prime p:
+Five graphs are computed for each prime p:
 
-  "2"    the supersingular 2-isogeny graph G_p(2)
-  "23"   the (2,3)-isogeny graph G_p({2,3}): same vertices, 2- and 3-isogenies
-  "2b3"  the 2-isogeny graph with Borel (Gamma_0(3)) level structure:
-         vertices are pairs (E, C), C < E of order 3, up to isomorphism;
-         a 2-isogeny phi: E -> E' gives an edge (E, C) -> (E', phi(C)).
-  "23b5" the (2,3)-isogeny graph with Borel (Gamma_0(5)) level structure:
-         vertices are pairs (E, C), C < E of order 5; 2- and 3-isogenies
-         push C forward.
+  "2"     the supersingular 2-isogeny graph G_p(2)
+  "23"    G_p({2,3}): the same vertices, 2- and 3-isogenies
+  "235"   G_p({2,3,5}): the same vertices, 2-, 3- and 5-isogenies
+  "2b5"   G_p(2) with Borel (Gamma_0(5)) level structure: vertices are pairs (E, C),
+          C < E of order 5, up to isomorphism; a 2-isogeny phi: E -> E' gives the
+          edge (E, C) -> (E', phi(C))
+  "23b5"  G_p({2,3}) with Borel level-5 structure (2- and 3-isogenies)
+
+and, in spectra.json, the eigenvalues of the Hecke operators T_2, T_3, T_5 on
+S_2(Gamma_0(p)) for a longer list of primes (the Brandt matrices of G_p(l) without
+their eigenvalue l + 1), for the spectral-law animation.
 
 Every graph also carries
   "sigma"  the permutation of the vertices induced by Frobenius (E, C) -> (E^(p), C^(p));
   "fp"     whether a vertex is fixed by Frobenius;
-  "jfp"    whether its j-invariant (of E) lies in F_p. The spine is the subgraph
-           induced on these vertices; for G_p(2) and G_p({2,3}) jfp = fp;
-  "fold"   the links of the folded graph, the quotient by Frobenius: vertices are
+  "jfp"    whether its j-invariant (of E) lies in F_p (informational: without level
+           structure jfp = fp; with level structure fp is the smaller set).
+The F_p-subgraph (also called the spine) is the subgraph induced on the vertices fixed
+by Frobenius ("fp"), which acts on the level structure as well.
+  "fold"   the links of the quotient by Frobenius: vertices are
            Frobenius-orbits of vertices (named by the smaller index), edges are orbits
            of edges. This needs Frobenius on edges, computed and checked below.
 
@@ -35,29 +41,28 @@ for polynomials of degree <= 4 are needed.
   * One supersingular curve is found by reducing a class-number-one CM curve
     at a prime that is inert or ramified in its CM field; the rest are found
     by walking the (connected) 2-isogeny graph.
-  * A subgroup C of order 3 is {O, +-P}; it is determined by x(P) = x0, a root
-    of the 3-division polynomial psi_3 = 3x^4 + 6ax^2 + 12bx - a^2.
-    Isomorphisms act by (a, b, x0) -> (t^2 a, t^3 b, t x0), so for x0 != 0 the
-    pair (a/x0^2, b/x0^3) is a complete invariant of (E, C). (x0 = 0 forces
-    a = 0, i.e. j = 0, and is a single vertex.)
+  * A subgroup of order 3 is {O, +-P}, determined by x(P), a root of the
+    3-division polynomial psi_3 = 3x^4 + 6ax^2 + 12bx - a^2. A subgroup of order 5
+    is determined by its kernel polynomial x^2 - s x + q (see below).
   * Edges are *directed* and counted by kernels, so every vertex has
-    out-degree ell + 1 (3 for the level-structure graph). At vertices with
+    out-degree the sum of ell + 1 over the ells used. At vertices with
     extra automorphisms (j = 0, 1728 and their lifts) the adjacency matrix is
     not symmetric; the drawing shows max(A_ij, A_ji) undirected edges.
 
 Checks run on every prime (the script aborts if one fails):
   * number of supersingular j-invariants agrees with the class number formula;
   * every Velu output is a root of the classical modular polynomial
-    Phi_2 or Phi_3;
-  * pushed-forward level structure is again 3-torsion (psi_3 vanishes);
+    Phi_2 or Phi_3; every 5-isogeny lands on a supersingular curve;
   * A_ij * |Aut_j| = A_ji * |Aut_i| (the Brandt-matrix symmetry);
   * number of F_p-rational vertices (the spine) agrees with the class number
     formula (h(-4p)/2, h(-p), or 2 h(-p) according to p mod 8);
-  * Frobenius is an involutive automorphism of every graph;
+  * Frobenius is an involution on vertices and on edges and respects the source
+    and target of every edge;
   * for level 5: the pushed-forward kernel polynomial is a factor of psi_5, every
     quotient curve is supersingular, and the mass is (p - 1)/4;
-  * number of level-structure vertices agrees with an orbit count giving
-    total mass 4 * (p - 1) / 24.
+  * the second-largest eigenvalue modulus is within the Ramanujan bound
+    (the sum of 2 sqrt(l) over the l used), and in spectra.json every eigenvalue
+    of T_l on S_2(Gamma_0(p)) is at most 2 sqrt(l) in absolute value.
 """
 from __future__ import annotations
 
@@ -68,13 +73,15 @@ from fractions import Fraction
 from pathlib import Path
 
 DEFAULT_PRIMES = [101, 157, 211, 307, 431, 599, 827, 1009, 1499, 1999, 2503,
-                  2999, 3511, 4001, 4507, 4999]
-# The level-structure graph has about four times as many vertices. It is stored for
-# primes up to this bound (recorded in index.json, which the page reads). It is
-# computed and checked for every prime either way.
-LEVEL_MAX_P = 5000
-# Same for the Gamma_0(5) graph, which has six times as many vertices as G_p(2).
-LEVEL5_MAX_P = 3000
+                  2999, 3511, 4001, 4507, 4999, 6007, 8009, 10007, 15013, 20011]
+# Largest p for each graph (recorded in index.json, which the page reads). The graphs
+# with level structure have 6 (Gamma_0(5)) or 12 (Gamma_1(5)) times as many vertices as
+# G_p(2); the full level-2 graph is a small example.
+CAPS = {"2": None, "23": None, "235": None, "2b5": 5000, "23b5": 5000, "2g15": 5000, "3g2": 431}
+LEVEL5_MAX_P = 5000
+# Primes for the spectral-law animation (spectra.json): roughly geometric up to 20000.
+SPECTRA_PRIMES = [101, 131, 173, 227, 293, 383, 499, 653, 853, 1109, 1447, 1889, 2459,
+                  3203, 4177, 5443, 7079, 9221, 12007, 15641, 20369]
 
 # j-invariants of the CM curves with class number one: discriminant -> j
 CM_J = {
@@ -345,10 +352,6 @@ def three_torsion(F, a, b):
     return roots(F, [F.neg(F.mul(a, a)), F.smul(12, b), F.smul(6, a), F.zero, F.el(3)])
 
 
-def psi3(F, a, b, x):
-    return peval(F, [F.neg(F.mul(a, a)), F.smul(12, b), F.smul(6, a), F.zero, F.el(3)], x)
-
-
 def velu2(F, a, b, e):
     """Quotient by <(e, 0)>. Returns (a', b', xmap)."""
     t = F.add(F.smul(3, F.mul(e, e)), a)
@@ -499,57 +502,6 @@ def isogeny_adjacency(F, js, ell):
     return A
 
 
-def level_invariant(F, a, b, x0):
-    if x0 == F.zero:
-        return ("zero",)
-    xi = F.inv(x0)
-    xi2 = F.mul(xi, xi)
-    return (F.mul(a, xi2), F.mul(b, F.mul(xi2, xi)))
-
-
-def borel3_graph(F, js):
-    """2-isogeny graph on pairs (E, C), C of order 3."""
-    verts = {}    # invariant -> index
-    reps = []     # (a, b, x0, j, j')
-    orbit = []    # number of x0 on the fixed model giving this vertex
-    for j in js:
-        a, b = model(F, j)
-        tors = three_torsion(F, a, b)
-        assert len(tors) == 4
-        for x0 in tors:
-            inv = level_invariant(F, a, b, x0)
-            if inv in verts:
-                orbit[verts[inv]] += 1
-                continue
-            verts[inv] = len(reps)
-            a3, b3 = velu3(F, a, b, x0)
-            reps.append((a, b, x0, j, j_inv(F, a3, b3)))
-            orbit.append(1)
-    n = len(reps)
-    # |Aut(E, C)| = |Aut(E)| / orbit size; total mass must be 4 (p - 1) / 24.
-    aut = [Fraction(aut_order(F, r[3]), orbit[k]) for k, r in enumerate(reps)]
-    assert all(x.denominator == 1 for x in aut)
-    assert sum(1 / x for x in aut) == Fraction(4 * (F.p - 1), 24), "mass formula fails"
-    A = [[0] * n for _ in range(n)]
-    for s, (a, b, x0, j, _) in enumerate(reps):
-        for e in two_torsion(F, a, b):
-            a2, b2, xmap = velu2(F, a, b, e)
-            x1 = xmap(x0)
-            assert psi3(F, a2, b2, x1) == F.zero, "image is not 3-torsion"
-            # move to the fixed model of the target j-invariant
-            inv = level_invariant(F, a2, b2, x1)
-            assert inv in verts, "unknown level-structure vertex"
-            A[s][verts[inv]] += 1
-    for s in range(n):
-        assert sum(A[s]) == 3
-        for t in range(n):
-            assert A[s][t] * aut[t] == A[t][s] * aut[s], "level Brandt symmetry fails"
-    sigma = [verts[frob_inv(F, level_invariant(F, r[0], r[1], r[2]))] for r in reps]
-    check_sigma(A, sigma)
-    labels = [[F.show(r[3]), F.show(r[4])] for r in reps]
-    return A, labels, sigma, reps
-
-
 # --------------------------------------------------------------------------
 # Level 5. A subgroup C of order 5 is {O, +-P, +-2P}; it is determined by the
 # kernel polynomial x^2 - s x + q with roots x(P), x(2P) (a quadratic over F_{p^2}
@@ -686,13 +638,36 @@ def frob_inv(F, inv):
     return tuple(F.frob(c) if isinstance(c, tuple) else c for c in inv)
 
 
+def arcs_from(A, ell):
+    """Directed links [s, t, ell, A[s][t]] (for directed graphs)."""
+    n = len(A)
+    return [[s_, t_, ell, A[s_][t_]] for s_ in range(n) for t_ in range(n) if A[s_][t_]]
+
+
 def check_sigma(A, sigma):
+    """Frobenius is a permutation of the vertices of order dividing 4 (order 2, except
+    with Gamma_1(5) structure) that preserves the adjacency matrix."""
     n = len(A)
     assert sorted(sigma) == list(range(n))
-    assert all(sigma[sigma[v]] == v for v in range(n)), "Frobenius is not an involution"
+    assert all(sigma[sigma[sigma[sigma[v]]]] == v for v in range(n)), "Frobenius^4 is not the identity"
     for s_ in range(n):
         for t_ in range(n):
             assert A[sigma[s_]][sigma[t_]] == A[s_][t_], "Frobenius is not an automorphism"
+
+
+def orbits(perm):
+    """The cycles of a permutation, each starting at its smallest element."""
+    seen, out = set(), []
+    for v in range(len(perm)):
+        if v in seen:
+            continue
+        cyc, w = [], v
+        while w not in seen:
+            seen.add(w)
+            cyc.append(w)
+            w = perm[w]
+        out.append(cyc)
+    return out
 
 
 def borel5_graph(F, js):
@@ -758,6 +733,212 @@ def borel5_graph(F, js):
 # vertices, its directed edges the orbits of directed edges. It is drawn, like the
 # others, with max(B_ij, B_ji) undirected edges between two vertices.
 # --------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+# F_{p^4} = F_{p^2}[t] / (t^2 - c), c a non-square in F_{p^2}: needed for points of
+# order 5, whose x-coordinates need not lie in F_{p^2}. Elements: pairs (u, v) = u + v t.
+# --------------------------------------------------------------------------
+class Fp4:
+    def __init__(self, F):
+        self.F = F
+        rng = random.Random(1)
+        while True:
+            c = (rng.randrange(F.p), rng.randrange(F.p))
+            if c != F.zero and F.pow(c, (F.q - 1) // 2) != F.one:
+                break
+        self.c = c
+        self.zero = (F.zero, F.zero)
+        self.one = (F.one, F.zero)
+
+    def emb(self, x):
+        return (x, self.F.zero)
+
+    def add(self, x, y):
+        F = self.F
+        return (F.add(x[0], y[0]), F.add(x[1], y[1]))
+
+    def sub(self, x, y):
+        F = self.F
+        return (F.sub(x[0], y[0]), F.sub(x[1], y[1]))
+
+    def scal(self, k, x):                  # k in F_{p^2}
+        F = self.F
+        return (F.mul(k, x[0]), F.mul(k, x[1]))
+
+    def mul(self, x, y):
+        F = self.F
+        return (F.add(F.mul(x[0], y[0]), F.mul(self.c, F.mul(x[1], y[1]))),
+                F.add(F.mul(x[0], y[1]), F.mul(x[1], y[0])))
+
+    def inv(self, x):
+        F = self.F
+        nrm = F.sub(F.mul(x[0], x[0]), F.mul(self.c, F.mul(x[1], x[1])))
+        ni = F.inv(nrm)
+        return (F.mul(x[0], ni), F.neg(F.mul(x[1], ni)))
+
+    def pow(self, x, n):
+        out = self.one
+        while n:
+            if n & 1:
+                out = self.mul(out, x)
+            x = self.mul(x, x)
+            n >>= 1
+        return out
+
+    def frob(self, x):                      # x -> x^p
+        return self.pow(x, self.F.p)
+
+    def quadratic_roots(self, s, q):
+        """The two roots of x^2 - s x + q (s, q in F_{p^2}) in F_{p^4}."""
+        F = self.F
+        rs = roots(F, [q, F.neg(s), F.one])
+        if len(rs) == 2:
+            out = [self.emb(r) for r in rs]
+        else:
+            assert not rs, "repeated root"
+            disc = F.sub(F.mul(s, s), F.smul(4, q))
+            w = roots(F, [F.neg(F.div(disc, self.c)), F.zero, F.one])
+            assert len(w) == 2
+            half = F.inv(F.el(2))
+            out = [(F.mul(s, half), F.mul(w[0], half)), (F.mul(s, half), F.neg(F.mul(w[0], half)))]
+        for x in out:
+            assert self.add(self.sub(self.mul(x, x), self.scal(s, x)), self.emb(q)) == self.zero
+        return out
+
+
+def gamma1_invariant(F, F4, a, b, x0, j):
+    """A complete invariant of (E, +-P) with x(P) = x0: isomorphisms act by
+    (a, b, x) -> (u^4 a, u^6 b, u^2 x)."""
+    if x0 == F4.zero:
+        return ("z", j)
+    xi = F4.inv(x0)
+    xi2 = F4.mul(xi, xi)
+    return ("x", F4.scal(a, xi2), F4.scal(b, F4.mul(xi2, xi)))
+
+
+def gamma1_graph(F, js):
+    """G_p(2) with Gamma_1(5) structure: vertices (E, +-P), P of order 5, up to
+    isomorphism; a 2-isogeny phi gives (E, +-P) -> (E', +-phi(P)).
+
+    This graph is directed: the dual isogeny sends +-phi(P) to +-2P, not +-P. The
+    Brandt symmetry becomes A[v][w] |Aut w| = A[w][<2>v] |Aut v|, where the diamond
+    operator <2> sends (E, +-P) to (E, +-2P)."""
+    F4 = Fp4(F)
+    verts, reps, orbit, other = {}, [], [], []
+    for j in js:
+        a, b = model(F, j)
+        for s_, q_ in five_subgroups(F, a, b):
+            xs = F4.quadratic_roots(s_, q_)          # x(P) and x(2P): two classes +-P
+            for x0, x2 in (xs, xs[::-1]):
+                inv = gamma1_invariant(F, F4, a, b, x0, j)
+                if inv in verts:
+                    orbit[verts[inv]] += 1
+                    continue
+                verts[inv] = len(reps)
+                a5, b5 = velu5(F, a, b, s_, q_)
+                reps.append((a, b, x0, j, j_inv(F, a5, b5)))
+                other.append(gamma1_invariant(F, F4, a, b, x2, j))
+                orbit.append(1)
+    n = len(reps)
+    aut = [Fraction(aut_order(F, r[3]), orbit[k]) for k, r in enumerate(reps)]
+    assert all(x.denominator == 1 for x in aut)
+    assert sum(1 / x for x in aut) == Fraction(F.p - 1, 2), "mass formula fails (Gamma_1(5))"
+    edges = []
+    for v, (a, b, x0, j, _) in enumerate(reps):
+        for e in two_torsion(F, a, b):
+            a2, b2, _ = velu2(F, a, b, e)
+            t = F.add(F.smul(3, F.mul(e, e)), a)
+            x1 = F4.add(x0, F4.scal(t, F4.inv(F4.sub(x0, F4.emb(e)))))
+            inv = gamma1_invariant(F, F4, a2, b2, x1, j_inv(F, a2, b2))
+            assert inv in verts, "unknown Gamma_1(5) vertex"
+            edges.append((v, verts[inv], 2, e))
+    A = [[0] * n for _ in range(n)]
+    for s_, t_, _, _ in edges:
+        A[s_][t_] += 1
+    dia = [verts[o] for o in other]          # the diamond operator <2>
+    for v in range(n):
+        assert sum(A[v]) == 3
+        assert dia[dia[v]] == v, "<2> is not an involution on +-P classes"
+        for w in range(n):
+            assert A[v][w] * aut[w] == A[w][dia[v]] * aut[v], "Gamma_1(5) Brandt symmetry fails"
+
+    def conj_inv(inv):
+        return ("z", F.frob(inv[1])) if inv[0] == "z" else ("x", F4.frob(inv[1]), F4.frob(inv[2]))
+    sig = [verts[conj_inv(gamma1_invariant(F, F4, r[0], r[1], r[2], r[3]))] for r in reps]
+    check_sigma(A, sig)
+    # Frobenius squared is the diamond operator <p>: the identity if p = +-1 (mod 5),
+    # and <2> if p = +-2 (mod 5).
+    sq = dia if F.p % 5 in (2, 3) else list(range(n))
+    assert all(sig[sig[v]] == sq[v] for v in range(n)), "Frobenius^2 is not <p>"
+    cs = []                                 # automorphism scalings, as in level_sigma
+    for v, r in enumerate(reps):
+        r2 = reps[sig[v]]
+        fx = F4.frob(r[2])
+        for c in scalings(F, r2[0], r2[1]):
+            if F4.scal(c, fx) == r2[2]:
+                cs.append(c)
+                break
+        else:
+            raise AssertionError("no automorphism matches the conjugate point")
+    se = edge_sigma(F, edges, sig, lambda v, key: F.mul(cs[v], F.frob(key)))
+    labels = [[F.show(r[3]), F.show(r[4])] for r in reps]
+    return A, labels, sig, reps, edges, se
+
+
+def full2_graph(F, js):
+    """G_p(3) with full level-2 structure: vertices (E, (P, Q)), (P, Q) an ordered basis
+    of E[2], up to isomorphism. The Legendre invariant lambda = (e3 - e1)/(e2 - e1)
+    (e_i the x-coordinates of P, Q, P + Q) is a complete invariant, so the vertices are
+    the supersingular lambda, the (p - 1)/2 roots of the Hasse polynomial. A 3-isogeny
+    phi gives (E, (P, Q)) -> (E', (phi P, phi Q))."""
+    verts, reps, orbit = {}, [], []
+    for j in js:
+        a, b = model(F, j)
+        es = two_torsion(F, a, b)
+        assert len(es) == 3
+        for e1 in es:
+            for e2 in es:
+                if e2 == e1:
+                    continue
+                e3 = next(e for e in es if e not in (e1, e2))
+                lam = F.div(F.sub(e3, e1), F.sub(e2, e1))
+                if lam in verts:
+                    orbit[verts[lam]] += 1
+                    continue
+                verts[lam] = len(reps)
+                reps.append((a, b, e1, e2, j, lam))
+                orbit.append(1)
+    n = len(reps)
+    assert n == (F.p - 1) // 2, "number of supersingular lambda is not (p - 1)/2"
+    aut = [Fraction(aut_order(F, r[4]), orbit[k]) for k, r in enumerate(reps)]
+    assert sum(1 / x for x in aut) == Fraction(F.p - 1, 4), "mass formula fails (Gamma(2))"
+    edges = []
+    for v, (a, b, e1, e2, j, _) in enumerate(reps):
+        es = two_torsion(F, a, b)
+        e3 = next(e for e in es if e not in (e1, e2))
+        for x0 in three_torsion(F, a, b):
+            a3, b3 = velu3(F, a, b, x0)
+            t = F.smul(2, F.add(F.smul(3, F.mul(x0, x0)), a))
+            u = F.smul(4, F.add(F.mul(x0, F.add(F.mul(x0, x0), a)), b))
+            push = lambda x: F.add(F.add(x, F.div(t, F.sub(x, x0))),
+                                   F.div(u, F.mul(F.sub(x, x0), F.sub(x, x0))))
+            f1, f2, f3 = push(e1), push(e2), push(e3)
+            assert set(two_torsion(F, a3, b3)) == {f1, f2, f3}, "image is not the 2-torsion"
+            lam = F.div(F.sub(f3, f1), F.sub(f2, f1))
+            edges.append((v, verts[lam], 3, x0))
+    A = [[0] * n for _ in range(n)]
+    for s_, t_, _, _ in edges:
+        A[s_][t_] += 1
+    for v in range(n):
+        assert sum(A[v]) == 4
+        for w in range(n):
+            assert A[v][w] * aut[w] == A[w][v] * aut[v], "Gamma(2) Brandt symmetry fails"
+    sig = [verts[F.frob(r[5])] for r in reps]
+    check_sigma(A, sig)
+    se = level_sigma(F, edges, reps, sig, lambda r: [(r[2], 1), (r[3], 1)], {3: A})
+    labels = [[F.show(r[4]), F.show(r[5])] for r in reps]
+    return A, labels, sig, reps, edges, se
+
+
 def scalings(F, a, b):
     """The values c = u^2 for automorphisms (x, y) -> (u^2 x, u^3 y) of y^2 = x^3 + ax + b."""
     out = [F.one]
@@ -778,21 +959,27 @@ def edge_sigma(F, edges, sig_v, transport):
         assert k2 is not None, "Frobenius image of an edge not found"
         assert edges[k2][1] == sig_v[t], "Frobenius does not respect the edge's target"
         sig_e.append(k2)
-    assert all(sig_e[sig_e[k]] == k for k in range(len(edges))), "Frobenius is not an involution on edges"
+    assert all(sig_e[sig_e[sig_e[sig_e[k]]]] == k for k in range(len(edges))), \
+        "Frobenius^4 is not the identity on edges"
+    assert all(sig_e[sig_e[k]] == k for k in range(len(edges))) == \
+        all(sig_v[sig_v[v]] == v for v in range(len(sig_v))), "Frobenius^2 differs on edges and vertices"
     return sig_e
 
 
-def fold_links(edges, sig_v, sig_e):
+def fold_links(edges, sig_v, sig_e, directed=False):
     """Undirected links of the quotient graph, with vertices named by the smaller
     member of each Frobenius orbit."""
-    rep_v = lambda v: min(v, sig_v[v])
-    B, seen = {}, set()
-    for k, (s, t, ell, _) in enumerate(edges):
-        if k in seen:
-            continue
-        seen.update((k, sig_e[k]))
-        key = (rep_v(s), rep_v(t), ell)
+    name = {}
+    for cyc in orbits(sig_v):
+        for v in cyc:
+            name[v] = cyc[0]
+    B = {}
+    for cyc in orbits(sig_e):
+        s, t, ell, _ = edges[cyc[0]]
+        key = (name[s], name[t], ell)
         B[key] = B.get(key, 0) + 1
+    if directed:
+        return [[a, b, ell, m] for (a, b, ell), m in sorted(B.items())]
     out = []
     for a, b, ell in sorted({(min(a, b), max(a, b), ell) for a, b, ell in B}):
         m = B.get((a, b, ell), 0) if a == b else max(B.get((a, b, ell), 0), B.get((b, a, ell), 0))
@@ -809,15 +996,52 @@ def base_edges(F, js, ell):
             for e in two_torsion(F, a, b):
                 a2, b2, _ = velu2(F, a, b, e)
                 edges.append((s, idx[j_inv(F, a2, b2)], 2, e))
-        else:
+        elif ell == 3:
             for x0 in three_torsion(F, a, b):
                 a2, b2 = velu3(F, a, b, x0)
                 edges.append((s, idx[j_inv(F, a2, b2)], 3, x0))
+        else:                  # ell = 5: the kernel is given by x^2 - s x + q
+            for sq in five_subgroups(F, a, b):
+                a2, b2 = velu5(F, a, b, *sq)
+                j2 = j_inv(F, a2, b2)
+                assert j2 in idx, "a 5-isogeny leaves the supersingular locus"
+                edges.append((s, idx[j2], 5, sq))
     sig_v = [idx[F.frob(j)] for j in js]
     for s, j in enumerate(js):
         assert model(F, F.frob(j)) == tuple(F.frob(c) for c in model(F, j))
-    sig_e = edge_sigma(F, edges, sig_v, lambda s, key: F.frob(key))
+    conj = (lambda key: tuple(F.frob(c) for c in key)) if ell == 5 else F.frob
+    sig_e = edge_sigma(F, edges, sig_v, lambda s, key: conj(key))
     return edges, sig_v, sig_e
+
+
+def adjacency_from(edges, n, ell, aut):
+    """Adjacency matrix of the ell-edges, with the Brandt-matrix symmetry checked."""
+    A = [[0] * n for _ in range(n)]
+    for s, t, e_ell, _ in edges:
+        if e_ell == ell:
+            A[s][t] += 1
+    for i in range(n):
+        assert sum(A[i]) == ell + 1
+        for k in range(n):
+            assert A[i][k] * aut[k] == A[k][i] * aut[i], "Brandt symmetry fails"
+    return A
+
+
+def join_edges(*parts):
+    """Concatenate (edges, sigma on edges) pairs."""
+    edges, sig = [], []
+    for e, se in parts:
+        off = len(edges)
+        edges += e
+        sig += [k + off for k in se]
+    return edges, sig
+
+
+def keep_ells(edges, se, ells):
+    """The edges with ell in ells, and Frobenius on them (it preserves ell)."""
+    keep = [k for k, e in enumerate(edges) if e[2] in ells]
+    new = {k: i for i, k in enumerate(keep)}
+    return [edges[k] for k in keep], [new[se[k]] for k in keep]
 
 
 def level_sigma(F, edges, reps, sig_v, kernel_of, A_by_ell):
@@ -842,16 +1066,6 @@ def level_sigma(F, edges, reps, sig_v, kernel_of, A_by_ell):
         else:
             raise AssertionError("no automorphism matches the conjugate level structure")
     return edge_sigma(F, edges, sig_v, lambda v, key: F.mul(cs[v], F.frob(key)))
-
-
-def level3_edges(F, reps, sig_v, A):
-    verts = {level_invariant(F, r[0], r[1], r[2]): k for k, r in enumerate(reps)}
-    edges = []
-    for v, (a, b, x0, _, _) in enumerate(reps):
-        for e in two_torsion(F, a, b):
-            a2, b2, xmap = velu2(F, a, b, e)
-            edges.append((v, verts[level_invariant(F, a2, b2, xmap(x0))], 2, e))
-    return edges, level_sigma(F, edges, reps, sig_v, lambda r: [(r[2], 1)], {2: A})
 
 
 def level5_edges(F, reps, sig_v, A2, A3):
@@ -891,69 +1105,85 @@ def second_eigenvalue(mats):
     return round(float(ev[1]), 4) if len(ev) > 1 else None
 
 
-def compute(p: int):
+RAMANUJAN = {2: 2 * 2 ** 0.5, 3: 2 * 3 ** 0.5, 5: 2 * 5 ** 0.5}
+
+
+def compute(p: int, level5: bool = True):
     F = Fp2(p)
     js = supersingular_js(F)
-    A2 = isogeny_adjacency(F, js, 2)
-    A3 = isogeny_adjacency(F, js, 3)
-    AB, lab_b, sig_b, reps_b = borel3_graph(F, js)
+    n = len(js)
     lab = [F.show(j) for j in js]
-    idx = {j: k for k, j in enumerate(js)}
-    sig = [idx[F.frob(j)] for j in js]
-    for A in (A2, A3):
-        check_sigma(A, sig)
-    fp = [sig[k] == k for k in range(len(js))]
+    aut = [aut_order(F, j) for j in js]
+    E = {ell: base_edges(F, js, ell) for ell in (2, 3, 5)}
+    sig = E[2][1]
+    A = {ell: adjacency_from(E[ell][0], n, ell, aut) for ell in (2, 3, 5)}
+    assert A[2] == isogeny_adjacency(F, js, 2) and A[3] == isogeny_adjacency(F, js, 3)
+    for M in A.values():
+        check_sigma(M, sig)
+    fp = [sig[k] == k for k in range(n)]
     assert fp == [j[1] == 0 for j in js]
-    if p > 3:
-        assert sum(fp) == n_spine(p), "spine size disagrees with the class number formula"
-    fp_b = [sig_b[k] == k for k in range(len(sig_b))]
-    A25 = None
-    if p != 5 and p <= LEVEL5_MAX_P:
+    assert sum(fp) == n_spine(p), "number of j in F_p disagrees with the class number formula"
+    graphs = {}
+
+    def add(key, nodes, fixed, jfp, sigma, mats, edges, sig_e, directed=False):
+        lam = second_eigenvalue([M for _, M in mats])
+        bound = sum(RAMANUJAN[ell] for ell, _ in mats)
+        if lam is not None:
+            assert lam <= bound + 1e-6, (p, key, lam, bound)
+        lf = arcs_from if directed else links_from
+        graphs[key] = {
+            "nodes": nodes, "fp": fixed, "jfp": jfp, "sigma": sigma,
+            "links": [lk for ell, M in mats for lk in lf(M, ell)],
+            "fold": fold_links(edges, sigma, sig_e, directed), "lambda2": lam}
+        if directed:
+            graphs[key]["directed"] = True
+
+    for key, ells in (("2", (2,)), ("23", (2, 3)), ("235", (2, 3, 5))):
+        edges, se = join_edges(*((E[ell][0], E[ell][2]) for ell in ells))
+        add(key, lab, fp, fp, sig, [(ell, A[ell]) for ell in ells], edges, se)
+    out = {"p": p, "nonresidue": F.r if F.r != p - 1 else -1, "graphs": graphs}
+    jset_fp = {j for j in js if j[1] == 0}
+    if level5 and p <= CAPS["2g15"]:
+        A1, lab_1, sig_1, reps_1, e1, se1 = gamma1_graph(F, js)
+        add("2g15", lab_1, [sig_1[k] == k for k in range(len(sig_1))],
+            [r[3] in jset_fp for r in reps_1], sig_1, [(2, A1)], e1, se1, directed=True)
+    if level5 and p <= CAPS["3g2"]:
+        Ag, lab_g, sig_g, reps_g, eg, seg = full2_graph(F, js)
+        add("3g2", lab_g, [sig_g[k] == k for k in range(len(sig_g))],
+            [r[4] in jset_fp for r in reps_g], sig_g, [(3, Ag)], eg, seg)
+    if level5 and p <= LEVEL5_MAX_P:
         A25, A35, lab_5, sig_5, reps_5 = borel5_graph(F, js)
         fp_5 = [sig_5[k] == k for k in range(len(sig_5))]
-    lam = {"2": second_eigenvalue([A2]), "23": second_eigenvalue([A2, A3]),
-           "2b3": second_eigenvalue([AB]),
-           "23b5": second_eigenvalue([A25, A35]) if A25 else None}
-    # Ramanujan-type bounds, checked numerically rather than assumed.
-    for key, bound in (("2", 2 * 2 ** 0.5), ("23", 2 * 2 ** 0.5 + 2 * 3 ** 0.5),
-                       ("2b3", 2 * 2 ** 0.5),
-                       ("23b5", 2 * 2 ** 0.5 + 2 * 3 ** 0.5)):
-        if lam[key] is not None:
-            assert lam[key] <= bound + 1e-6, (p, key, lam[key], bound)
-    # Frobenius on edges, and the folded graphs (the quotient by Frobenius).
-    e2, sv, se2 = base_edges(F, js, 2)
-    e3, _, se3 = base_edges(F, js, 3)
-    assert sv == sig
-    off = len(e2)
-    e23 = e2 + e3
-    se23 = se2 + [k + off for k in se3]
-    eb = level3_edges(F, reps_b, sig_b, AB)
-    jset_fp = {j for j in js if j[1] == 0}
-    out = {
-        "p": p,
-        "nonresidue": F.r if F.r != p - 1 else -1,
-        "n_level": len(lab_b),
-        "graphs": {
-            "2": {"nodes": lab, "fp": fp, "jfp": fp, "links": links_from(A2, 2), "sigma": sig,
-                  "fold": fold_links(e2, sig, se2), "lambda2": lam["2"]},
-            "23": {"nodes": lab, "fp": fp, "jfp": fp,
-                   "links": links_from(A2, 2) + links_from(A3, 3), "sigma": sig,
-                   "fold": fold_links(e23, sig, se23), "lambda2": lam["23"]},
-            "2b3": {"nodes": lab_b, "fp": fp_b, "jfp": [r[3] in jset_fp for r in reps_b],
-                    "links": links_from(AB, 2), "sigma": sig_b,
-                    "fold": fold_links(eb[0], sig_b, eb[1]), "lambda2": lam["2b3"]},
-        },
-    }
-    if A25 is not None:
+        jfp_5 = [r[4] in jset_fp for r in reps_5]
         e5, se5 = level5_edges(F, reps_5, sig_5, A25, A35)
+        add("2b5", lab_5, fp_5, jfp_5, sig_5, [(2, A25)], *keep_ells(e5, se5, {2}))
+        add("23b5", lab_5, fp_5, jfp_5, sig_5, [(2, A25), (3, A35)], e5, se5)
         out["n_level5"] = len(lab_5)
-        out["graphs"]["23b5"] = {
-            "nodes": lab_5, "fp": fp_5, "jfp": [r[4] in jset_fp for r in reps_5], "sigma": sig_5,
-            "links": links_from(A25, 2) + links_from(A35, 3),
-            "fold": fold_links(e5, sig_5, se5), "lambda2": lam["23b5"]}
-    if p > LEVEL_MAX_P:
-        del out["graphs"]["2b3"]
     return out
+
+
+def hecke_spectra(p: int):
+    """Eigenvalues of T_l on S_2(Gamma_0(p)) for l = 2, 3, 5: the eigenvalues of the
+    Brandt matrix (the adjacency matrix of G_p(l)) with the eigenvalue l + 1 of the
+    Eisenstein series removed. A D is symmetric (D = diag |Aut|), so
+    D^(-1/2) (A D) D^(-1/2) is a symmetric matrix similar to A."""
+    import numpy as np
+    F = Fp2(p)
+    js = supersingular_js(F)
+    n = len(js)
+    aut = [aut_order(F, j) for j in js]
+    d = np.sqrt(np.array(aut, dtype=float))
+    out = {}
+    for ell in (2, 3, 5):
+        A = np.array(adjacency_from(base_edges(F, js, ell)[0], n, ell, aut), dtype=float)
+        S = (A * np.array(aut, dtype=float)[None, :]) / d[:, None] / d[None, :]
+        assert np.allclose(S, S.T)
+        ev = np.sort(np.linalg.eigvalsh(S))
+        assert abs(ev[-1] - (ell + 1)) < 1e-8, "the top eigenvalue is not l + 1"
+        cusp = ev[:-1]
+        assert np.all(np.abs(cusp) <= 2 * ell ** 0.5 + 1e-8), "an eigenvalue exceeds 2 sqrt(l)"
+        out[str(ell)] = [round(float(x), 4) for x in cusp]
+    return {"p": p, "dim": n - 1, "eigenvalues": out}
 
 
 def is_prime(n: int) -> bool:
@@ -962,39 +1192,55 @@ def is_prime(n: int) -> bool:
 
 def main():
     random.seed(0)
-    primes = sorted({int(a) for a in sys.argv[1:]} or DEFAULT_PRIMES)
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    primes = sorted({int(a) for a in args} or DEFAULT_PRIMES)
     bad = [p for p in primes if not is_prime(p) or p < 5]
     if bad:
         sys.exit(f"not primes >= 5: {bad}")
     out = Path(__file__).resolve().parent.parent / "assets" / "data" / "isogeny"
     out.mkdir(parents=True, exist_ok=True)
-    for old in out.glob("p*.json"):      # drop files for primes no longer listed
-        if old.stem[1:].isdigit():
-            old.unlink()
+    for old in out.glob("p*.json"):      # drop old files
+        old.unlink()
     total = 0
     for p in primes:
         res = compute(p)
         g = res["graphs"]
         print(f"p = {p:5d}: {len(g['2']['nodes']):4d} curves, "
-              f"{res['n_level']:4d} level-structure vertices, "
-              f"lambda2 = {g['2']['lambda2']}, {g['23']['lambda2']}")
-        f = out / f"p{p}.json"
-        f.write_text(json.dumps(res, separators=(",", ":")) + "\n")
-        total += f.stat().st_size
+              f"{res.get('n_level5', '-'):>4} level-5 vertices, "
+              f"lambda2 = {g['2']['lambda2']}, {g['23']['lambda2']}, {g['235']['lambda2']}")
+        total += write_prime(out, res)
     write_index(out, primes)
     print(f"wrote {len(primes)} files to {out} ({total} bytes in all)")
+    if "--skip-spectra" not in sys.argv:
+        spectra = []
+        for p in SPECTRA_PRIMES:
+            spectra.append(hecke_spectra(p))
+            print(f"spectra: p = {p}, dim S_2 = {spectra[-1]['dim']}")
+        (out / "spectra.json").write_text(json.dumps(spectra, separators=(",", ":")) + "\n")
+
+
+def write_prime(out: Path, res) -> int:
+    """One file per graph: p<prime>-<graph>.json. Returns the bytes written."""
+    total = 0
+    for kind, g in res["graphs"].items():
+        f = out / f"p{res['p']}-{kind}.json"
+        f.write_text(json.dumps({"p": res["p"], "nonresidue": res["nonresidue"], "graph": g},
+                                separators=(",", ":")) + "\n")
+        total += f.stat().st_size
+    return total
 
 
 def write_index(out: Path, primes) -> None:
-    """index.json: the primes on offer, the size caps, and the size of each spine
-    (so the page can mark primes whose spine is empty without loading them)."""
+    """index.json: the primes on offer, the caps, and the size of each F_p-subgraph
+    (the number of vertices fixed by Frobenius)."""
     spine = {}
     for p in primes:
-        g = json.loads((out / f"p{p}.json").read_text())["graphs"]
-        spine[str(p)] = {k: sum(v["jfp"]) for k, v in g.items()}
+        spine[str(p)] = {}
+        for f in out.glob(f"p{p}-*.json"):
+            spine[str(p)][f.stem.split("-", 1)[1]] = sum(json.loads(f.read_text())["graph"]["fp"])
     (out / "index.json").write_text(json.dumps(
-        {"primes": primes, "level_max_p": LEVEL_MAX_P, "level5_max_p": LEVEL5_MAX_P,
-         "spine": spine}, separators=(",", ":")) + "\n")
+        {"primes": primes, "caps": CAPS, "spine": spine},
+        separators=(",", ":")) + "\n")
 
 
 if __name__ == "__main__":

@@ -1,18 +1,18 @@
 ---
 title: "Animations"
-description-meta: "Interactive pictures of supersingular isogeny graphs: random walks, growing balls, and spines."
+description-meta: "Interactive pictures of supersingular isogeny graphs: random walks, growing balls, and the spectral law of Hecke operators."
 ---
 
-Pictures of the supersingular isogeny graphs I work on. Every graph is computed from scratch (the arithmetic in $\mathbb{F}_{p^2}$ and Vélu's formulas, with consistency checks), for primes up to 5000.
+Pictures of the supersingular isogeny graphs I work on: $G_p(2)$, $G_p(\{2,3\})$ and $G_p(\{2,3,5\})$ for primes up to 20011, and graphs with level structure $\Gamma_0(5)$, $\Gamma_1(5)$ and $\Gamma(2)$. Every graph is computed from scratch (arithmetic in $\mathbb{F}_{p^2}$ and Vélu's formulas, with consistency checks). Each picture can be shown as the full graph, its $\mathbb{F}_p$-subgraph, or its quotient by Frobenius, and the animation menu under it switches between the animations below.
 
 [Random walks](walks.qmd)
-: A random walk on the 2-isogeny graph, the (2,3)-isogeny graph, and the versions with level-3 and level-5 structure. Each graph can be shown whole, folded by Frobenius, or restricted to its spine.
+: A random walk, drawn as a laser with a fading trail.
 
 [Growing balls](balls.qmd)
-: A ball grows around a random curve until it contains a curve and its Frobenius conjugate. That takes about $\sqrt{n}$ vertices.
+: A ball grows around a random curve until it contains a Frobenius orbit twice (or, in the quotient by Frobenius, until it collides with itself or reaches the $\mathbb{F}_p$-subgraph). That takes about $\sqrt{n}$ vertices.
 
-[Spines](spines.qmd)
-: Pictures of the spine of each graph (the subgraph induced on the vertices with $j$-invariant in $\mathbb{F}_p$), for one prime in each residue class.
+[Spectral law](spectral.qmd)
+: The eigenvalues of the Hecke operator $T_\ell$ on $S_2(\Gamma_0(p))$ approach the Kesten–McKay law as $p \to \infty$.
 
-[About these graphs](about.qmd)
-: Exact definitions: the four graphs, Frobenius on vertices and edges, the spine, the folded graph. The eye in the corner of each picture links here.
+[Read more](about.qmd)
+: Exact definitions: the graphs and their level structures, Frobenius on vertices and edges, the $\mathbb{F}_p$-subgraph (spine) with pictures, the quotient by Frobenius, and the spectral law. The eye in the corner of each picture links here.
