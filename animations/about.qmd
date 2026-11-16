@@ -50,11 +50,11 @@ On $j$-invariants, $\sigma(a + bi) = a - bi$. **$\sigma^2$ is the identity, exce
 
 ## The $\mathbb{F}_p$-subgraph {#spine}
 
-**Definition.** The $\mathbb{F}_p$-subgraph, also called the spine, is the subgraph induced on the vertices whose $j$-invariant lies in $\mathbb{F}_p$ (with level structure, $j(E) \in \mathbb{F}_p$). That is, it consists of those vertices and every edge, with multiplicity, whose source and target are both among them.
+**Definition.** The $\mathbb{F}_p$-subgraph, also called the spine, is the subgraph induced on the vertices fixed by Frobenius. That is, it consists of those vertices and every edge, with multiplicity, whose source and target are both fixed. Frobenius acts on the level structure as well, so with level structure a vertex is fixed when $(E^{(p)}, C^{(p)}) \cong (E, C)$ (similarly for $\pm P$ and for a basis of $E[2]$), not merely when $j(E) \in \mathbb{F}_p$.
 
-1. Frobenius preserves this vertex set, so it permutes the edges of the $\mathbb{F}_p$-subgraph. The fixed edges are the $\mathbb{F}_p$-rational isogenies; the others are moved. The $\mathbb{F}_p$-subgraph keeps both kinds. For $G_p(2)$ at $p = 431$, 41 of its 49 directed edges are fixed by Frobenius.
+1. Frobenius fixes this vertex set pointwise, so it permutes the edges of the $\mathbb{F}_p$-subgraph. The fixed edges are the $\mathbb{F}_p$-rational isogenies; the others are moved. The $\mathbb{F}_p$-subgraph keeps both kinds. For $G_p(2)$ at $p = 431$, 41 of its 49 directed edges are fixed by Frobenius.
 2. Without level structure, the vertex set is the set of vertices fixed by Frobenius. It has $\tfrac12 h(-4p)$, $h(-p)$ or $2h(-p)$ elements for $p \equiv 1 \pmod 4$, $7 \pmod 8$, $3 \pmod 8$ (Delfs–Galbraith; *checked*), so it is never empty.
-3. With level structure it also contains vertices that Frobenius moves. At $p = 431$ the $\Gamma_0(5)$ version has 120 vertices, of which 42 are fixed.
+3. With level structure it is smaller than the set of vertices with $j(E) \in \mathbb{F}_p$: at $p = 431$, the $\Gamma_0(5)$ graph has 120 vertices with $j(E) \in \mathbb{F}_p$, of which 42 are fixed. It can be empty; see [below](#fixed-level).
 4. On the animations page the random walk is switched off when the $\mathbb{F}_p$-subgraph is not connected.
 
 Some examples, one prime per residue class. Each panel gives the numbers of vertices, edges and components; blue, red and green edges are 2-, 3- and 5-isogenies.
@@ -65,9 +65,9 @@ Some examples, one prime per residue class. Each panel gives the numbers of vert
 
 ![$G_p(\{2,3,5\})$ by $p \bmod 24$.](../assets/img/spine/spine-235.svg)
 
-![$G_p(2)$ with $\Gamma_0(5)$ structure, by $p \bmod 24$.](../assets/img/spine/spine-2b5.svg)
+![$G_p(2)$ with $\Gamma_0(5)$ structure, by $p \bmod 24$ (primes with $p \equiv \pm1 \pmod 5$; for the others it is empty).](../assets/img/spine/spine-2b5.svg)
 
-![$G_p(\{2,3\})$ with $\Gamma_0(5)$ structure, by $p \bmod 24$.](../assets/img/spine/spine-23b5.svg)
+![$G_p(\{2,3\})$ with $\Gamma_0(5)$ structure, by $p \bmod 24$ (primes with $p \equiv \pm1 \pmod 5$).](../assets/img/spine/spine-23b5.svg)
 
 ## The quotient by Frobenius {#folded}
 
@@ -80,7 +80,7 @@ The edge orbits need Frobenius on edges, not just on vertices, so the script com
 The [growing-ball animation](balls.qmd) runs a breadth-first search from a random vertex $v$ in the full graph, one layer at a time.
 
 - **On the full graph** it stops once the ball contains two vertices of one Frobenius orbit, for instance $w$ and $w^{(p)} \neq w$. Since $\sigma$ preserves distances, $w, \sigma w \in B_r(v)$ exactly when $w \in B_r(v) \cap B_r(\sigma v)$. Joining the two shortest paths gives a path from $E$ to $E^{(p)}$ of length at most $2r$, and composing it with Frobenius gives an endomorphism of $E$.
-- **On the quotient by Frobenius** the ball is the image of the ball upstairs, and it remembers which lift it reached each vertex by. It stops at the first self-collision, when a vertex is reached again by a different lift (the condition above), or when it reaches the $\mathbb{F}_p$-subgraph, whichever comes first.
+- **On the quotient by Frobenius** the ball is the image of the ball upstairs, and it remembers which lift it reached each vertex by. It stops at the first self-collision, when a vertex is reached again by a different lift (the condition above), or when it reaches the $\mathbb{F}_p$-subgraph (a vertex fixed by Frobenius), whichever comes first.
 
 ## The spectral law {#spectral}
 
@@ -92,31 +92,44 @@ the spectral measure of the $(\ell+1)$-regular tree (Kesten, McKay).
 
 The animation shows the histogram of the eigenvalues for 21 primes from 101 to 20369, with the density of $\mu_\ell$ in red. The inset tracks the Kolmogorov distance $\sup_x \lvert F_p(x) - F_\ell(x)\rvert$ between the empirical distribution function and that of $\mu_\ell$. For $\ell = 2$ it falls from 0.125 at $p = 101$ to 0.005 at $p = 20369$; for $\ell = 3$ from 0.197 to 0.008; for $\ell = 5$ from 0.232 to 0.008. These eigenvalues are stored in `assets/data/isogeny/spectra.json`.
 
-## Frobenius-fixed $\Gamma_0(N)$-structures {#fixed-level}
+## When the $\mathbb{F}_p$-subgraph is empty {#fixed-level}
 
-**Proposition.** Let $N$ be an odd prime. If $-p$ is not a square modulo $N$, then no pair $(E, C)$ with $C$ of order $N$ is fixed by Frobenius. For $N = 5$: there is none when $p \equiv \pm 2 \pmod 5$.
+Without level structure the $\mathbb{F}_p$-subgraph is never empty. With level structure it can be, for the following reason.
+
+**Lemma.** Suppose a vertex $(E, \mathcal{L})$ is fixed by Frobenius, where $\mathcal{L}$ is the level structure. Then $j(E) \in \mathbb{F}_p$, and there is a twist $E'$ of $E$ over $\mathbb{F}_p$ whose Frobenius endomorphism $\pi'$ preserves $\mathcal{L}$ and satisfies $\pi'^2 = -p$.
 
 *Proof.*
 
-1. Suppose $(E^{(p)}, C^{(p)}) \cong (E, C)$. Then $j(E) \in \mathbb{F}_p$; take a model over $\mathbb{F}_p$, with Frobenius endomorphism $\pi$. Being fixed means $\xi(\pi(C)) = C$ for some $\xi \in \mathrm{Aut}(E)$.
-2. The endomorphism $\pi' = \xi\pi$ is the Frobenius of a twist of $E$ over $\mathbb{F}_p$. That twist is supersingular, so its trace $t$ is divisible by $p$; the Hasse bound gives $\lvert t\rvert \le 2\sqrt p < p$, so $t = 0$ and $\pi'^2 = -p$.
-3. $\pi'$ acts on the cyclic group $C$ by some $\lambda \in \mathbb{F}_N$, and $\pi'^2 = -p$ gives $\lambda^2 = -p$ in $\mathbb{F}_N$. $\square$
+1. Being fixed gives $j(E) \in \mathbb{F}_p$. Take a model over $\mathbb{F}_p$, with Frobenius $\pi$; being fixed means $\xi\pi$ preserves $\mathcal{L}$ for some $\xi \in \mathrm{Aut}(E)$.
+2. $\pi' = \xi\pi$ is the Frobenius of a twist $E'$ of $E$ over $\mathbb{F}_p$, and $E'$ is supersingular. So its trace $t$ is divisible by $p$, and the Hasse bound $\lvert t\rvert \le 2\sqrt p < p$ forces $t = 0$, hence $\pi'^2 = -p$. $\square$
 
-The converse is only observed, for the primes computed.
+**Proposition.**
+
+- **$\Gamma_0(N)$, $N$ an odd prime.** If $-p$ is not a square mod $N$, the $\mathbb{F}_p$-subgraph is empty. For $N = 5$: whenever $p \equiv \pm 2 \pmod 5$.
+- **$\Gamma_1(5)$.** If $p \not\equiv 4 \pmod 5$, it is empty.
+- **$\Gamma(2)$.** If $p \equiv 1 \pmod 4$, it is empty.
+
+*Proof.* In each case, use the $\pi'$ of the lemma.
+
+- **$\Gamma_0(N)$.** $\pi'$ acts on the cyclic group $C$ of order $N$ by some $\lambda \in \mathbb{F}_N$, and $\lambda^2 = -p$.
+- **$\Gamma_1(5)$.** $\pi'(P) = \pm P$, so $(\pm1)^2 = -p$ in $\mathbb{F}_5$, i.e. $p \equiv 4 \pmod 5$.
+- **$\Gamma(2)$.** $\pi'$ fixes $E[2]$ pointwise, so $\pi' - 1$ kills $E[2]$ and $\alpha = (\pi' - 1)/2$ is an endomorphism. Since $\pi'^2 = -p$, $\alpha$ satisfies $\alpha^2 + \alpha + (1 + p)/4 = 0$, which has integer coefficients only if $p \equiv 3 \pmod 4$. $\square$
+
+The converses are only observed: among the primes in the menu, the $\mathbb{F}_p$-subgraph is nonempty for every $p \equiv \pm1 \pmod 5$ ($\Gamma_0(5)$), every $p \equiv 4 \pmod 5$ ($\Gamma_1(5)$: $p = 599, 1009, 1499, 1999, 2999, 4999$) and every $p \equiv 3 \pmod 4$ ($\Gamma(2)$: $p = 211, 307, 431$). When the subgraph is empty, the page says why and offers the nearest prime where it is not.
 
 ## Numbers at $p = 431$
 
-Computed by the script. "Spine" means the $\mathbb{F}_p$-subgraph; edges are directed; "fixed" means fixed by Frobenius; the last column counts the edges of the quotient.
+Computed by the script. Edges are directed. "Spine" means the $\mathbb{F}_p$-subgraph (the vertices fixed by Frobenius, and the edges between them); "fixed edges" are the edges fixed by Frobenius, which all lie in the spine; the last two columns describe the quotient by Frobenius.
 
-| graph | vertices | spine vertices | fixed vertices | quotient vertices | edges | spine edges | fixed edges | quotient edges |
-|---|--:|--:|--:|--:|--:|--:|--:|--:|
-| $G_p(2)$ | 37 | 21 | 21 | 29 | 111 | 49 | 41 | 76 |
-| $G_p(\{2,3\})$ | 37 | 21 | 21 | 29 | 259 | 107 | 83 | 171 |
-| $G_p(\{2,3,5\})$ | 37 | 21 | 21 | 29 | 481 | 187 | 125 | 303 |
-| $G_p(2)$, $\Gamma_0(5)$ | 216 | 120 | 42 | 129 | 648 | 276 | 84 | 366 |
-| $G_p(\{2,3\})$, $\Gamma_0(5)$ | 216 | 120 | 42 | 129 | 1512 | 600 | 168 | 840 |
-| $G_p(2)$, $\Gamma_1(5)$ | 430 | 238 | 0 | 215 | 1290 | 546 | 0 | 645 |
-| $G_p(3)$, $\Gamma(2)$ | 215 | 119 | 63 | 139 | 860 | 320 | 126 | 493 |
+| graph | vertices | spine vertices | edges | spine edges | fixed edges | quotient vertices | quotient edges |
+|---|--:|--:|--:|--:|--:|--:|--:|
+| $G_p(2)$ | 37 | 21 | 111 | 49 | 41 | 29 | 76 |
+| $G_p(\{2,3\})$ | 37 | 21 | 259 | 107 | 83 | 29 | 171 |
+| $G_p(\{2,3,5\})$ | 37 | 21 | 481 | 187 | 125 | 29 | 303 |
+| $G_p(2)$, $\Gamma_0(5)$ | 216 | 42 | 648 | 88 | 84 | 129 | 366 |
+| $G_p(\{2,3\})$, $\Gamma_0(5)$ | 216 | 42 | 1512 | 176 | 168 | 129 | 840 |
+| $G_p(2)$, $\Gamma_1(5)$ | 430 | 0 | 1290 | 0 | 0 | 215 | 645 |
+| $G_p(3)$, $\Gamma(2)$ | 215 | 63 | 860 | 138 | 126 | 139 | 493 |
 
 ## What the script checks
 

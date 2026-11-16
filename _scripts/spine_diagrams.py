@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Draw the F_p-subgraphs (spines) of the isogeny graphs, for animations/about.qmd.
 
-The spine of a graph is the subgraph induced on the vertices whose j-invariant
-(of E, with level structure) lies in F_p: those vertices and every edge between them. This script computes each graph with
+The spine (F_p-subgraph) of a graph is the subgraph induced on the vertices fixed by
+Frobenius (which acts on the level structure too): those vertices and every edge
+between them. This script computes each graph with
 _scripts/isogeny_graphs.py (all of its consistency checks run), restricts to the
 spine, and writes static SVG files to assets/img/spine/.
 
@@ -46,8 +47,8 @@ def graphs(p: int, level5: bool) -> dict:
 def spine(p: int, kind: str):
     """(multigraph on the fixed vertices, set of special vertices) for G_p(kind)."""
     d = graphs(p, kind.endswith("b5"))[kind]
-    # The spine: the subgraph induced on the vertices whose j-invariant (of E) is in F_p.
-    fixed = [i for i, f in enumerate(d["jfp"]) if f]
+    # The spine: the subgraph induced on the vertices fixed by Frobenius.
+    fixed = [i for i, f in enumerate(d["fp"]) if f]
     keep = set(fixed)
     G = nx.MultiGraph()
     G.add_nodes_from(fixed)
@@ -201,7 +202,7 @@ def legend(ells, has_special: bool, y: int) -> str:
         items.append((RED, "line", "3-isogeny"))
     if 5 in ells:
         items.append((GREEN, "line", "5-isogeny"))
-    items.append((GOLD, "dot", "j-invariant in F_p"))
+    items.append((GOLD, "dot", "fixed by Frobenius"))
     if has_special:
         items += [(INK, "dot", "j = 0"), (PURPLE, "sq", "j = 1728")]
     out, x = [], 8

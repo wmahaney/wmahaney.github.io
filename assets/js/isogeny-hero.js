@@ -53,21 +53,39 @@ const KINDS = {
     tip: (l) => `j(E) = ${l[0]}, λ = ${l[1]}`,
   },
 };
+// Why the F_p-subgraph (the vertices fixed by Frobenius) is empty, when the reason is a
+// theorem. Write pi for the Frobenius of a model of E over F_p (or of a twist): it has
+// trace 0, so pi^2 = -p. Proofs on the Read more page.
+const EMPTY_WHY = {
+  "2b5": (p) => (p % 5 === 2 || p % 5 === 3) ?
+    `A fixed (E, C) needs Frobenius to preserve C, so to act on it by some λ with λ² ≡ −p (mod 5); ` +
+    `there is no such λ when p ≡ ${p % 5} (mod 5).` : null,
+  "2g15": (p) => (p % 5 !== 4) ?
+    "A fixed (E, ±P) needs Frobenius to send P to ±P, so (±1)² ≡ −p (mod 5), i.e. p ≡ 4 (mod 5); " +
+    `here p ≡ ${p % 5} (mod 5).` : null,
+  "3g2": (p) => (p % 4 === 1) ?
+    "A fixed (E, (P, Q)) needs all of E[2] to be fixed by Frobenius π, so (π − 1)/2 to be an " +
+    "endomorphism; since π² = −p that needs p ≡ 3 (mod 4), and here p ≡ 1 (mod 4)." : null,
+};
+EMPTY_WHY["23b5"] = EMPTY_WHY["2b5"];
+
 // The view menu's names for the three views.
 const VIEW_NAME = { full: "full graph", spine: "F_p-subgraph", folded: "quotient by Frobenius" };
 
 // The three ways to look at each graph (the data come from _scripts/isogeny_graphs.py).
 //  full    every vertex and edge.
 //  spine   the F_p-subgraph (also called the spine): the subgraph induced on the vertices
-//          whose j-invariant (of E) lies in F_p, i.e. those vertices and every edge between them.
+//          fixed by Frobenius, i.e. those vertices and every edge between them. Frobenius
+//          acts on the level structure too, so with level structure this is smaller than
+//          the set of vertices with j(E) in F_p (and it can be empty).
 //  folded  the quotient by Frobenius (E, C) -> (E^(p), C^(p)): vertices are orbits of
 //          vertices, edges are orbits of edges. The edge orbits need Frobenius on edges,
 //          so they are computed by the script ("fold"), not here.
 function derive(g, view) {
-  const n = g.nodes.length, sigma = g.sigma, jfp = g.jfp || g.fp;
+  const n = g.nodes.length, sigma = g.sigma, fixed = g.fp;
   if (view === "spine") {
     const keep = [], at = new Map();
-    for (let i = 0; i < n; i++) if (jfp[i]) { at.set(i, keep.length); keep.push(i); }
+    for (let i = 0; i < n; i++) if (fixed[i]) { at.set(i, keep.length); keep.push(i); }
     return {
       nodes: keep.map((i) => ({ label: g.nodes[i], members: [i], fp: true })),
       links: g.links.filter(([s, t]) => at.has(s) && at.has(t))
@@ -80,11 +98,11 @@ function derive(g, view) {
     const at = new Map(), nodes = [];
     for (const cyc of cycles(sigma)) {
       for (const m of cyc) at.set(m, nodes.length);
-      nodes.push({ label: g.nodes[cyc[0]], members: cyc, fp: jfp[cyc[0]], pair: cyc.length > 1 });
+      nodes.push({ label: g.nodes[cyc[0]], members: cyc, fp: cyc.length === 1, pair: cyc.length > 1 });
     }
     return { nodes, links: g.fold.map(([s, t, ell, m]) => [at.get(s), at.get(t), ell, m]) };
   }
-  return { nodes: g.nodes.map((label, i) => ({ label, members: [i], fp: jfp[i] })), links: g.links };
+  return { nodes: g.nodes.map((label, i) => ({ label, members: [i], fp: fixed[i] })), links: g.links };
 }
 
 // The cycles of a permutation, each starting at its smallest element.
@@ -377,18 +395,18 @@ function init(root, index, base) {
         " (drawn larger). Edges are Frobenius-orbits of edges.";
     } else if (view === "spine") {
       caption.textContent = cfg.caption(p, nFull).replace(/ in characteristic/, ", F_p-subgraph, in characteristic")
-        .replace(/: .*$/, `: the subgraph induced on the ${n} of ${nFull} vertices with j-invariant in F_p.`);
+        .replace(/: .*$/, `: the subgraph induced on the ${n} of ${nFull} vertices fixed by Frobenius.`);
       stats.textContent = (n === 0 ? "The F_p-subgraph is empty." :
         nComp === 1 ? "The F_p-subgraph is connected." :
         nComp === n ? `The F_p-subgraph is totally disconnected: ${n} vertices and no edges between them.` :
         `The F_p-subgraph has ${nComp} connected components.`) +
-        (state.walkOff && mode === "walk" ? " The random walk is off, since the graph is not connected." : "");
+        (state.walkOff && mode === "walk" && n > 0 ? " The random walk is off, since the graph is not connected." : "");
     } else {
       caption.textContent = cfg.caption(p, n);
       const lam = g.lambda2;
       stats.textContent = (lam == null ? "" :
         `Second-largest eigenvalue modulus ${lam.toFixed(3)} ≤ ${cfg.bound} ≈ ${cfg.boundVal.toFixed(3)}. `) +
-        `${(g.jfp || g.fp).filter(Boolean).length} of the ${n} vertices have j-invariant in F_p.`;
+        `${g.fp.filter(Boolean).length} of the ${n} vertices are fixed by Frobenius (the F_p-subgraph).`;
     }
     legend3.hidden = !cfg.ells.includes(3);
     if (legend5) legend5.hidden = !cfg.ells.includes(5);
@@ -622,11 +640,22 @@ function init(root, index, base) {
     const text = document.createElement("div");
     text.className = "wm-graph-empty-text";
     if (n === 0) {
-      head.textContent = "Empty spine";
-      text.append(`No vertex of this graph has its j-invariant in F`, sub("p"), ` for p = ${p}.`);
+      head.textContent = "Empty F_p-subgraph";
+      text.append(`No vertex of this graph is fixed by Frobenius for p = ${p}, so the F`, sub("p"),
+        "-subgraph is empty (not just disconnected).");
+      const reason = EMPTY_WHY[kind] && EMPTY_WHY[kind](p);
+      if (reason) {
+        // The reason, folded away on small screens so the buttons stay in view.
+        const why = document.createElement("details");
+        why.open = window.matchMedia("(min-width: 576px)").matches;
+        const summary = document.createElement("summary");
+        summary.textContent = "Why?";
+        why.append(summary, reason);
+        text.append(why);
+      }
     } else {
-      head.textContent = "Totally disconnected spine";
-      text.append(`For p = ${p} the spine has ${n} vertices but no edges between them.`);
+      head.textContent = "Totally disconnected F_p-subgraph";
+      text.append(`For p = ${p} the F`, sub("p"), `-subgraph has ${n} vertices but no edges between them.`);
     }
     const go = document.createElement("div");
     go.className = "wm-graph-empty-go";
@@ -676,11 +705,11 @@ function init(root, index, base) {
     return state.ballGraph;
   }
   function startBall(now, at) {
-    const g = state.graph, quotient = state.shownView === "folded", jfp = g.jfp || g.fp;
+    const g = state.graph, quotient = state.shownView === "folded", fixed = g.fp;
     let center;
     if (at != null) center = state.nodes[at].members[0];
     else {
-      const all = [...g.nodes.keys()], off = all.filter((i) => !jfp[i]);
+      const all = [...g.nodes.keys()], off = all.filter((i) => !fixed[i]);
       const pool = quotient && off.length ? off : all;
       const seed = new Uint32Array(1);
       crypto.getRandomValues(seed);
@@ -688,11 +717,11 @@ function init(root, index, base) {
     }
     ball = { center, quotient, dist: new Map([[center, 0]]), parent: new Map(), layers: [[center]],
              r: 0, t0: now, done: null, holdUntil: 0 };
-    if (quotient && jfp[center]) { ball.done = { fp: center }; ball.holdUntil = now + BALL_HOLD; }
+    if (quotient && fixed[center]) { ball.done = { fp: center }; ball.holdUntil = now + BALL_HOLD; }
     paintBall();
   }
   function stepBall(now) {
-    const b = ball, g = state.graph, jfp = g.jfp || g.fp, next = [];
+    const b = ball, g = state.graph, fixed = g.fp, next = [];
     for (const u of b.layers[b.r]) {
       for (const w of ballGraph().up[u]) {
         if (b.dist.has(w)) continue;
@@ -715,7 +744,7 @@ function init(root, index, base) {
           const score = b.dist.get(w) + b.dist.get(c);
           if (!pair || score < pair.score) pair = { w, c, score };
         }
-        if (b.quotient && fp == null && jfp[w]) fp = w;
+        if (b.quotient && fp == null && fixed[w]) fp = w;
       }
       if (pair || fp != null) b.done = { pair, fp };
     }
@@ -814,7 +843,7 @@ function init(root, index, base) {
     });
     state.strands.forEach((s) => s.path.classList.toggle("wm-g-dim", !hot.has(s)));
     nd.circle.classList.add("wm-g-focus");
-    tip.replaceChildren(labelOf(nd), ...(nd.fp ? [" · j ∈ F", sub("p")] : []));
+    tip.replaceChildren(labelOf(nd), ...(nd.fp ? [" · fixed by Frobenius"] : []));
     tip.hidden = false;
     const box = svg.getBoundingClientRect(), host = root.getBoundingClientRect();
     const px = box.left - host.left + (nd.sx / W) * box.width;

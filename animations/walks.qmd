@@ -3,7 +3,7 @@ title: "Random walks"
 description-meta: "A random walk on supersingular isogeny graphs: the full graph, the F_p-subgraph, or the quotient by Frobenius."
 ---
 
-A random walk on a supersingular isogeny graph, starting at a random vertex. The laser shows the step being taken and the trail its recent history. Choose the graph and the prime $p$ above the picture. The **view** menu shows the **full graph**, the **$\mathbb{F}_p$-subgraph** (the subgraph induced on the vertices with $j$-invariant in $\mathbb{F}_p$; the walk is switched off when it is not connected), or the **quotient by Frobenius** (vertices and edges are Frobenius-orbits). Vertices are labelled by $j$-invariants on graphs of up to 60 vertices; hover for the others. The **animation** menu switches to the [growing ball](balls.qmd) or the [spectral law](spectral.qmd), and the eye in the corner links to [exact definitions](about.qmd).
+A random walk on a supersingular isogeny graph, starting at a random vertex. The laser shows the step being taken and the trail its recent history. Choose the graph and the prime $p$ above the picture. The **view** menu shows the **full graph**, the **$\mathbb{F}_p$-subgraph** (the subgraph induced on the vertices fixed by Frobenius, which acts on the level structure too; the walk is switched off when it is not connected), or the **quotient by Frobenius** (vertices and edges are Frobenius-orbits). Vertices are labelled by $j$-invariants on graphs of up to 60 vertices; hover for the others. The **animation** menu switches to the [growing ball](balls.qmd) or the [spectral law](spectral.qmd), and the eye in the corner links to [exact definitions](about.qmd).
 
 {{< include /_partials/isogeny-widget.qmd >}}
 

@@ -159,7 +159,7 @@ def example_panel(p, kind, seed):
         out.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" '
                    f'stroke="{INK}" stroke-width="3.4" stroke-linecap="round"/>')
     for u, (x, y) in pos.items():
-        fill = RED if u in (w, c) else GOLD if g["jfp"][u] else BLUE
+        fill = RED if u in (w, c) else GOLD if g["fp"][u] else BLUE
         big = u in (w, c) or u == v
         r = 7.5 if big else 4.6
         ring = INK if big else PAPER
@@ -188,7 +188,7 @@ def examples():
         body.append(f'<g transform="translate({x},{y})">{example_panel(p, kind, seed)}</g>')
     y = H - 14
     items = [("line", BLUE, "2-isogeny"), ("line", RED, "3-isogeny"), ("dot", BLUE, "curve"),
-             ("dot", GOLD, "j-invariant in F_p"), ("dot", RED, "the conjugate pair"),
+             ("dot", GOLD, "fixed by Frobenius"), ("dot", RED, "the conjugate pair"),
              ("thick", INK, "shortest paths")]
     x, leg = 6, []
     for shape, col, text in items:

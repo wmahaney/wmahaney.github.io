@@ -26,9 +26,10 @@ their eigenvalue l + 1), for the spectral-law animation.
 Every graph also carries
   "sigma"  the permutation of the vertices induced by Frobenius (E, C) -> (E^(p), C^(p));
   "fp"     whether a vertex is fixed by Frobenius;
-  "jfp"    whether its j-invariant (of E) lies in F_p. The F_p-subgraph (also called
-           the spine) is the subgraph induced on these vertices; without level
-           structure jfp = fp;
+  "jfp"    whether its j-invariant (of E) lies in F_p (informational: without level
+           structure jfp = fp; with level structure fp is the smaller set).
+The F_p-subgraph (also called the spine) is the subgraph induced on the vertices fixed
+by Frobenius ("fp"), which acts on the level structure as well.
   "fold"   the links of the quotient by Frobenius: vertices are
            Frobenius-orbits of vertices (named by the smaller index), edges are orbits
            of edges. This needs Frobenius on edges, computed and checked below.
@@ -1230,13 +1231,13 @@ def write_prime(out: Path, res) -> int:
 
 
 def write_index(out: Path, primes) -> None:
-    """index.json: the primes on offer, the size cap for level 5, and the size of
-    each F_p-subgraph."""
+    """index.json: the primes on offer, the caps, and the size of each F_p-subgraph
+    (the number of vertices fixed by Frobenius)."""
     spine = {}
     for p in primes:
         spine[str(p)] = {}
         for f in out.glob(f"p{p}-*.json"):
-            spine[str(p)][f.stem.split("-", 1)[1]] = sum(json.loads(f.read_text())["graph"]["jfp"])
+            spine[str(p)][f.stem.split("-", 1)[1]] = sum(json.loads(f.read_text())["graph"]["fp"])
     (out / "index.json").write_text(json.dumps(
         {"primes": primes, "caps": CAPS, "spine": spine},
         separators=(",", ":")) + "\n")

@@ -80,7 +80,7 @@
     <span class="wm-graph-legend">
       <span><i class="wm-key wm-key-node"></i>supersingular curve</span>
       <span class="wm-graph-legend-pair" hidden><i class="wm-key wm-key-pair"></i>conjugate pair {E, E<sup>(p)</sup>}</span>
-      <span class="wm-graph-legend-fp"><i class="wm-key wm-key-fp"></i><span>j-invariant in F<sub>p</sub></span></span>
+      <span class="wm-graph-legend-fp"><i class="wm-key wm-key-fp"></i><span>fixed by Frobenius</span></span>
       <span><i class="wm-key wm-key-2"></i>2-isogeny</span>
       <span class="wm-graph-legend-3" hidden><i class="wm-key wm-key-3"></i>3-isogeny</span>
       <span class="wm-graph-legend-5" hidden><i class="wm-key wm-key-5"></i>5-isogeny</span>
@@ -110,8 +110,8 @@
       <dd>Two curves can be joined by several isogenies, drawn as parallel arcs, and an isogeny from a curve to itself is drawn as a loop.</dd>
       <dt data-term="p">p</dt>
       <dd>The characteristic, a prime: the curves live over finite fields with p<sup>k</sup> elements. The graph has about p/12 vertices, so a larger p gives a larger graph.</dd>
-      <dt data-term="fp">j-invariant in F<sub>p</sub> (gold)</dt>
-      <dd>A vertex whose j-invariant lies in the prime field F<sub>p</sub> (b = 0), not only in F<sub>p²</sub>. With level structure the j-invariant of a vertex (E, C) means j(E).</dd>
+      <dt data-term="fp">Fixed by Frobenius (gold)</dt>
+      <dd>A vertex isomorphic to its Frobenius image. Without level structure this means its j-invariant lies in F<sub>p</sub> (b = 0). With level structure Frobenius moves the level structure too, so it is a stronger condition: (E, C) ≅ (E<sup>(p)</sup>, C<sup>(p)</sup>), i.e. the pair is defined over F<sub>p</sub>.</dd>
       <dt data-term="frobenius">Frobenius</dt>
       <dd>Raising every coordinate to the p-th power sends a curve E to a curve E<sup>(p)</sup> and a subgroup K of E to a subgroup K<sup>(p)</sup> of E<sup>(p)</sup>; on j-invariants it is a + bi ↦ a − bi. It sends the edge E → E/K to the edge E<sup>(p)</sup> → E<sup>(p)</sup>/K<sup>(p)</sup>, so it is a symmetry of the whole graph, on vertices and on edges, and applying it twice gives back every vertex and edge.</dd>
       <dt data-term="pair">Conjugate pair</dt>
@@ -119,7 +119,7 @@
       <dt data-term="full">Full graph</dt>
       <dd>Every vertex and every edge.</dd>
       <dt data-term="spine">F<sub>p</sub>-subgraph (the spine)</dt>
-      <dd>The subgraph induced on the vertices whose j-invariant lies in F<sub>p</sub>: those vertices and every edge of the graph between them, whether or not Frobenius fixes the edge. When it is not connected the random walk is switched off.</dd>
+      <dd>The subgraph induced on the vertices fixed by Frobenius: those vertices and every edge of the graph between them, whether or not Frobenius fixes the edge. With level structure it can be empty (the "?" in the empty box says why). When it is not connected the random walk is switched off.</dd>
       <dt data-term="folded">Quotient by Frobenius</dt>
       <dd>Its vertices are the orbits of Frobenius on vertices (a conjugate pair becomes one vertex, drawn larger with a gold ring) and its edges are the orbits of Frobenius on edges. Two parallel edges with conjugate kernels between two vertices with j in F<sub>p</sub> are swapped by Frobenius and become one edge.</dd>
       <dt data-term="walk">Random walk</dt>
