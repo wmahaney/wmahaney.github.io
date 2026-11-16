@@ -203,7 +203,3 @@ Python 3, SageMath, LaTeX/Beamer, Microsoft Excel, Linux, Git
 
 C, C++, Java, Magma
 :::
-
-<!-- Un-hide once the Statements page is published: delete this comment line and the "END" line.
-My research, teaching, AI, and culture statements are on the [Statements](../statements/index.qmd) page.
-END -->

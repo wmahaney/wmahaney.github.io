@@ -9,7 +9,8 @@ published with GitHub Pages. Live site: <https://wmahaney.github.io>
 |---|---|---|
 | `index.qmd` | Home page: intro, isogeny graphs, news, about | Edit text, links, news items |
 | `research/index.qmd` | Research page: papers and talks | Add papers and talks (templates inside the file) |
-| `writing/index.qmd` | **Writing** page: lists every note and post | Leave alone |
+| `writing/index.qmd` | **Writing** page: lists every note and post together | Leave alone |
+| `blog/index.qmd`, `notes/index.qmd` | The Blog and Expository Notes pages in the Writing menu | Leave alone |
 | `notes/articles/<name>/index.qmd` | Expository notes, one folder per note | Copy `notes/_template.qmd` |
 | `blog/posts/<name>/index.qmd` | Blog posts, one folder per post | Copy `blog/_template.qmd` |
 | `teaching/index.qmd` | Teaching page | Fill in the hidden skeleton (instructions inside the file) |
@@ -55,18 +56,32 @@ END -->
 
 Edit the piece, then delete the first line (`<!-- TO FILL IN ...`) and the last line (`END -->`).
 
-## Statements and AI pages
+## Statements and AI pages; the private branch
 
-These pages are in the repository but hidden. A page whose header contains the line
-`draft: true` is not published, is left out of listings, and its menu entry does not appear.
-To publish a page, delete that line and push. Suggested order:
+The four statements (`statements/<name>/index.qmd`: research, teaching, culture, AI) are empty
+and marked `draft: true`. The public site leaves them out, and its menu has no Statements tab.
 
-1. Write a statement in `statements/<name>/index.qmd` (each page is empty), then delete its `draft: true`.
-2. Delete `draft: true` in `statements/index.qmd`. "Statements" now appears in the menu.
-3. Same for `ai/index.qmd` once it has an introduction or a project.
-4. Un-hide the matching cards on the home page (`index.qmd`) and the line on the CV page.
+The site has two build profiles:
 
-`quarto preview` on your own computer shows draft pages, so you can read them before publishing.
+| Profile | File | Used for | Drafts | Statements menu |
+|---|---|---|---|---|
+| public (default) | `_quarto-public.yml` | `main` → https://wmahaney.github.io | hidden | hidden |
+| private | `_quarto-private.yml` | the `private` branch; `quarto preview --profile private` | shown | shown |
+
+**Test-deploying sensitive updates.** Work on the `private` branch. Every push builds the
+site with the private profile and attaches it as **site-private** (Actions → the run →
+Artifacts). Unzip it and open `index.html`. The `private` branch is never deployed.
+
+**This repository is public.** Anything pushed to any branch, including `private` (the
+`.qmd` source and the site-private download), can be read by anyone on GitHub. "Private"
+here means "not on the live site", not "confidential". Keep confidential text out of this
+repository; use `quarto preview --profile private` on your own computer, or a private repository.
+
+**Publishing a statement:** delete its `draft: true`, then copy the "Statements" menu entry
+from `_quarto-private.yml` into `_quarto-public.yml` (listing only the statements that are
+published), and merge into `main`. The AI tab (`ai/index.qmd`) and the Statements overview
+page (`statements/index.qmd`) are drafts too, and work the same way. A home-page card for
+either can be added to the card row in `index.qmd` once it is public.
 
 ## The isogeny graphs on the home page
 

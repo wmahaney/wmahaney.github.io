@@ -1,0 +1,33 @@
+# PRIVATE PROFILE: for checking unpublished work before it goes public.
+#   - Builds of the "private" branch use it (see .github/workflows/publish.yml);
+#     they are never deployed. Download the result from Actions -> Artifacts -> site-private.
+#   - On your own computer:   quarto preview --profile private
+# Draft pages are shown, and the menu includes the Statements tab.
+website:
+  draft-mode: visible
+  navbar:
+    left:
+      - href: research/index.qmd
+        text: Research
+      - text: Writing
+        menu:
+          - href: blog/index.qmd
+            text: Blog
+          - href: notes/index.qmd
+            text: Expository Notes
+      - text: Statements
+        menu:
+          - href: statements/research/index.qmd
+            text: Research
+          - href: statements/teaching/index.qmd
+            text: Teaching
+          - href: statements/culture/index.qmd
+            text: Culture
+          - href: statements/ai/index.qmd
+            text: AI
+      - href: teaching/index.qmd
+        text: Teaching
+      - href: ai/index.qmd
+        text: AI
+      - href: cv/index.qmd
+        text: CV

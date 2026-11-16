@@ -62,6 +62,10 @@ function init(root, data) {
     view: null, dragging: false,
   };
   let visible = true, raf = 0, walker = null;
+  // The walk's recent history: the strands of the last TRAIL steps, oldest first.
+  // The newest is drawn boldest; older steps fade out.
+  const TRAIL = 10;
+  let trail = [];
 
   function build() {
     const kind = state.kind, cfg = KINDS[kind];
@@ -148,6 +152,7 @@ function init(root, data) {
     root.dataset.kind = kind;
 
     walker = { at: Math.floor(Math.random() * n), next: null, strand: null, t0: 0 };
+    trail = [];
     walkerDot.style.display = reduced ? "none" : "";
   }
 
@@ -225,10 +230,11 @@ function init(root, data) {
     if (walker.next == null) {
       const options = state.adj[walker.at];
       const pick = options[Math.floor(Math.random() * options.length)];
-      if (walker.strand) walker.strand.path.classList.remove("wm-g-edge-hot");
       walker.next = pick.to; walker.strand = pick.strand; walker.t0 = now;
       walker.reverse = pick.strand.s !== walker.at;
-      pick.strand.path.classList.add("wm-g-edge-hot");
+      trail.push(pick.strand);
+      if (trail.length > TRAIL) trail.shift();
+      paintTrail();
     }
     let t = (now - walker.t0) / HOP_MS;
     if (t >= 1) {
@@ -239,6 +245,18 @@ function init(root, data) {
     const [x, y] = pointOn(geometry(walker.strand), ease, walker.reverse);
     walkerDot.setAttribute("cx", x.toFixed(1));
     walkerDot.setAttribute("cy", y.toFixed(1));
+  }
+  // Strength 1 for the step being taken now, down to 1/TRAIL for the oldest.
+  // A strand walked more than once shows its most recent step.
+  function paintTrail() {
+    for (const st of state.strands) {
+      st.path.classList.remove("wm-g-trail");
+      st.path.style.removeProperty("--trail");
+    }
+    trail.forEach((st, k) => {
+      st.path.classList.add("wm-g-trail");
+      st.path.style.setProperty("--trail", ((k + 1 + TRAIL - trail.length) / TRAIL).toFixed(2));
+    });
   }
   function frame(now) {
     raf = 0;

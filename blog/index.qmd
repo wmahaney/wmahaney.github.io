@@ -1,0 +1,15 @@
+---
+title: "Blog"
+description: "Shorter, informal posts."
+listing:
+  contents: "posts/*/index.qmd"
+  type: grid
+  grid-columns: 2
+  sort: "date desc"
+  categories: false
+  feed: true
+  fields: [title, description, date, reading-time]
+  date-format: "MMMM D, YYYY"
+  sort-ui: false
+  filter-ui: false
+---

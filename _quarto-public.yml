@@ -1,0 +1,26 @@
+# PUBLIC PROFILE: the site everyone sees at https://wmahaney.github.io
+# Used by default (see "profile:" in _quarto.yml), so main always builds with it.
+# Draft pages ("draft: true") are left out, and the menu has no Statements tab.
+website:
+  draft-mode: gone
+  navbar:
+    left:
+      # The name at the left of the menu links to the home page.
+      - href: research/index.qmd
+        text: Research
+      - text: Writing
+        menu:
+          - href: blog/index.qmd
+            text: Blog
+          - href: notes/index.qmd
+            text: Expository Notes
+      # STATEMENTS: hidden from the public for now. To show it, copy the "Statements"
+      # entry from _quarto-private.yml to this spot, and delete "draft: true" in each
+      # statement you list.
+      - href: teaching/index.qmd
+        text: Teaching
+      # The AI tab appears here once ai/index.qmd is no longer a draft.
+      - href: ai/index.qmd
+        text: AI
+      - href: cv/index.qmd
+        text: CV
