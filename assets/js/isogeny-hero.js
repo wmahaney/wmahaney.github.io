@@ -166,25 +166,20 @@ function init(root, index, base) {
     const view = mode === "ball" ? "full" : viewSelect.value;
     viewSelect.disabled = mode === "ball";
     // Some spines are empty (no vertex fixed by Frobenius): for example the level-3 graph
-    // when p = 1 (mod 3). Those primes stay in the menu, greyed out, in the spine view.
+    // when p = 1 (mod 3). In the spine view those primes are marked in the menu, and
+    // choosing one shows a short explanation with buttons to move on (see showEmpty).
     const empty = (q) => view === "spine" && index.spine && index.spine[q] && index.spine[q][kind] === 0;
-    let moved = null;
-    if (empty(state.p[kind])) {
-      const ok = primes.filter((q) => !empty(q));
-      if (ok.length) {
-        const old = state.p[kind];
-        state.p[kind] = ok.reduce((a, b) => (Math.abs(b - old) < Math.abs(a - old) ? b : a));
-        moved = old;
-      }
-    }
     const p = state.p[kind];
     select.replaceChildren(...primes.map((q) => {
       const o = document.createElement("option");
       o.value = q; o.selected = q === p;
-      o.disabled = empty(q);
       o.textContent = empty(q) ? `${q} (empty spine)` : q;
       return o;
     }));
+    const nearestNonempty = () => {
+      const ok = primes.filter((q) => !empty(q));
+      return ok.length ? ok.reduce((a, b) => (Math.abs(b - p) < Math.abs(a - p) ? b : a)) : null;
+    };
     buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.kind === kind)));
 
     root.classList.add("wm-graph-loading");
@@ -274,9 +269,10 @@ function init(root, index, base) {
     } else if (view === "spine") {
       caption.textContent = cfg.caption(p, nFull).replace(/ in characteristic/, " restricted to its spine, in characteristic")
         .replace(/: .*$/, `: the ${n} vertices defined over F_p, of ${nFull}, and the edges between them.`);
-      stats.textContent = (n === 0 ? "No vertex is fixed by Frobenius for this p (nothing is defined over F_p)." :
-        nComp === 1 ? "The spine is connected." : `The spine has ${nComp} connected components.`) +
-        (moved ? ` (The spine for p = ${moved} is empty, so this is the nearest prime with a nonempty one.)` : "");
+      stats.textContent = n === 0 ? "The spine is empty." :
+        nComp === 1 ? "The spine is connected." :
+        nComp === n ? `The spine is totally disconnected: ${n} vertices and no edges between them.` :
+        `The spine has ${nComp} connected components.`;
     } else {
       caption.textContent = cfg.caption(p, n);
       const lam = g.lambda2;
@@ -287,6 +283,9 @@ function init(root, index, base) {
     legend3.hidden = !cfg.ells.includes(3);
     if (legendFp) legendFp.hidden = !d.nodes.some((nd) => nd.fp);
     if (legendPair) legendPair.hidden = view !== "folded";
+    const nEdges = d.links.filter(([a, b]) => a !== b).length;
+    showEmpty(view === "spine" && (n === 0 || nEdges === 0)
+      ? { kind, p, n, alternative: nearestNonempty() } : null);
     const nr = entry.nonresidue;
     fieldNote.replaceChildren("Labels are j-invariants in F", sub("p"), "(i), i",
       sup("2"), ` = ${nr < 0 ? "−" + (-nr) : nr}.`);
@@ -414,6 +413,61 @@ function init(root, index, base) {
     });
     painted = trail.slice();
   }
+  // ---- empty or totally disconnected spines --------------------------------
+  // Why a spine can be empty: a supersingular curve over F_p (p > 3) has trace 0, so
+  // its Frobenius pi satisfies pi^2 = -p. A subgroup of order N (N = 3 or 5, prime)
+  // that Frobenius preserves is an eigenline of pi on E[N], whose eigenvalue would be a
+  // square root of -p mod N. There is none for p = 1 (mod 3), or p = 2, 3 (mod 5).
+  const LEVEL = { "2b3": 3, "23b5": 5 };
+  const emptyBox = document.createElement("div");
+  emptyBox.className = "wm-graph-empty";
+  emptyBox.hidden = true;
+  svg.parentNode.appendChild(emptyBox);
+  function button(text, act) {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = text;
+    b.addEventListener("click", act);
+    return b;
+  }
+  function showEmpty(info) {
+    emptyBox.hidden = !info;
+    emptyBox.classList.toggle("wm-graph-empty-top", !!info && info.n > 0);
+    if (!info) return;
+    const { kind, p, n, alternative } = info;
+    const N = LEVEL[kind];
+    const head = document.createElement("strong");
+    const text = document.createElement("div");
+    text.className = "wm-graph-empty-text";
+    if (n === 0) {
+      head.textContent = "Empty spine";
+      text.append(`No vertex is fixed by Frobenius for p = ${p}, so the spine is empty, not just disconnected.`);
+      if (N) {
+        // The reason, folded away on small screens so the buttons stay in view.
+        const why = document.createElement("details");
+        why.open = window.matchMedia("(min-width: 576px)").matches;
+        const summary = document.createElement("summary");
+        summary.textContent = "Why?";
+        why.append(summary, "On a curve over F", sub("p"), ` Frobenius satisfies π² = −p, and −p has no ` +
+          `square root mod ${N} when p ≡ ${p % N} (mod ${N}), so no subgroup of order ${N} is ` +
+          "stable under Frobenius.");
+        text.append(why);
+      }
+    } else {
+      head.textContent = "Totally disconnected spine";
+      text.append(`For p = ${p} the spine has ${n} vertices but no edges between them.`);
+    }
+    const go = document.createElement("div");
+    go.className = "wm-graph-empty-go";
+    if (alternative) {
+      go.appendChild(button(`Show p = ${alternative}`, () => {
+        state.p[state.kind] = alternative; build().then(startLoop);
+      }));
+    }
+    go.appendChild(button("Full graph", () => { viewSelect.value = "full"; build().then(startLoop); }));
+    go.appendChild(button("Folded graph", () => { viewSelect.value = "folded"; build().then(startLoop); }));
+    emptyBox.replaceChildren(head, text, go);
+  }
+
   // ---- growing ball -------------------------------------------------------
   // Breadth-first search from a random centre v, one layer at a time. Frobenius is
   // an automorphism of the graph, so the ball B_r(v) contains a pair {w, w^(p)}

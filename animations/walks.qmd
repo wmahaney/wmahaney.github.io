@@ -11,4 +11,4 @@ A random walk on a supersingular isogeny graph, with its recent steps highlighte
 <script type="module" src="../assets/js/isogeny-hero.js"></script>
 ```
 
-The level-3 graph has pairs $(E, C)$ with $C$ a subgroup of order 3 as vertices, and a 2-isogeny $\varphi\colon E\to E'$ gives an edge $(E, C)\to(E', \varphi(C))$; the level-5 graph is the same with subgroups of order 5 and both 2- and 3-isogenies. In the spine view some primes are greyed out: for those the spine is empty, for instance the level-3 graph when $p \equiv 1 \pmod 3$. There are pictures of the spines on the [Spines](spines.qmd) page.
+The level-3 graph has pairs $(E, C)$ with $C$ a subgroup of order 3 as vertices, and a 2-isogeny $\varphi\colon E\to E'$ gives an edge $(E, C)\to(E', \varphi(C))$; the level-5 graph is the same with subgroups of order 5 and both 2- and 3-isogenies. In the spine view some primes are marked *(empty spine)*: for those no vertex is fixed by Frobenius, for instance the level-3 graph when $p \equiv 1 \pmod 3$. Choosing one explains why and offers a nearby prime instead. There are pictures of the spines on the [Spines](spines.qmd) page.
