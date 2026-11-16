@@ -241,8 +241,17 @@ h1, h2, h3, h4, h5, h6,
 .wm-g-edge-3 { stroke: var(--wm-red); }
 /* The last ten steps of the random walk; --trail runs from 1 (newest) to 0.1. */
 .wm-g-trail {
-  opacity: calc(0.45 + 0.55 * var(--trail, 1));
-  stroke-width: calc(1.4px + 2.4px * var(--trail, 1));
+  opacity: calc(0.6 + 0.4 * var(--trail, 1));
+  stroke-width: calc(1.6px + 2.2px * var(--trail, 1));
+}
+/* The trail is a darker shade of its edge colour, so it stands out from the rest. */
+.wm-g-edge-2.wm-g-trail { stroke: color-mix(in srgb, var(--wm-accent) 72%, var(--wm-ink)); }
+.wm-g-edge-3.wm-g-trail { stroke: color-mix(in srgb, var(--wm-red) 72%, var(--wm-ink)); }
+/* Big graphs (hundreds of vertices): thinner background edges, so the trail stays visible. */
+.wm-dense .wm-g-edge { stroke-width: 0.9; opacity: 0.38; }
+.wm-dense .wm-g-trail {
+  opacity: calc(0.7 + 0.3 * var(--trail, 1));
+  stroke-width: calc(1.8px + 2px * var(--trail, 1));
 }
 .wm-g-node {
   fill: var(--wm-accent);
@@ -262,6 +271,35 @@ h1, h2, h3, h4, h5, h6,
   stroke: var(--wm-ink);
   stroke-width: 2.5;
   pointer-events: none;
+}
+/* Walk controls under the picture */
+.wm-graph-walk {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 1rem;
+  margin-top: 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--wm-muted);
+}
+.wm-graph-walk-label { color: var(--wm-ink); }
+.wm-graph-walk select {
+  font: 600 0.8rem/1.2 var(--wm-sans);
+  color: var(--wm-ink);
+  background: var(--wm-surface);
+  border: 1.5px solid var(--wm-line);
+  border-radius: 999px;
+  padding: 0.25rem 0.6rem;
+  margin-left: 0.25rem;
+}
+.wm-graph-walk select:focus-visible {
+  outline: 2px solid var(--wm-accent2);
+  outline-offset: 2px;
+}
+.wm-graph-loading .wm-graph-svg { opacity: 0.45; transition: opacity 0.2s ease; }
+@media (prefers-reduced-motion: reduce) {
+  .wm-graph-walk { display: none; }
 }
 .wm-graph-tip sub,
 .wm-graph figcaption sub { font-size: 0.75em; }
@@ -319,6 +357,7 @@ h1, h2, h3, h4, h5, h6,
 /* If the data cannot be loaded, drop the figure rather than show an empty frame. */
 .wm-graph.wm-graph-failed { display: none; }
 .wm-graph:not(.wm-graph-ready) .wm-graph-controls,
+.wm-graph:not(.wm-graph-ready) .wm-graph-walk,
 .wm-graph:not(.wm-graph-ready) .wm-graph-legend,
 .wm-graph:not(.wm-graph-ready) .wm-graph-hint { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) {

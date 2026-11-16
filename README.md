@@ -88,13 +88,15 @@ either can be added to the card row in `index.qmd` once it is public.
 The home page draws three graphs for a choice of primes `p`: the supersingular 2-isogeny graph,
 the (2,3)-isogeny graph, and the 2-isogeny graph with Borel level-3 structure. The data is
 computed ahead of time by `_scripts/isogeny_graphs.py` (plain Python, no SageMath needed) and
-stored in `assets/data/isogeny-graphs.json`. To offer different primes:
+stored as one small file per prime in `assets/data/isogeny/` (`p431.json`, ... plus `index.json`),
+so the page only downloads the prime being viewed. The default list goes up to p = 4999; the level-3
+graph is offered up to p = 5000. The walk has "history" (10 to 250 steps) and "speed" controls. To offer different primes:
 
 ```
 python3 _scripts/isogeny_graphs.py 101 431 1009
 ```
 
-then commit the new JSON file. The script checks its own output on every prime (class number
+then commit the new JSON files. The script checks its own output on every prime (class number
 formula, modular polynomials, the mass formula, Brandt-matrix symmetry, and the Ramanujan bound)
 and stops if a check fails. The method is described at the top of the script.
 
