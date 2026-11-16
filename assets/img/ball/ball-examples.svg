@@ -1,0 +1,236 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 816 912" width="816" font-family="Inter, system-ui, -apple-system, Segoe UI, sans-serif" role="img">
+<g transform="translate(0,0)"><rect x="0.75" y="0.75" width="398.5" height="428.5" rx="16" fill="#FFFDF7" stroke="#E3D9C3" stroke-width="1.5"/>
+<text x="18" y="27" font-size="14" font-weight="700" fill="#1E2430">2-isogeny graph, p = 1009</text>
+<text x="18" y="46" font-size="12" fill="#5A6070">84 vertices; √n ≈ 9.2</text>
+<text x="18" y="63" font-size="12" fill="#5A6070">pair found at radius 2, ball of 10 vertices</text>
+<circle cx="200.0" cy="233.0" r="66.5" fill="none" stroke="#E3D9C3" stroke-width="1.2" stroke-dasharray="3 4"/>
+<text x="204.0" y="162.5" font-size="10.5" fill="#5A6070">r = 1</text>
+<circle cx="200.0" cy="233.0" r="133.0" fill="none" stroke="#E3D9C3" stroke-width="1.2" stroke-dasharray="3 4"/>
+<text x="204.0" y="96.0" font-size="10.5" fill="#5A6070">r = 2</text>
+<line x1="200.0" y1="233.0" x2="257.6" y2="199.8" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="200.0" y1="233.0" x2="142.4" y2="199.8" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="257.6" y1="199.8" x2="266.5" y2="117.8" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="257.6" y1="199.8" x2="333.0" y2="233.0" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="200.0" y1="299.5" x2="266.5" y2="348.2" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="142.4" y1="199.8" x2="67.0" y2="233.0" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="142.4" y1="199.8" x2="133.5" y2="117.8" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="133.5" y1="348.2" x2="200.0" y2="299.5" stroke="#1E2430" stroke-width="3.4" stroke-linecap="round"/>
+<line x1="200.0" y1="233.0" x2="200.0" y2="299.5" stroke="#1E2430" stroke-width="3.4" stroke-linecap="round"/>
+<circle cx="200.0" cy="233.0" r="7.5" fill="#2B4FB8" stroke="#1E2430" stroke-width="2.5"><title>322 + 568i (distance 0)</title></circle>
+<circle cx="257.6" cy="199.8" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>478 + 585i (distance 1)</title></circle>
+<circle cx="200.0" cy="299.5" r="7.5" fill="#B93A2B" stroke="#1E2430" stroke-width="2.5"><title>563 + 895i (distance 1)</title></circle>
+<circle cx="142.4" cy="199.8" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>635 + 421i (distance 1)</title></circle>
+<circle cx="266.5" cy="117.8" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>792 + 1007i (distance 2)</title></circle>
+<circle cx="333.0" cy="233.0" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>882 + 1004i (distance 2)</title></circle>
+<circle cx="266.5" cy="348.2" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>231 + 226i (distance 2)</title></circle>
+<circle cx="133.5" cy="348.2" r="7.5" fill="#B93A2B" stroke="#1E2430" stroke-width="2.5"><title>563 + 114i (distance 2)</title></circle>
+<circle cx="67.0" cy="233.0" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>155 (distance 2)</title></circle>
+<circle cx="133.5" cy="117.8" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>524 + 482i (distance 2)</title></circle>
+<text x="121.5" y="352.2" font-size="11.5" text-anchor="end" fill="#1E2430" stroke="#FFFDF7" stroke-width="3" paint-order="stroke">563 + 114i</text>
+<text x="212.0" y="303.5" font-size="11.5" text-anchor="start" fill="#1E2430" stroke="#FFFDF7" stroke-width="3" paint-order="stroke">563 + 895i</text>
+<text x="200.0" y="255.0" font-size="11" text-anchor="middle" fill="#1E2430" stroke="#FFFDF7" stroke-width="3" paint-order="stroke">start</text></g>
+<g transform="translate(416,0)"><rect x="0.75" y="0.75" width="398.5" height="428.5" rx="16" fill="#FFFDF7" stroke="#E3D9C3" stroke-width="1.5"/>
+<text x="18" y="27" font-size="14" font-weight="700" fill="#1E2430">(2,3)-isogeny graph, p = 431</text>
+<text x="18" y="46" font-size="12" fill="#5A6070">37 vertices; √n ≈ 6.1</text>
+<text x="18" y="63" font-size="12" fill="#5A6070">pair found at radius 2, ball of 16 vertices</text>
+<circle cx="200.0" cy="233.0" r="66.5" fill="none" stroke="#E3D9C3" stroke-width="1.2" stroke-dasharray="3 4"/>
+<text x="204.0" y="162.5" font-size="10.5" fill="#5A6070">r = 1</text>
+<circle cx="200.0" cy="233.0" r="133.0" fill="none" stroke="#E3D9C3" stroke-width="1.2" stroke-dasharray="3 4"/>
+<text x="204.0" y="96.0" font-size="10.5" fill="#5A6070">r = 2</text>
+<line x1="200.0" y1="233.0" x2="153.0" y2="280.0" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="200.0" y1="233.0" x2="153.0" y2="186.0" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="266.5" y1="233.0" x2="294.0" y2="139.0" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="266.5" y1="233.0" x2="328.5" y2="198.6" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="266.5" y1="233.0" x2="234.4" y2="104.5" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="266.5" y1="233.0" x2="328.5" y2="267.4" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="153.0" y1="280.0" x2="234.4" y2="104.5" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="153.0" y1="280.0" x2="153.0" y2="186.0" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="153.0" y1="280.0" x2="328.5" y2="267.4" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="153.0" y1="280.0" x2="165.6" y2="361.5" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="153.0" y1="280.0" x2="106.0" y2="327.0" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="153.0" y1="280.0" x2="71.5" y2="267.4" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="153.0" y1="186.0" x2="294.0" y2="327.0" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="153.0" y1="186.0" x2="234.4" y2="361.5" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="153.0" y1="186.0" x2="71.5" y2="198.6" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="153.0" y1="186.0" x2="106.0" y2="139.0" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="153.0" y1="186.0" x2="165.6" y2="104.5" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="234.4" y1="104.5" x2="165.6" y2="361.5" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="294.0" y1="139.0" x2="165.6" y2="361.5" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="165.6" y1="361.5" x2="71.5" y2="198.6" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="106.0" y1="327.0" x2="165.6" y2="104.5" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="71.5" y1="267.4" x2="106.0" y2="139.0" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="106.0" y1="139.0" x2="165.6" y2="104.5" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="266.5" y1="233.0" x2="234.4" y2="361.5" stroke="#1E2430" stroke-width="3.4" stroke-linecap="round"/>
+<line x1="200.0" y1="233.0" x2="266.5" y2="233.0" stroke="#1E2430" stroke-width="3.4" stroke-linecap="round"/>
+<line x1="266.5" y1="233.0" x2="294.0" y2="327.0" stroke="#1E2430" stroke-width="3.4" stroke-linecap="round"/>
+<circle cx="200.0" cy="233.0" r="7.5" fill="#E5A11C" stroke="#1E2430" stroke-width="2.5"><title>4 (distance 0)</title></circle>
+<circle cx="266.5" cy="233.0" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>19 (distance 1)</title></circle>
+<circle cx="153.0" cy="280.0" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>102 (distance 1)</title></circle>
+<circle cx="153.0" cy="186.0" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>319 (distance 1)</title></circle>
+<circle cx="234.4" cy="104.5" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>125 (distance 2)</title></circle>
+<circle cx="294.0" cy="139.0" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>234 (distance 2)</title></circle>
+<circle cx="328.5" cy="198.6" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>241 (distance 2)</title></circle>
+<circle cx="328.5" cy="267.4" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>358 (distance 2)</title></circle>
+<circle cx="294.0" cy="327.0" r="7.5" fill="#B93A2B" stroke="#1E2430" stroke-width="2.5"><title>304 + 67i (distance 2)</title></circle>
+<circle cx="234.4" cy="361.5" r="7.5" fill="#B93A2B" stroke="#1E2430" stroke-width="2.5"><title>304 + 364i (distance 2)</title></circle>
+<circle cx="165.6" cy="361.5" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>143 (distance 2)</title></circle>
+<circle cx="106.0" cy="327.0" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>315 + 132i (distance 2)</title></circle>
+<circle cx="71.5" cy="267.4" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>315 + 299i (distance 2)</title></circle>
+<circle cx="71.5" cy="198.6" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>150 (distance 2)</title></circle>
+<circle cx="106.0" cy="139.0" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>426 + 125i (distance 2)</title></circle>
+<circle cx="165.6" cy="104.5" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>426 + 306i (distance 2)</title></circle>
+<text x="306.0" y="331.0" font-size="11.5" text-anchor="start" fill="#1E2430" stroke="#FFFDF7" stroke-width="3" paint-order="stroke">304 + 67i</text>
+<text x="246.4" y="365.5" font-size="11.5" text-anchor="start" fill="#1E2430" stroke="#FFFDF7" stroke-width="3" paint-order="stroke">304 + 364i</text>
+<text x="200.0" y="255.0" font-size="11" text-anchor="middle" fill="#1E2430" stroke="#FFFDF7" stroke-width="3" paint-order="stroke">start</text></g>
+<g transform="translate(0,446)"><rect x="0.75" y="0.75" width="398.5" height="428.5" rx="16" fill="#FFFDF7" stroke="#E3D9C3" stroke-width="1.5"/>
+<text x="18" y="27" font-size="14" font-weight="700" fill="#1E2430">2-isogeny graph, level 3, p = 431</text>
+<text x="18" y="46" font-size="12" fill="#5A6070">144 vertices; √n ≈ 12.0</text>
+<text x="18" y="63" font-size="12" fill="#5A6070">pair found at radius 2, ball of 10 vertices</text>
+<circle cx="200.0" cy="233.0" r="66.5" fill="none" stroke="#E3D9C3" stroke-width="1.2" stroke-dasharray="3 4"/>
+<text x="204.0" y="162.5" font-size="10.5" fill="#5A6070">r = 1</text>
+<circle cx="200.0" cy="233.0" r="133.0" fill="none" stroke="#E3D9C3" stroke-width="1.2" stroke-dasharray="3 4"/>
+<text x="204.0" y="96.0" font-size="10.5" fill="#5A6070">r = 2</text>
+<line x1="200.0" y1="233.0" x2="200.0" y2="299.5" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="200.0" y1="233.0" x2="142.4" y2="199.8" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="257.6" y1="199.8" x2="266.5" y2="117.8" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="200.0" y1="299.5" x2="266.5" y2="348.2" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="200.0" y1="299.5" x2="133.5" y2="348.2" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="142.4" y1="199.8" x2="67.0" y2="233.0" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="142.4" y1="199.8" x2="133.5" y2="117.8" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="333.0" y1="233.0" x2="257.6" y2="199.8" stroke="#1E2430" stroke-width="3.4" stroke-linecap="round"/>
+<line x1="257.6" y1="199.8" x2="200.0" y2="233.0" stroke="#1E2430" stroke-width="3.4" stroke-linecap="round"/>
+<circle cx="200.0" cy="233.0" r="7.5" fill="#B93A2B" stroke="#1E2430" stroke-width="2.5"><title>379 + 325i (distance 0)</title></circle>
+<circle cx="257.6" cy="199.8" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>316 (distance 1)</title></circle>
+<circle cx="200.0" cy="299.5" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>379 + 106i (distance 1)</title></circle>
+<circle cx="142.4" cy="199.8" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>426 + 125i (distance 1)</title></circle>
+<circle cx="266.5" cy="117.8" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>356 (distance 2)</title></circle>
+<circle cx="333.0" cy="233.0" r="7.5" fill="#B93A2B" stroke="#1E2430" stroke-width="2.5"><title>379 + 106i (distance 2)</title></circle>
+<circle cx="266.5" cy="348.2" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>316 (distance 2)</title></circle>
+<circle cx="133.5" cy="348.2" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>426 + 306i (distance 2)</title></circle>
+<circle cx="67.0" cy="233.0" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>141 + 42i (distance 2)</title></circle>
+<circle cx="133.5" cy="117.8" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>315 + 299i (distance 2)</title></circle>
+<text x="345.0" y="237.0" font-size="11.5" text-anchor="start" fill="#1E2430" stroke="#FFFDF7" stroke-width="3" paint-order="stroke">379 + 106i</text>
+<text x="212.0" y="237.0" font-size="11.5" text-anchor="start" fill="#1E2430" stroke="#FFFDF7" stroke-width="3" paint-order="stroke">379 + 325i</text>
+<text x="200.0" y="255.0" font-size="11" text-anchor="middle" fill="#1E2430" stroke="#FFFDF7" stroke-width="3" paint-order="stroke">start</text></g>
+<g transform="translate(416,446)"><rect x="0.75" y="0.75" width="398.5" height="428.5" rx="16" fill="#FFFDF7" stroke="#E3D9C3" stroke-width="1.5"/>
+<text x="18" y="27" font-size="14" font-weight="700" fill="#1E2430">(2,3)-isogeny graph, level 5, p = 211</text>
+<text x="18" y="46" font-size="12" fill="#5A6070">106 vertices; √n ≈ 10.3</text>
+<text x="18" y="63" font-size="12" fill="#5A6070">pair found at radius 2, ball of 35 vertices</text>
+<circle cx="200.0" cy="233.0" r="66.5" fill="none" stroke="#E3D9C3" stroke-width="1.2" stroke-dasharray="3 4"/>
+<text x="204.0" y="162.5" font-size="10.5" fill="#5A6070">r = 1</text>
+<circle cx="200.0" cy="233.0" r="133.0" fill="none" stroke="#E3D9C3" stroke-width="1.2" stroke-dasharray="3 4"/>
+<text x="204.0" y="96.0" font-size="10.5" fill="#5A6070">r = 2</text>
+<line x1="200.0" y1="233.0" x2="261.1" y2="259.3" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="200.0" y1="233.0" x2="142.4" y2="199.8" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="200.0" y1="233.0" x2="192.3" y2="166.9" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="200.0" y1="233.0" x2="200.0" y2="299.5" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="200.0" y1="233.0" x2="138.9" y2="259.3" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="200.0" y1="233.0" x2="170.2" y2="173.6" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="242.7" y1="182.1" x2="215.4" y2="100.9" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="242.7" y1="182.1" x2="273.1" y2="121.9" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="242.7" y1="182.1" x2="296.7" y2="141.7" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="242.7" y1="182.1" x2="315.2" y2="166.5" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="242.7" y1="182.1" x2="327.4" y2="194.9" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="261.1" y1="259.3" x2="332.8" y2="225.3" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="261.1" y1="259.3" x2="331.0" y2="256.1" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="261.1" y1="259.3" x2="322.1" y2="285.7" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="261.1" y1="259.3" x2="296.7" y2="141.7" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="261.1" y1="259.3" x2="306.7" y2="312.4" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="261.1" y1="259.3" x2="285.5" y2="334.9" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="200.0" y1="299.5" x2="230.7" y2="362.4" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="200.0" y1="299.5" x2="200.0" y2="366.0" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="200.0" y1="299.5" x2="306.7" y2="312.4" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="200.0" y1="299.5" x2="259.7" y2="351.9" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="200.0" y1="299.5" x2="169.3" y2="362.4" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="200.0" y1="299.5" x2="140.3" y2="351.9" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="138.9" y1="259.3" x2="114.5" y2="334.9" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="138.9" y1="259.3" x2="93.3" y2="312.4" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="138.9" y1="259.3" x2="322.1" y2="285.7" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="138.9" y1="259.3" x2="77.9" y2="285.7" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="138.9" y1="259.3" x2="69.0" y2="256.1" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="138.9" y1="259.3" x2="67.2" y2="225.3" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="142.4" y1="199.8" x2="72.6" y2="194.9" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="142.4" y1="199.8" x2="84.8" y2="166.5" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="142.4" y1="199.8" x2="93.3" y2="312.4" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="142.4" y1="199.8" x2="200.0" y2="366.0" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="142.4" y1="199.8" x2="273.1" y2="121.9" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="142.4" y1="199.8" x2="103.3" y2="141.7" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="170.2" y1="173.6" x2="93.3" y2="312.4" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="170.2" y1="173.6" x2="285.5" y2="334.9" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="170.2" y1="173.6" x2="103.3" y2="141.7" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="170.2" y1="173.6" x2="126.9" y2="121.9" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="170.2" y1="173.6" x2="154.5" y2="108.0" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="170.2" y1="173.6" x2="72.6" y2="194.9" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="192.3" y1="166.9" x2="184.6" y2="100.9" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="192.3" y1="166.9" x2="67.2" y2="225.3" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="192.3" y1="166.9" x2="215.4" y2="100.9" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="192.3" y1="166.9" x2="230.7" y2="362.4" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="192.3" y1="166.9" x2="114.5" y2="334.9" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="192.3" y1="166.9" x2="93.3" y2="312.4" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="215.4" y1="100.9" x2="259.7" y2="351.9" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="215.4" y1="100.9" x2="306.7" y2="312.4" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="315.2" y1="166.5" x2="306.7" y2="312.4" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="315.2" y1="166.5" x2="332.8" y2="225.3" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="315.2" y1="166.5" x2="77.9" y2="285.7" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="322.1" y1="285.7" x2="77.9" y2="285.7" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="285.5" y1="334.9" x2="126.9" y2="121.9" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="259.7" y1="351.9" x2="67.2" y2="225.3" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="114.5" y1="334.9" x2="103.3" y2="141.7" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="114.5" y1="334.9" x2="72.6" y2="194.9" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="114.5" y1="334.9" x2="69.0" y2="256.1" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="77.9" y1="285.7" x2="69.0" y2="256.1" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="67.2" y1="225.3" x2="72.6" y2="194.9" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
+<line x1="67.2" y1="225.3" x2="103.3" y2="141.7" stroke="#B93A2B" stroke-width="1.3" opacity="0.55"/>
+<line x1="242.7" y1="182.1" x2="200.0" y2="233.0" stroke="#1E2430" stroke-width="3.4" stroke-linecap="round"/>
+<line x1="245.5" y1="108.0" x2="242.7" y2="182.1" stroke="#1E2430" stroke-width="3.4" stroke-linecap="round"/>
+<circle cx="200.0" cy="233.0" r="7.5" fill="#B93A2B" stroke="#1E2430" stroke-width="2.5"><title>118 + 164i (distance 0)</title></circle>
+<circle cx="242.7" cy="182.1" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>114 (distance 1)</title></circle>
+<circle cx="261.1" cy="259.3" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>198 (distance 1)</title></circle>
+<circle cx="200.0" cy="299.5" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>118 + 47i (distance 1)</title></circle>
+<circle cx="138.9" cy="259.3" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>119 + 22i (distance 1)</title></circle>
+<circle cx="142.4" cy="199.8" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>119 + 189i (distance 1)</title></circle>
+<circle cx="170.2" cy="173.6" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>135 + 3i (distance 1)</title></circle>
+<circle cx="192.3" cy="166.9" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>135 + 208i (distance 1)</title></circle>
+<circle cx="215.4" cy="100.9" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>40 (distance 2)</title></circle>
+<circle cx="245.5" cy="108.0" r="7.5" fill="#B93A2B" stroke="#1E2430" stroke-width="2.5"><title>118 + 47i (distance 2)</title></circle>
+<circle cx="273.1" cy="121.9" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>130 + 45i (distance 2)</title></circle>
+<circle cx="296.7" cy="141.7" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>130 + 166i (distance 2)</title></circle>
+<circle cx="315.2" cy="166.5" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>183 + 100i (distance 2)</title></circle>
+<circle cx="327.4" cy="194.9" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>183 + 111i (distance 2)</title></circle>
+<circle cx="332.8" cy="225.3" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>28 (distance 2)</title></circle>
+<circle cx="331.0" cy="256.1" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>118 + 47i (distance 2)</title></circle>
+<circle cx="322.1" cy="285.7" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>130 + 45i (distance 2)</title></circle>
+<circle cx="306.7" cy="312.4" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>135 + 3i (distance 2)</title></circle>
+<circle cx="285.5" cy="334.9" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>135 + 208i (distance 2)</title></circle>
+<circle cx="259.7" cy="351.9" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>114 (distance 2)</title></circle>
+<circle cx="230.7" cy="362.4" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>198 (distance 2)</title></circle>
+<circle cx="200.0" cy="366.0" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>119 + 22i (distance 2)</title></circle>
+<circle cx="169.3" cy="362.4" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>119 + 189i (distance 2)</title></circle>
+<circle cx="140.3" cy="351.9" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>135 + 208i (distance 2)</title></circle>
+<circle cx="114.5" cy="334.9" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>45 + 49i (distance 2)</title></circle>
+<circle cx="93.3" cy="312.4" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>118 + 47i (distance 2)</title></circle>
+<circle cx="77.9" cy="285.7" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>119 + 189i (distance 2)</title></circle>
+<circle cx="69.0" cy="256.1" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>130 + 166i (distance 2)</title></circle>
+<circle cx="67.2" cy="225.3" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>183 + 111i (distance 2)</title></circle>
+<circle cx="72.6" cy="194.9" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>45 + 162i (distance 2)</title></circle>
+<circle cx="84.8" cy="166.5" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>130 + 166i (distance 2)</title></circle>
+<circle cx="103.3" cy="141.7" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>183 + 100i (distance 2)</title></circle>
+<circle cx="126.9" cy="121.9" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>40 (distance 2)</title></circle>
+<circle cx="154.5" cy="108.0" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>198 (distance 2)</title></circle>
+<circle cx="184.6" cy="100.9" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>135 + 3i (distance 2)</title></circle>
+<text x="257.5" y="112.0" font-size="11.5" text-anchor="start" fill="#1E2430" stroke="#FFFDF7" stroke-width="3" paint-order="stroke">118 + 47i</text>
+<text x="212.0" y="237.0" font-size="11.5" text-anchor="start" fill="#1E2430" stroke="#FFFDF7" stroke-width="3" paint-order="stroke">118 + 164i</text>
+<text x="200.0" y="255.0" font-size="11" text-anchor="middle" fill="#1E2430" stroke="#FFFDF7" stroke-width="3" paint-order="stroke">start</text></g>
+<line x1="6" y1="898" x2="24" y2="898" stroke="#2B4FB8" stroke-width="2"/>
+<text x="30" y="902" font-size="12" fill="#5A6070">2-isogeny</text>
+<line x1="109" y1="898" x2="127" y2="898" stroke="#B93A2B" stroke-width="2"/>
+<text x="133" y="902" font-size="12" fill="#5A6070">3-isogeny</text>
+<circle cx="217" cy="898" r="5" fill="#2B4FB8"/>
+<text x="227" y="902" font-size="12" fill="#5A6070">curve</text>
+<circle cx="283" cy="898" r="5" fill="#E5A11C"/>
+<text x="293" y="902" font-size="12" fill="#5A6070">defined over F_p</text>
+<circle cx="426" cy="898" r="5" fill="#B93A2B"/>
+<text x="436" y="902" font-size="12" fill="#5A6070">the conjugate pair</text>
+<line x1="578" y1="898" x2="596" y2="898" stroke="#1E2430" stroke-width="3.4"/>
+<text x="602" y="902" font-size="12" fill="#5A6070">shortest paths</text>
+</svg>

@@ -96,6 +96,10 @@ const sub = html("sub"), sup = html("sup");
 
 // How long one step of the random walk takes, in milliseconds.
 const SPEEDS = { calm: 700, fast: 220, frantic: 90 };
+// How long the growing ball waits between layers, and how long it rests once it has
+// found a conjugate pair before starting again somewhere else.
+const BALL_MS = { calm: 1400, fast: 750, frantic: 330 };
+const BALL_HOLD = 3200;
 
 function init(root, index, base) {
   const svg = root.querySelector("svg");
@@ -106,6 +110,8 @@ function init(root, index, base) {
   const trailSelect = root.querySelector(".wm-graph-trail-len");
   const speedSelect = root.querySelector(".wm-graph-speed");
   const viewSelect = root.querySelector(".wm-graph-view select");
+  const animSelect = root.querySelector(".wm-graph-anim");
+  const ballStatus = root.querySelector(".wm-graph-ball-status");
   const legendPair = root.querySelector(".wm-graph-legend-pair");
   const trailLabel = root.querySelector(".wm-trail-n");
   const buttons = [...root.querySelectorAll("[data-kind]")];
@@ -128,6 +134,13 @@ function init(root, index, base) {
   // The newest is drawn boldest; older steps fade out.
   let TRAIL = Number(trailSelect.value), hopMs = SPEEDS[speedSelect.value];
   let trail = [], painted = [];
+  // "walk" (a random walk with a fading trail) or "ball" (a ball grown layer by layer
+  // from a random vertex until it contains a vertex and its Frobenius conjugate).
+  const host = root.closest("[data-mode]");
+  if (host && [...animSelect.options].some((o) => o.value === host.dataset.mode)) {
+    animSelect.value = host.dataset.mode;
+  }
+  let mode = animSelect.value, ball = null;
 
   // Each prime's data is a separate small file, fetched the first time it is chosen.
   const cache = new Map();
@@ -149,10 +162,27 @@ function init(root, index, base) {
     if (!primes.includes(state.p[kind])) {
       state.p[kind] = primes.includes(cfg.defaultP) ? cfg.defaultP : primes[0];
     }
+    // The growing ball needs the whole graph; the view menu is set aside meanwhile.
+    const view = mode === "ball" ? "full" : viewSelect.value;
+    viewSelect.disabled = mode === "ball";
+    // Some spines are empty (no vertex fixed by Frobenius): for example the level-3 graph
+    // when p = 1 (mod 3). Those primes stay in the menu, greyed out, in the spine view.
+    const empty = (q) => view === "spine" && index.spine && index.spine[q] && index.spine[q][kind] === 0;
+    let moved = null;
+    if (empty(state.p[kind])) {
+      const ok = primes.filter((q) => !empty(q));
+      if (ok.length) {
+        const old = state.p[kind];
+        state.p[kind] = ok.reduce((a, b) => (Math.abs(b - old) < Math.abs(a - old) ? b : a));
+        moved = old;
+      }
+    }
     const p = state.p[kind];
     select.replaceChildren(...primes.map((q) => {
       const o = document.createElement("option");
-      o.value = q; o.textContent = q; o.selected = q === p;
+      o.value = q; o.selected = q === p;
+      o.disabled = empty(q);
+      o.textContent = empty(q) ? `${q} (empty spine)` : q;
       return o;
     }));
     buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.kind === kind)));
@@ -169,7 +199,6 @@ function init(root, index, base) {
     if (id !== buildId) return;        // a newer choice has been made meanwhile
     root.classList.remove("wm-graph-loading");
     const g = entry.graphs[kind];
-    const view = viewSelect.value;
     const d = derive(g, view);
     const n = d.nodes.length;
     const nodes = d.nodes.map((nd, i) => ({
@@ -212,7 +241,7 @@ function init(root, index, base) {
       }, gNodes);
       attachNodeEvents(nd);
     }
-    Object.assign(state, { nodes, strands, adj, pinned: null, r, graph: g });
+    Object.assign(state, { nodes, strands, adj, pinned: null, r, graph: g, sigma: g.sigma });
     painted = [];
     hideTip();
 
@@ -245,8 +274,9 @@ function init(root, index, base) {
     } else if (view === "spine") {
       caption.textContent = cfg.caption(p, nFull).replace(/ in characteristic/, " restricted to its spine, in characteristic")
         .replace(/: .*$/, `: the ${n} vertices defined over F_p, of ${nFull}, and the edges between them.`);
-      stats.textContent = n === 0 ? "No vertex is fixed by Frobenius for this p (nothing is defined over F_p)." :
-        nComp === 1 ? "The spine is connected." : `The spine has ${nComp} connected components.`;
+      stats.textContent = (n === 0 ? "No vertex is fixed by Frobenius for this p (nothing is defined over F_p)." :
+        nComp === 1 ? "The spine is connected." : `The spine has ${nComp} connected components.`) +
+        (moved ? ` (The spine for p = ${moved} is empty, so this is the nearest prime with a nonempty one.)` : "");
     } else {
       caption.textContent = cfg.caption(p, n);
       const lam = g.lambda2;
@@ -263,10 +293,21 @@ function init(root, index, base) {
     root.dataset.kind = kind;
 
     const movable = nodes.filter((nd) => adj[nd.i].length);
+    root.dataset.mode = mode;
+    svg.classList.toggle("wm-ball-mode", mode === "ball");
+    ball = null;
+    ballStatus.hidden = mode !== "ball";
+    if (mode === "ball") {
+      trail = []; paintTrail();
+      if (reduced) {              // no animation: show one finished ball
+        startBall(0);
+        while (!ball.done) stepBall(0);
+      } else ballStatus.textContent = "";
+    }
     walker = { at: movable.length ? movable[Math.floor(Math.random() * movable.length)].i : 0,
                next: null, strand: null, t0: 0 };
     trail = [];
-    walkerDot.style.display = reduced || !strands.length ? "none" : "";
+    walkerDot.style.display = reduced || !strands.length || mode === "ball" ? "none" : "";
   }
 
   // The simulation runs in its own coordinates; the view scales and centres it
@@ -373,10 +414,93 @@ function init(root, index, base) {
     });
     painted = trail.slice();
   }
+  // ---- growing ball -------------------------------------------------------
+  // Breadth-first search from a random centre v, one layer at a time. Frobenius is
+  // an automorphism of the graph, so the ball B_r(v) contains a pair {w, w^(p)}
+  // exactly when B_r(v) and B_r(v^(p)) share a vertex w not fixed by Frobenius.
+  const shortLabel = (i) => {
+    const l = state.graph.nodes[i];
+    return Array.isArray(l) ? `(${l[0]}, ${l[1]})` : `j = ${l}`;
+  };
+  function startBall(now, at) {
+    const n = state.nodes.length;
+    const center = at ?? Math.floor(Math.random() * n);
+    ball = { center, dist: new Map([[center, 0]]), parent: new Map(), layers: [[center]],
+             r: 0, t0: now, done: null, holdUntil: 0 };
+    paintBall();
+  }
+  function stepBall(now) {
+    const b = ball, sigma = state.sigma, next = [];
+    for (const u of b.layers[b.r]) {
+      for (const { to, strand } of state.adj[u]) {
+        if (b.dist.has(to)) continue;
+        b.dist.set(to, b.r + 1);
+        b.parent.set(to, { from: u, strand });
+        next.push(to);
+      }
+    }
+    if (!next.length) {
+      b.done = { none: true };
+    } else {
+      b.layers.push(next);
+      b.r += 1;
+      // Any new pair has a member in the new layer. Prefer the one closest to the centre.
+      let best = null;
+      for (const w of next) {
+        const c = sigma[w];
+        if (c === w || !b.dist.has(c)) continue;
+        const score = b.dist.get(w) + b.dist.get(c);
+        if (!best || score < best.score) best = { w, c, score };
+      }
+      b.done = best;
+    }
+    if (b.done) b.holdUntil = now + BALL_HOLD;
+    paintBall();
+  }
+  function growBall(now) {
+    if (!state.nodes.length) return;
+    if (!ball) { startBall(now); return; }
+    if (ball.done) { if (now >= ball.holdUntil) startBall(now); return; }
+    if (now - ball.t0 >= BALL_MS[speedSelect.value]) { ball.t0 = now; stepBall(now); }
+  }
+  function paintBall() {
+    const b = ball, n = state.nodes.length;
+    const hit = b.done && !b.done.none ? [b.done.w, b.done.c] : [];
+    const geo = new Set();               // the strands of the two shortest paths
+    for (const x of hit) {
+      for (let y = x; b.parent.has(y); y = b.parent.get(y).from) geo.add(b.parent.get(y).strand);
+    }
+    for (const nd of state.nodes) {
+      const d = b.dist.get(nd.i), c = nd.circle;
+      c.classList.toggle("wm-g-out", d === undefined);
+      c.classList.toggle("wm-g-front", d !== undefined && d === b.r && b.r > 0 && !b.done);
+      c.classList.toggle("wm-g-center", nd.i === b.center);
+      c.classList.toggle("wm-g-hit", hit.includes(nd.i));
+      const r0 = nd.pair ? state.r * 1.35 : state.r;
+      c.setAttribute("r", hit.includes(nd.i) || nd.i === b.center ? r0 * 1.6 : r0);
+    }
+    for (const st of state.strands) {
+      st.path.classList.toggle("wm-g-inball", b.dist.has(st.s) && b.dist.has(st.t));
+      st.path.classList.toggle("wm-g-geo", geo.has(st));
+    }
+    const size = b.dist.size, root2 = Math.sqrt(n).toFixed(1);
+    if (b.done && b.done.none) {
+      ballStatus.textContent = `The ball around ${shortLabel(b.center)} filled the graph without ` +
+        "meeting a conjugate pair (every vertex it reached is defined over F_p).";
+    } else if (b.done) {
+      ballStatus.textContent = `Radius ${b.r}: the ball around ${shortLabel(b.center)} ` +
+        `(${size} of ${n} vertices; √n ≈ ${root2}) now contains the conjugate pair ` +
+        `${shortLabel(b.done.w)} and ${shortLabel(b.done.c)}. The pair is in red; bold: shortest paths from the centre to each.`;
+    } else {
+      ballStatus.textContent = `Growing a ball around ${shortLabel(b.center)}: radius ${b.r}, ` +
+        `${size} of ${n} vertices.`;
+    }
+  }
+
   function frame(now) {
     raf = 0;
     if (!visible || document.hidden) return;
-    positionWalker(now);
+    if (mode === "ball") growBall(now); else positionWalker(now);
     raf = requestAnimationFrame(frame);
   }
   function startLoop() {
@@ -440,6 +564,11 @@ function init(root, index, base) {
       dragging = state.dragging = false;
       nd.fx = nd.fy = null;
       if (!reduced) state.sim.alphaTarget(0);
+      if (!moved && mode === "ball") {   // in ball mode a tap grows a ball from that vertex
+        startBall(performance.now(), nd.i);
+        if (reduced) while (!ball.done) stepBall(0);
+        return;
+      }
       if (!moved) {            // a tap or click pins the label
         hideTip();
         if (state.pinned === nd.i) state.pinned = null;
@@ -467,6 +596,7 @@ function init(root, index, base) {
     paintTrail();
   });
   viewSelect.addEventListener("change", () => { build().then(startLoop); });
+  animSelect.addEventListener("change", () => { mode = animSelect.value; build().then(startLoop); });
   speedSelect.addEventListener("change", () => { hopMs = SPEEDS[speedSelect.value]; });
 
   // Only animate while the figure is on screen and the tab is visible.
@@ -484,10 +614,13 @@ function init(root, index, base) {
   build().then(() => { startLoop(); root.classList.add("wm-graph-ready"); });
 }
 
+// The data sits at assets/data/isogeny/, next to this script's folder, so the same
+// widget works on any page.
 const root = document.getElementById("wm-graph");
 if (root) {
-  fetch(`${root.dataset.src}/index.json`)
+  const base = new URL("../data/isogeny", import.meta.url).href;
+  fetch(`${base}/index.json`)
     .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then((index) => init(root, index, root.dataset.src))
+    .then((index) => init(root, index, base))
     .catch(() => root.classList.add("wm-graph-failed"));
 }

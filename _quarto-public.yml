@@ -14,6 +14,14 @@ website:
             text: Blog
           - href: notes/index.qmd
             text: Expository Notes
+      - text: Animations
+        menu:
+          - href: animations/walks.qmd
+            text: Random walks
+          - href: animations/balls.qmd
+            text: Growing balls
+          - href: animations/spines.qmd
+            text: Spines
       # STATEMENTS: hidden from the public for now. To show it, copy the "Statements"
       # entry from _quarto-private.yml to this spot, and delete "draft: true" in each
       # statement you list.

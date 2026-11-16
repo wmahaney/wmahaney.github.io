@@ -1,0 +1,15 @@
+---
+title: "Animations"
+description-meta: "Interactive pictures of supersingular isogeny graphs: random walks, growing balls, and spines."
+---
+
+Pictures of the supersingular isogeny graphs I work on. Every graph is computed from scratch (the arithmetic in $\mathbb{F}_{p^2}$ and Vélu's formulas, with consistency checks), for primes up to 5000.
+
+[Random walks](walks.qmd)
+: A random walk on the 2-isogeny graph, the (2,3)-isogeny graph, and the versions with level-3 and level-5 structure. Each graph can be shown whole, folded by Frobenius, or restricted to its spine.
+
+[Growing balls](balls.qmd)
+: A ball grows around a random curve until it contains a curve and its Frobenius conjugate. That takes about $\sqrt{n}$ vertices.
+
+[Spines](spines.qmd)
+: Pictures of the $\mathbb{F}_p$-rational part of each graph, for one prime in each residue class.

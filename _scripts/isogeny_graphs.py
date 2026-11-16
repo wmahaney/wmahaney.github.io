@@ -839,9 +839,20 @@ def main():
         f = out / f"p{p}.json"
         f.write_text(json.dumps(res, separators=(",", ":")) + "\n")
         total += f.stat().st_size
-    (out / "index.json").write_text(json.dumps(
-        {"primes": primes, "level_max_p": LEVEL_MAX_P, "level5_max_p": LEVEL5_MAX_P}, separators=(",", ":")) + "\n")
+    write_index(out, primes)
     print(f"wrote {len(primes)} files to {out} ({total} bytes in all)")
+
+
+def write_index(out: Path, primes) -> None:
+    """index.json: the primes on offer, the size caps, and the size of each spine
+    (so the page can mark primes whose spine is empty without loading them)."""
+    spine = {}
+    for p in primes:
+        g = json.loads((out / f"p{p}.json").read_text())["graphs"]
+        spine[str(p)] = {k: sum(v["fp"]) for k, v in g.items()}
+    (out / "index.json").write_text(json.dumps(
+        {"primes": primes, "level_max_p": LEVEL_MAX_P, "level5_max_p": LEVEL5_MAX_P,
+         "spine": spine}, separators=(",", ":")) + "\n")
 
 
 if __name__ == "__main__":

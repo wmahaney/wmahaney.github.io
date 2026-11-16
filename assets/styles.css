@@ -769,3 +769,34 @@ body.quarto-dark .quarto-color-scheme-toggle .bi::before,
   body { background: #fff !important; }
   .wm-cv-item { break-inside: avoid; }
 }
+
+/* ---- Growing-ball animation (isogeny-hero.js, animation = growing ball) ---- */
+.wm-graph[data-mode="ball"] .wm-graph-history,
+.wm-graph[data-mode="ball"] .wm-graph-legend-walk,
+.wm-graph:not([data-mode="ball"]) .wm-graph-legend-ball { display: none; }
+.wm-graph-view select:disabled { opacity: 0.5; cursor: not-allowed; }
+.wm-graph-ball-status {
+  display: block;
+  font-family: var(--wm-sans);
+  font-size: 0.85rem;
+  color: var(--wm-ink);
+  min-height: 2.6em;           /* the line length changes as the ball grows */
+}
+.wm-graph-ball-status[hidden] { display: none; }
+.wm-ball-mode .wm-g-edge { opacity: 0.16; }
+.wm-ball-mode.wm-dense .wm-g-edge { opacity: 0.1; }
+.wm-ball-mode .wm-g-node { transition: opacity 0.25s ease, r 0.25s ease; }
+.wm-ball-mode .wm-g-node.wm-g-out { opacity: 0.25; }
+.wm-ball-mode .wm-g-edge.wm-g-inball { opacity: 0.85; stroke-width: 1.8; }
+.wm-ball-mode.wm-dense .wm-g-edge.wm-g-inball { opacity: 0.75; stroke-width: 1.4; }
+.wm-ball-mode .wm-g-node.wm-g-front { stroke: var(--wm-ink); stroke-width: 1.8; }
+.wm-ball-mode .wm-g-node.wm-g-center { stroke: var(--wm-ink); stroke-width: 3; }
+.wm-ball-mode .wm-g-node.wm-g-hit { fill: var(--wm-red); stroke: var(--wm-ink); stroke-width: 2.5; }
+.wm-ball-mode .wm-g-edge.wm-g-geo { stroke: var(--wm-ink); stroke-width: 3.4; opacity: 1; }
+.wm-key-ball { width: 0.75rem; height: 0.75rem; border-radius: 50%;
+  background: var(--wm-accent); border: 2px solid var(--wm-ink); }
+.wm-key-hit { width: 1rem; height: 3px; border-radius: 2px; background: var(--wm-ink); margin-left: 0.5rem; }
+.wm-ball-chart { display: block; width: 100%; height: auto; margin: 1rem 0; }
+.wm-ball-mode.wm-dense .wm-g-node.wm-g-front { stroke-width: 0.8; }
+.wm-ball-mode.wm-dense .wm-g-node.wm-g-center,
+.wm-ball-mode.wm-dense .wm-g-node.wm-g-hit { stroke-width: 1.5; }

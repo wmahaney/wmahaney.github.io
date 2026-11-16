@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Draw the spines of the isogeny graphs, for the gallery page (graphs/index.qmd).
+"""Draw the spines of the isogeny graphs, for the Spines page (animations/spines.qmd).
 
 The spine of a graph is its set of Frobenius-fixed vertices (the F_p-rational
 ones) together with the edges between them. This script computes each graph with

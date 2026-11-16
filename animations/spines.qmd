@@ -1,9 +1,11 @@
 ---
 title: "Spines of isogeny graphs"
 description-meta: "Pictures of the F_p-rational part (the spine) of supersingular isogeny graphs, with and without level structure."
+aliases:
+  - /graphs/index.html
 ---
 
-The graph on the [home page](../index.qmd) has three views. The **spine** view keeps only the vertices fixed by Frobenius, that is, the curves defined over $\mathbb{F}_p$ (for level structure: the pairs $(E, C)$ fixed by $(E, C)\mapsto(E^{(p)}, C^{(p)})$), and the edges between them. The **folded** view is the quotient of the whole graph by Frobenius: each conjugate pair becomes one vertex, and an edge is an orbit of edges.
+The [random walk](walks.qmd) graph has three views. The **spine** view keeps only the vertices fixed by Frobenius, that is, the curves defined over $\mathbb{F}_p$ (for level structure: the pairs $(E, C)$ fixed by $(E, C)\mapsto(E^{(p)}, C^{(p)})$), and the edges between them. The **folded** view is the quotient of the whole graph by Frobenius: each conjugate pair becomes one vertex, and an edge is an orbit of edges.
 
 The pictures below are the spines for one prime in each residue class. They were computed with `_scripts/isogeny_graphs.py` and drawn by `_scripts/spine_diagrams.py` (the arithmetic is done from scratch in $\mathbb{F}_{p^2}$ with Vélu's formulas, and every graph passes the consistency checks listed at the top of the first script). Blue edges are 2-isogenies, red edges are 3-isogenies, a loop is an isogeny from a vertex to itself, and several edges between two vertices are drawn as parallel arcs. These are observations from the primes shown, not proofs.
 
