@@ -156,7 +156,7 @@
       <dt data-term="fp">Fixed by Frobenius (gold)</dt>
       <dd>A vertex isomorphic to its Frobenius image. Without level structure this means its j-invariant lies in F<sub>p</sub> (b = 0). With level structure Frobenius moves the level structure too, so it is a stronger condition: (E, C) ≅ (E<sup>(p)</sup>, C<sup>(p)</sup>), i.e. the pair is defined over F<sub>p</sub>.</dd>
       <dt data-term="frobenius">Frobenius</dt>
-      <dd>Raising every coordinate to the p-th power sends a curve E to a curve E<sup>(p)</sup> and a subgroup K of E to a subgroup K<sup>(p)</sup> of E<sup>(p)</sup>; on j-invariants it is a + bi ↦ a − bi. It sends the edge E → E/K to the edge E<sup>(p)</sup> → E<sup>(p)</sup>/K<sup>(p)</sup>, so it is a symmetry of the whole graph, on vertices and on edges, and applying it twice gives back every vertex and edge.</dd>
+      <dd>Raising every coordinate to the p-th power sends a curve E to a curve E<sup>(p)</sup> and a subgroup K of E to a subgroup K<sup>(p)</sup> of E<sup>(p)</sup>; on j-invariants it is a + bi ↦ a − bi. It sends the edge E → E/K to the edge E<sup>(p)</sup> → E<sup>(p)</sup>/K<sup>(p)</sup>, so it is a symmetry of the whole graph, on vertices and on edges. Applying it twice gives back every vertex and edge, except with Γ<sub>1</sub>(5) structure when p ≡ ±2 (mod 5), where it takes four applications.</dd>
       <dt data-term="pair">Conjugate pair</dt>
       <dd>A vertex E and its Frobenius image E<sup>(p)</sup>, when the two are different.</dd>
       <dt data-term="full">Full graph</dt>
