@@ -23,6 +23,8 @@ website:
             text: Growing balls
           - href: animations/spines.qmd
             text: Spines
+          - href: animations/about.qmd
+            text: About these graphs
       - text: Statements
         menu:
           - href: statements/research/index.qmd

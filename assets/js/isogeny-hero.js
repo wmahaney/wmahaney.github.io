@@ -33,18 +33,20 @@ const KINDS = {
   },
 };
 
-// The three ways to look at each graph.
-//  full    every vertex.
-//  folded  the quotient by Frobenius (E, C) -> (E^(p), C^(p)): conjugate pairs become one vertex.
-//  spine   only the vertices fixed by Frobenius (the F_p-rational ones), and the edges among them.
+// The three ways to look at each graph (the data come from _scripts/isogeny_graphs.py).
+//  full    every vertex and edge.
+//  spine   the subgraph induced on the vertices whose j-invariant (of E) lies in F_p:
+//          those vertices and every edge between them.
+//  folded  the quotient by Frobenius (E, C) -> (E^(p), C^(p)): vertices are orbits of
+//          vertices, edges are orbits of edges. The edge orbits need Frobenius on edges,
+//          so they are computed by the script ("fold"), not here.
 function derive(g, view) {
-  const n = g.nodes.length, sigma = g.sigma;
-  const base = (i) => ({ label: g.nodes[i], members: [i] });
+  const n = g.nodes.length, sigma = g.sigma, jfp = g.jfp || g.fp;
   if (view === "spine") {
     const keep = [], at = new Map();
-    for (let i = 0; i < n; i++) if (g.fp[i]) { at.set(i, keep.length); keep.push(i); }
+    for (let i = 0; i < n; i++) if (jfp[i]) { at.set(i, keep.length); keep.push(i); }
     return {
-      nodes: keep.map((i) => ({ ...base(i), fp: true })),
+      nodes: keep.map((i) => ({ label: g.nodes[i], members: [i], fp: true })),
       links: g.links.filter(([s, t]) => at.has(s) && at.has(t))
         .map(([s, t, ell, m]) => [at.get(s), at.get(t), ell, m]),
     };
@@ -52,26 +54,36 @@ function derive(g, view) {
   if (view === "folded") {
     const at = new Map(), nodes = [];
     for (let i = 0; i < n; i++) {
-      if (sigma[i] < i) continue;                    // its partner comes first
+      if (sigma[i] < i) continue;                    // the orbit is named by its smaller member
       const pair = sigma[i] !== i;
       at.set(i, nodes.length);
-      if (pair) at.set(sigma[i], nodes.length);
-      nodes.push({ label: g.nodes[i], members: pair ? [i, sigma[i]] : [i], fp: !pair, pair });
+      nodes.push({ label: g.nodes[i], members: pair ? [i, sigma[i]] : [i], fp: jfp[i], pair });
     }
-    // An edge of the quotient is a Frobenius-orbit of edges of the original graph.
-    const seen = new Set(), links = [];
-    const norm = (a, b) => (a <= b ? [a, b] : [b, a]);
-    for (const [s, t, ell, m] of g.links) {
-      const [a, b] = norm(s, t), [c, d] = norm(sigma[s], sigma[t]);
-      const key = `${ell}|${a < c || (a === c && b <= d) ? `${a}-${b}` : `${c}-${d}`}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      links.push([...norm(at.get(s), at.get(t)), ell, m]);
-    }
-    return { nodes, links };
+    return { nodes, links: g.fold.map(([s, t, ell, m]) => [at.get(s), at.get(t), ell, m]) };
   }
-  return { nodes: g.nodes.map((_, i) => ({ ...base(i), fp: g.fp[i] })), links: g.links };
+  return { nodes: g.nodes.map((label, i) => ({ label, members: [i], fp: jfp[i] })), links: g.links };
 }
+
+// The j-invariant(s) to write next to a vertex. Labels are strings "a", "a + bi", "bi"
+// (or pairs [j(E), j(E/C)] with level structure, where j(E) is used). A conjugate pair
+// {a + bi, a - bi} is written a ± bi.
+const jOf = (label) => (Array.isArray(label) ? label[0] : label);
+function shortJ(nodes, nd) {
+  const j1 = jOf(nd.label);
+  if (!nd.pair) return j1;
+  const j2 = jOf(nodes[nd.members[1]]);
+  if (j1 === j2) return j1;
+  const parse = (j) => {
+    const m = /^(?:(\d+) \+ )?(\d*)i$/.exec(j);
+    return m ? [m[1] || "0", Number(m[2] || 1)] : null;
+  };
+  const u = parse(j1), v = parse(j2);
+  if (!u || !v || u[0] !== v[0]) return `${j1} / ${j2}`;
+  const b = Math.min(u[1], v[1]), bi = b === 1 ? "i" : `${b}i`;
+  return u[0] === "0" ? `±${bi}` : `${u[0]} ± ${bi}`;
+}
+// Labels are drawn only for graphs up to this many vertices; beyond that, hover instead.
+const LABEL_MAX = 60;
 
 function components(n, links) {
   const parent = [...Array(n).keys()];
@@ -112,6 +124,8 @@ function init(root, index, base) {
   const viewSelect = root.querySelector(".wm-graph-view select");
   const animSelect = root.querySelector(".wm-graph-anim");
   const ballStatus = root.querySelector(".wm-graph-ball-status");
+  const labelBox = root.querySelector(".wm-graph-labels input");
+  const eye = root.querySelector(".wm-graph-eye");
   const legendPair = root.querySelector(".wm-graph-legend-pair");
   const trailLabel = root.querySelector(".wm-trail-n");
   const buttons = [...root.querySelectorAll("[data-kind]")];
@@ -123,6 +137,7 @@ function init(root, index, base) {
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   const gEdges = el("g", { class: "wm-g-edges" }, svg);
   const gNodes = el("g", { class: "wm-g-nodes" }, svg);
+  const gLabels = el("g", { class: "wm-g-labels", "aria-hidden": "true" }, svg);
   const walkerDot = el("circle", { class: "wm-g-walker", r: 5 }, svg);
 
   const state = {
@@ -226,6 +241,10 @@ function init(root, index, base) {
     const rOf = (nd) => (nd.pair ? r * 1.35 : r);
     gEdges.replaceChildren();
     gNodes.replaceChildren();
+    gLabels.replaceChildren();
+    const labelled = n <= LABEL_MAX;
+    labelBox.disabled = !labelled;
+    labelBox.parentNode.title = labelled ? "" : `Labels are shown for graphs with at most ${LABEL_MAX} vertices; hover a vertex instead.`;
     for (const st of strands) {
       st.path = el("path", { class: `wm-g-edge wm-g-edge-${st.ell}` }, gEdges);
     }
@@ -235,7 +254,12 @@ function init(root, index, base) {
         r: rOf(nd), tabindex: "-1",
       }, gNodes);
       attachNodeEvents(nd);
+      if (labelled) {
+        nd.text = el("text", { class: "wm-g-label" }, gLabels);
+        nd.text.textContent = shortJ(g.nodes, nd);
+      }
     }
+    gLabels.style.display = labelled && labelBox.checked ? "" : "none";
     Object.assign(state, { nodes, strands, adj, pinned: null, r, graph: g, sigma: g.sigma });
     painted = [];
     hideTip();
@@ -264,11 +288,11 @@ function init(root, index, base) {
     if (view === "folded") {
       caption.textContent = cfg.caption(p, nFull).replace(/ in characteristic/, " folded by Frobenius, in characteristic")
         .replace(/: .*$/, `: ${n} vertices, the orbits of Frobenius on ${nFull} vertices.`);
-      stats.textContent = `${nFixed} fixed by Frobenius (the spine) and ${(nFull - nFixed) / 2} conjugate pairs. ` +
-        `Edges are Frobenius-orbits of edges.`;
+      stats.textContent = `${nFixed} vertices fixed by Frobenius and ${(nFull - nFixed) / 2} conjugate pairs ` +
+        "(drawn larger). Edges are Frobenius-orbits of edges.";
     } else if (view === "spine") {
-      caption.textContent = cfg.caption(p, nFull).replace(/ in characteristic/, " restricted to its spine, in characteristic")
-        .replace(/: .*$/, `: the ${n} vertices defined over F_p, of ${nFull}, and the edges between them.`);
+      caption.textContent = cfg.caption(p, nFull).replace(/ in characteristic/, ", spine, in characteristic")
+        .replace(/: .*$/, `: the subgraph induced on the ${n} of ${nFull} vertices with j-invariant in F_p.`);
       stats.textContent = n === 0 ? "The spine is empty." :
         nComp === 1 ? "The spine is connected." :
         nComp === n ? `The spine is totally disconnected: ${n} vertices and no edges between them.` :
@@ -278,7 +302,7 @@ function init(root, index, base) {
       const lam = g.lambda2;
       stats.textContent = (lam == null ? "" :
         `Second-largest eigenvalue modulus ${lam.toFixed(3)} ≤ ${cfg.bound} ≈ ${cfg.boundVal.toFixed(3)}. `) +
-        `${nFixed} of the ${n} vertices are defined over F_p (the spine).`;
+        `${(g.jfp || g.fp).filter(Boolean).length} of the ${n} vertices have j-invariant in F_p (the spine).`;
     }
     legend3.hidden = !cfg.ells.includes(3);
     if (legendFp) legendFp.hidden = !d.nodes.some((nd) => nd.fp);
@@ -290,6 +314,12 @@ function init(root, index, base) {
     fieldNote.replaceChildren("Labels are j-invariants in F", sub("p"), "(i), i",
       sup("2"), ` = ${nr < 0 ? "−" + (-nr) : nr}.`);
     root.dataset.kind = kind;
+    if (eye) {
+      eye.href = `${eye.dataset.base}#graph-${kind}`;
+      eye.dataset.tip = view === "full" ? "Learn more about this graph" :
+        `Learn more about this graph and its ${view === "spine" ? "spine" : "folded version"}`;
+      eye.setAttribute("aria-label", eye.dataset.tip);
+    }
 
     const movable = nodes.filter((nd) => adj[nd.i].length);
     root.dataset.mode = mode;
@@ -366,6 +396,14 @@ function init(root, index, base) {
     for (const nd of state.nodes) {
       nd.circle.setAttribute("cx", f(nd.sx));
       nd.circle.setAttribute("cy", f(nd.sy));
+    }
+    if (gLabels.style.display !== "none") {
+      const off = state.r + 2.5;
+      for (const nd of state.nodes) {
+        if (!nd.text) continue;
+        nd.text.setAttribute("x", f(nd.sx + off));
+        nd.text.setAttribute("y", f(nd.sy - off * 0.6));
+      }
     }
     for (const st of state.strands) {
       const g = geometry(st);
@@ -460,11 +498,8 @@ function init(root, index, base) {
   });
 
   // ---- empty or totally disconnected spines --------------------------------
-  // Why a spine can be empty: a supersingular curve over F_p (p > 3) has trace 0, so
-  // its Frobenius pi satisfies pi^2 = -p. A subgroup of order N (N = 3 or 5, prime)
-  // that Frobenius preserves is an eigenline of pi on E[N], whose eigenvalue would be a
-  // square root of -p mod N. There is none for p = 1 (mod 3), or p = 2, 3 (mod 5).
-  const LEVEL = { "2b3": 3, "23b5": 5 };
+  // With the spine induced on the vertices with j in F_p it is never empty (every p
+  // has supersingular j-invariants in F_p), but the message is kept as a safeguard.
   const emptyBox = document.createElement("div");
   emptyBox.className = "wm-graph-empty";
   emptyBox.hidden = true;
@@ -480,24 +515,12 @@ function init(root, index, base) {
     emptyBox.classList.toggle("wm-graph-empty-top", !!info && info.n > 0);
     if (!info) return;
     const { kind, p, n, alternative } = info;
-    const N = LEVEL[kind];
     const head = document.createElement("strong");
     const text = document.createElement("div");
     text.className = "wm-graph-empty-text";
     if (n === 0) {
       head.textContent = "Empty spine";
-      text.append(`No vertex is fixed by Frobenius for p = ${p}, so the spine is empty, not just disconnected.`);
-      if (N) {
-        // The reason, folded away on small screens so the buttons stay in view.
-        const why = document.createElement("details");
-        why.open = window.matchMedia("(min-width: 576px)").matches;
-        const summary = document.createElement("summary");
-        summary.textContent = "Why?";
-        why.append(summary, "On a curve over F", sub("p"), ` Frobenius satisfies π² = −p, and −p has no ` +
-          `square root mod ${N} when p ≡ ${p % N} (mod ${N}), so no subgroup of order ${N} is ` +
-          "stable under Frobenius.");
-        text.append(why);
-      }
+      text.append(`No vertex of this graph has its j-invariant in F`, sub("p"), ` for p = ${p}.`);
     } else {
       head.textContent = "Totally disconnected spine";
       text.append(`For p = ${p} the spine has ${n} vertices but no edges between them.`);
@@ -573,6 +596,7 @@ function init(root, index, base) {
     for (const nd of state.nodes) {
       const d = b.dist.get(nd.i), c = nd.circle;
       c.classList.toggle("wm-g-out", d === undefined);
+      if (nd.text) nd.text.classList.toggle("wm-g-out", d === undefined);
       c.classList.toggle("wm-g-front", d !== undefined && d === b.r && b.r > 0 && !b.done);
       c.classList.toggle("wm-g-center", nd.i === b.center);
       c.classList.toggle("wm-g-hit", hit.includes(nd.i));
@@ -619,10 +643,13 @@ function init(root, index, base) {
     const nbrs = new Set(state.adj[nd.i].map((e) => e.to));
     nbrs.add(nd.i);
     const hot = new Set(state.adj[nd.i].map((e) => e.strand));
-    state.nodes.forEach((m) => m.circle.classList.toggle("wm-g-dim", !nbrs.has(m.i)));
+    state.nodes.forEach((m) => {
+      m.circle.classList.toggle("wm-g-dim", !nbrs.has(m.i));
+      if (m.text) m.text.classList.toggle("wm-g-dim", !nbrs.has(m.i));
+    });
     state.strands.forEach((s) => s.path.classList.toggle("wm-g-dim", !hot.has(s)));
     nd.circle.classList.add("wm-g-focus");
-    tip.replaceChildren(labelOf(nd), ...(nd.fp ? [" · defined over F", sub("p")] : []));
+    tip.replaceChildren(labelOf(nd), ...(nd.fp ? [" · j ∈ F", sub("p")] : []));
     tip.hidden = false;
     const box = svg.getBoundingClientRect(), host = root.getBoundingClientRect();
     const px = box.left - host.left + (nd.sx / W) * box.width;
@@ -632,7 +659,10 @@ function init(root, index, base) {
   }
   function hideTip() {
     tip.hidden = true;
-    state.nodes.forEach((m) => m.circle.classList.remove("wm-g-dim", "wm-g-focus"));
+    state.nodes.forEach((m) => {
+      m.circle.classList.remove("wm-g-dim", "wm-g-focus");
+      if (m.text) m.text.classList.remove("wm-g-dim");
+    });
     state.strands.forEach((s) => s.path.classList.remove("wm-g-dim"));
   }
   function attachNodeEvents(nd) {
@@ -696,6 +726,10 @@ function init(root, index, base) {
     paintTrail();
   });
   viewSelect.addEventListener("change", () => { build().then(startLoop); });
+  labelBox.addEventListener("change", () => {
+    gLabels.style.display = labelBox.checked && !labelBox.disabled ? "" : "none";
+    draw();
+  });
   animSelect.addEventListener("change", () => { mode = animSelect.value; build().then(startLoop); });
   speedSelect.addEventListener("change", () => { hopMs = SPEEDS[speedSelect.value]; });
 

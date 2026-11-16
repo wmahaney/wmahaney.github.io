@@ -3,7 +3,7 @@ title: "Random walks"
 description-meta: "A random walk on supersingular isogeny graphs, whole, folded by Frobenius, or on the spine."
 ---
 
-A random walk on a supersingular isogeny graph, with its recent steps highlighted. Choose the graph and the prime $p$ above the picture. The **view** menu shows the whole graph, the graph **folded** by Frobenius (each pair $\{E, E^{(p)}\}$ becomes one vertex, drawn larger, and each edge is an orbit of edges), or only the **spine** (the vertices defined over $\mathbb{F}_p$ and the edges between them). Switch the **animation** to *growing ball* for the [growing-ball animation](balls.qmd).
+A random walk on a supersingular isogeny graph, with its recent steps highlighted. Choose the graph and the prime $p$ above the picture. The **view** menu shows the whole graph; the **spine**, the subgraph induced on the vertices whose $j$-invariant lies in $\mathbb{F}_p$; or the graph **folded** by Frobenius, the quotient whose vertices are the Frobenius-orbits of vertices (a conjugate pair is drawn larger) and whose edges are the Frobenius-orbits of edges. Vertices are labelled by their $j$-invariants on graphs of up to 60 vertices; hover for the others. The eye in the corner links to [exact definitions](about.qmd). Switch the **animation** to *growing ball* for the [growing-ball animation](balls.qmd).
 
 {{< include /_partials/isogeny-widget.qmd >}}
 
@@ -11,4 +11,4 @@ A random walk on a supersingular isogeny graph, with its recent steps highlighte
 <script type="module" src="../assets/js/isogeny-hero.js"></script>
 ```
 
-The level-3 graph has pairs $(E, C)$ with $C$ a subgroup of order 3 as vertices, and a 2-isogeny $\varphi\colon E\to E'$ gives an edge $(E, C)\to(E', \varphi(C))$; the level-5 graph is the same with subgroups of order 5 and both 2- and 3-isogenies. In the spine view some primes are marked *(empty spine)*: for those no vertex is fixed by Frobenius, for instance the level-3 graph when $p \equiv 1 \pmod 3$. Choosing one explains why and offers a nearby prime instead. There are pictures of the spines on the [Spines](spines.qmd) page.
+The level-3 graph has pairs $(E, C)$ with $C$ a subgroup of order 3 as vertices, and a 2-isogeny $\varphi\colon E\to E'$ gives an edge $(E, C)\to(E', \varphi(C))$; the level-5 graph is the same with subgroups of order 5 and both 2- and 3-isogenies. There are pictures of the spines on the [Spines](spines.qmd) page.

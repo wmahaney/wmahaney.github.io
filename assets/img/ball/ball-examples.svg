@@ -185,7 +185,7 @@
 <line x1="245.5" y1="108.0" x2="242.7" y2="182.1" stroke="#1E2430" stroke-width="3.4" stroke-linecap="round"/>
 <circle cx="200.0" cy="233.0" r="7.5" fill="#B93A2B" stroke="#1E2430" stroke-width="2.5"><title>118 + 164i (distance 0)</title></circle>
 <circle cx="242.7" cy="182.1" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>114 (distance 1)</title></circle>
-<circle cx="261.1" cy="259.3" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>198 (distance 1)</title></circle>
+<circle cx="261.1" cy="259.3" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>198 (distance 1)</title></circle>
 <circle cx="200.0" cy="299.5" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>118 + 47i (distance 1)</title></circle>
 <circle cx="138.9" cy="259.3" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>119 + 22i (distance 1)</title></circle>
 <circle cx="142.4" cy="199.8" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>119 + 189i (distance 1)</title></circle>
@@ -197,7 +197,7 @@
 <circle cx="296.7" cy="141.7" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>130 + 166i (distance 2)</title></circle>
 <circle cx="315.2" cy="166.5" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>183 + 100i (distance 2)</title></circle>
 <circle cx="327.4" cy="194.9" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>183 + 111i (distance 2)</title></circle>
-<circle cx="332.8" cy="225.3" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>28 (distance 2)</title></circle>
+<circle cx="332.8" cy="225.3" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>28 (distance 2)</title></circle>
 <circle cx="331.0" cy="256.1" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>118 + 47i (distance 2)</title></circle>
 <circle cx="322.1" cy="285.7" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>130 + 45i (distance 2)</title></circle>
 <circle cx="306.7" cy="312.4" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>135 + 3i (distance 2)</title></circle>
@@ -215,8 +215,8 @@
 <circle cx="72.6" cy="194.9" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>45 + 162i (distance 2)</title></circle>
 <circle cx="84.8" cy="166.5" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>130 + 166i (distance 2)</title></circle>
 <circle cx="103.3" cy="141.7" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>183 + 100i (distance 2)</title></circle>
-<circle cx="126.9" cy="121.9" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>40 (distance 2)</title></circle>
-<circle cx="154.5" cy="108.0" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>198 (distance 2)</title></circle>
+<circle cx="126.9" cy="121.9" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>40 (distance 2)</title></circle>
+<circle cx="154.5" cy="108.0" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>198 (distance 2)</title></circle>
 <circle cx="184.6" cy="100.9" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>135 + 3i (distance 2)</title></circle>
 <text x="257.5" y="112.0" font-size="11.5" text-anchor="start" fill="#1E2430" stroke="#FFFDF7" stroke-width="3" paint-order="stroke">118 + 47i</text>
 <text x="212.0" y="237.0" font-size="11.5" text-anchor="start" fill="#1E2430" stroke="#FFFDF7" stroke-width="3" paint-order="stroke">118 + 164i</text>
@@ -228,9 +228,9 @@
 <circle cx="217" cy="898" r="5" fill="#2B4FB8"/>
 <text x="227" y="902" font-size="12" fill="#5A6070">curve</text>
 <circle cx="283" cy="898" r="5" fill="#E5A11C"/>
-<text x="293" y="902" font-size="12" fill="#5A6070">defined over F_p</text>
-<circle cx="426" cy="898" r="5" fill="#B93A2B"/>
-<text x="436" y="902" font-size="12" fill="#5A6070">the conjugate pair</text>
-<line x1="578" y1="898" x2="596" y2="898" stroke="#1E2430" stroke-width="3.4"/>
-<text x="602" y="902" font-size="12" fill="#5A6070">shortest paths</text>
+<text x="293" y="902" font-size="12" fill="#5A6070">j-invariant in F_p</text>
+<circle cx="440" cy="898" r="5" fill="#B93A2B"/>
+<text x="450" y="902" font-size="12" fill="#5A6070">the conjugate pair</text>
+<line x1="592" y1="898" x2="610" y2="898" stroke="#1E2430" stroke-width="3.4"/>
+<text x="616" y="902" font-size="12" fill="#5A6070">shortest paths</text>
 </svg>

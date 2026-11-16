@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Draw the spines of the isogeny graphs, for the Spines page (animations/spines.qmd).
 
-The spine of a graph is its set of Frobenius-fixed vertices (the F_p-rational
-ones) together with the edges between them. This script computes each graph with
+The spine of a graph is the subgraph induced on the vertices whose j-invariant
+(of E, with level structure) lies in F_p: those vertices and every edge between them. This script computes each graph with
 _scripts/isogeny_graphs.py (all of its consistency checks run), restricts to the
 spine, and writes static SVG files to assets/img/spine/.
 
@@ -46,7 +46,8 @@ def graphs(p: int) -> dict:
 def spine(p: int, kind: str):
     """(multigraph on the fixed vertices, set of special vertices) for G_p(kind)."""
     d = graphs(p)[kind]
-    fixed = [i for i, f in enumerate(d["fp"]) if f]
+    # The spine: the subgraph induced on the vertices whose j-invariant (of E) is in F_p.
+    fixed = [i for i, f in enumerate(d["jfp"]) if f]
     keep = set(fixed)
     G = nx.MultiGraph()
     G.add_nodes_from(fixed)
@@ -60,7 +61,7 @@ def spine(p: int, kind: str):
         j = lab[0] if isinstance(lab, list) else lab
         if j == "0":
             special[i] = "0"
-        elif j == "1728":
+        elif j == str(1728 % p):        # labels store j mod p
             special[i] = "1728"
     return G, special
 
@@ -149,7 +150,7 @@ def panel(p: int, kind: str, note: str) -> str:
                f'{n} vertices, {G.number_of_edges()} edges, {ncomp} {comp_word}</text>')
     if not n:
         out.append(f'<text x="{PW / 2}" y="{PH / 2 + 16}" font-size="14" text-anchor="middle" '
-                   f'fill="{MUTED}">empty: no vertex is fixed by Frobenius</text>')
+                   f'fill="{MUTED}">empty</text>')
         return "\n".join(out)
     r = max(3.4, min(8.5, 6.2 * math.sqrt(k) + 1.4 - 0.06 * n))
     if ncomp > 1:       # a faint card behind each component
@@ -198,7 +199,7 @@ def legend(has3: bool, has_special: bool, y: int) -> str:
     items = [(BLUE, "line", "2-isogeny")]
     if has3:
         items.append((RED, "line", "3-isogeny"))
-    items.append((GOLD, "dot", "fixed by Frobenius"))
+    items.append((GOLD, "dot", "j-invariant in F_p"))
     if has_special:
         items += [(GREEN, "dot", "j = 0"), (PURPLE, "sq", "j = 1728")]
     out, x = [], 8
@@ -246,15 +247,14 @@ def main():
     cases = [(pick("23", lambda p, r=r: p % 24 == r, lo=6, hi=30), f"p ≡ {r} (mod 24)")
              for r in classes]
     figure("spine-23", "23", cases, has3=True)
-    # 3. the 2-isogeny graph with level 3: empty unless p = 2 (mod 3)
-    cases = [(pick("2b3", lambda p, r=r: p % 24 == r, lo=10, hi=42), f"p ≡ {r} (mod 24)")
-             for r in (17, 5, 11, 23)]
+    # 3. the 2-isogeny graph with level 3, by p mod 24
+    cases = [(pick("2b3", lambda p, r=r: p % 24 == r, lo=10, hi=60, start=100), f"p ≡ {r} (mod 24)")
+             for r in classes]
     figure("spine-2b3", "2b3", cases)
-    # 4. the (2,3)-isogeny graph with level 5: empty unless p = +-1 (mod 5)
-    cases = []
-    for r in classes:
-        p = pick("23b5", lambda p, r=r: p % 24 == r and p % 5 in (1, 4), lo=8, hi=60, start=190)
-        cases.append((p, f"p ≡ {r} (mod 24), {p % 5} (mod 5)"))
+    # 4. the (2,3)-isogeny graph with level 5, by p mod 24 (smaller primes: six times
+    #    as many vertices)
+    cases = [(pick("23b5", lambda p, r=r: p % 24 == r, lo=8, hi=60, start=60), f"p ≡ {r} (mod 24)")
+             for r in classes]
     figure("spine-23b5", "23b5", cases, has3=True)
 
 

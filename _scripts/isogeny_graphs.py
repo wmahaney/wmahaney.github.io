@@ -19,9 +19,14 @@ Three graphs are computed for each prime p:
          vertices are pairs (E, C), C < E of order 5; 2- and 3-isogenies
          push C forward.
 
-Every graph also carries "sigma", the permutation induced by Frobenius
-(E -> E^(p), C -> C^(p)). Its fixed vertices are the F_p-rational ones (the "spine");
-the page draws the folded graph (the quotient by sigma) from it.
+Every graph also carries
+  "sigma"  the permutation of the vertices induced by Frobenius (E, C) -> (E^(p), C^(p));
+  "fp"     whether a vertex is fixed by Frobenius;
+  "jfp"    whether its j-invariant (of E) lies in F_p. The spine is the subgraph
+           induced on these vertices; for G_p(2) and G_p({2,3}) jfp = fp;
+  "fold"   the links of the folded graph, the quotient by Frobenius: vertices are
+           Frobenius-orbits of vertices (named by the smaller index), edges are orbits
+           of edges. This needs Frobenius on edges, computed and checked below.
 
 Method. Everything is done with short Weierstrass models y^2 = x^3 + ax + b
 over F_{p^2} and Velu's formulas, so only F_{p^2} arithmetic and root finding
@@ -542,7 +547,7 @@ def borel3_graph(F, js):
     sigma = [verts[frob_inv(F, level_invariant(F, r[0], r[1], r[2]))] for r in reps]
     check_sigma(A, sigma)
     labels = [[F.show(r[3]), F.show(r[4])] for r in reps]
-    return A, labels, sigma
+    return A, labels, sigma, reps
 
 
 # --------------------------------------------------------------------------
@@ -735,7 +740,132 @@ def borel5_graph(F, js):
     check_sigma(A2, sigma)
     check_sigma(A3, sigma)
     labels = [[F.show(r[4]), F.show(r[5])] for r in reps]
-    return A2, A3, labels, sigma
+    return A2, A3, labels, sigma, reps
+
+
+# --------------------------------------------------------------------------
+# Frobenius on edges, and the folded graph.
+#
+# An edge out of a vertex is a kernel on that vertex's fixed model: a 2-torsion
+# x-coordinate e (2-isogeny) or the x-coordinate x0 of a 3-torsion point (3-isogeny).
+# Frobenius sends the edge (v, K) to (sigma(v), K^(p)). The fixed model of sigma(v) is
+# the conjugate of the model of v (model() has coefficients in F_p(j)), so on the
+# 2- and (2,3)-graphs K^(p) is just the conjugate kernel. With level structure the
+# stored representative of sigma(v) can differ from the conjugate representative by
+# an automorphism of the model, x -> c x with c = u^2 (c = -1 needs j = 1728,
+# c a cube root of unity needs j = 0); the kernel is moved by the same c.
+# The folded graph is the quotient by Frobenius: its vertices are the orbits of
+# vertices, its directed edges the orbits of directed edges. It is drawn, like the
+# others, with max(B_ij, B_ji) undirected edges between two vertices.
+# --------------------------------------------------------------------------
+def scalings(F, a, b):
+    """The values c = u^2 for automorphisms (x, y) -> (u^2 x, u^3 y) of y^2 = x^3 + ax + b."""
+    out = [F.one]
+    if b == F.zero:
+        out.append(F.neg(F.one))
+    if a == F.zero:
+        out += roots(F, [F.one, F.one, F.one])          # c^2 + c + 1 = 0
+    return out
+
+
+def edge_sigma(F, edges, sig_v, transport):
+    """edges: list of (src, dst, ell, key). transport(src, key) -> key on sigma(src).
+    Returns the permutation of edges induced by Frobenius, after checking it."""
+    where = {(s, ell, key): k for k, (s, _, ell, key) in enumerate(edges)}
+    sig_e = []
+    for s, t, ell, key in edges:
+        k2 = where.get((sig_v[s], ell, transport(s, key)))
+        assert k2 is not None, "Frobenius image of an edge not found"
+        assert edges[k2][1] == sig_v[t], "Frobenius does not respect the edge's target"
+        sig_e.append(k2)
+    assert all(sig_e[sig_e[k]] == k for k in range(len(edges))), "Frobenius is not an involution on edges"
+    return sig_e
+
+
+def fold_links(edges, sig_v, sig_e):
+    """Undirected links of the quotient graph, with vertices named by the smaller
+    member of each Frobenius orbit."""
+    rep_v = lambda v: min(v, sig_v[v])
+    B, seen = {}, set()
+    for k, (s, t, ell, _) in enumerate(edges):
+        if k in seen:
+            continue
+        seen.update((k, sig_e[k]))
+        key = (rep_v(s), rep_v(t), ell)
+        B[key] = B.get(key, 0) + 1
+    out = []
+    for a, b, ell in sorted({(min(a, b), max(a, b), ell) for a, b, ell in B}):
+        m = B.get((a, b, ell), 0) if a == b else max(B.get((a, b, ell), 0), B.get((b, a, ell), 0))
+        out.append([a, b, ell, m])
+    return out
+
+
+def base_edges(F, js, ell):
+    idx = {j: k for k, j in enumerate(js)}
+    edges = []
+    for s, j in enumerate(js):
+        a, b = model(F, j)
+        if ell == 2:
+            for e in two_torsion(F, a, b):
+                a2, b2, _ = velu2(F, a, b, e)
+                edges.append((s, idx[j_inv(F, a2, b2)], 2, e))
+        else:
+            for x0 in three_torsion(F, a, b):
+                a2, b2 = velu3(F, a, b, x0)
+                edges.append((s, idx[j_inv(F, a2, b2)], 3, x0))
+    sig_v = [idx[F.frob(j)] for j in js]
+    for s, j in enumerate(js):
+        assert model(F, F.frob(j)) == tuple(F.frob(c) for c in model(F, j))
+    sig_e = edge_sigma(F, edges, sig_v, lambda s, key: F.frob(key))
+    return edges, sig_v, sig_e
+
+
+def level_sigma(F, edges, reps, sig_v, kernel_of, A_by_ell):
+    """Frobenius on the edges of a level-structure graph. kernel_of(rep) lists the
+    level data with their weights under x -> c x: [(x0, 1)] or [(s, 1), (q, 2)]."""
+    for ell, A in A_by_ell.items():          # the edge list must match the matrices
+        n = len(A)
+        cnt = [[0] * n for _ in range(n)]
+        for s, t, e_ell, _ in edges:
+            if e_ell == ell:
+                cnt[s][t] += 1
+        assert cnt == A, "edge list disagrees with the adjacency matrix"
+    cs = []
+    for v, r in enumerate(reps):
+        r2 = reps[sig_v[v]]
+        assert (F.frob(r[0]), F.frob(r[1])) == (r2[0], r2[1])
+        for c in scalings(F, r2[0], r2[1]):
+            if all(F.mul(F.pow(c, w), F.frob(x)) == y
+                   for (x, w), (y, _) in zip(kernel_of(r), kernel_of(r2))):
+                cs.append(c)
+                break
+        else:
+            raise AssertionError("no automorphism matches the conjugate level structure")
+    return edge_sigma(F, edges, sig_v, lambda v, key: F.mul(cs[v], F.frob(key)))
+
+
+def level3_edges(F, reps, sig_v, A):
+    verts = {level_invariant(F, r[0], r[1], r[2]): k for k, r in enumerate(reps)}
+    edges = []
+    for v, (a, b, x0, _, _) in enumerate(reps):
+        for e in two_torsion(F, a, b):
+            a2, b2, xmap = velu2(F, a, b, e)
+            edges.append((v, verts[level_invariant(F, a2, b2, xmap(x0))], 2, e))
+    return edges, level_sigma(F, edges, reps, sig_v, lambda r: [(r[2], 1)], {2: A})
+
+
+def level5_edges(F, reps, sig_v, A2, A3):
+    verts = {level5_invariant(F, r[0], r[1], r[2], r[3]): k for k, r in enumerate(reps)}
+    edges = []
+    for v, (a, b, s_, q_, _, _) in enumerate(reps):
+        for e in two_torsion(F, a, b):
+            a2, b2, s2, q2 = push2(F, a, b, e, s_, q_)
+            edges.append((v, verts[level5_invariant(F, a2, b2, s2, q2)], 2, e))
+        for x0 in three_torsion(F, a, b):
+            a3, b3, s3, q3 = push3(F, a, b, x0, s_, q_)
+            edges.append((v, verts[level5_invariant(F, a3, b3, s3, q3)], 3, x0))
+    return edges, level_sigma(F, edges, reps, sig_v, lambda r: [(r[2], 1), (r[3], 2)],
+                              {2: A2, 3: A3})
 
 
 def links_from(A, ell):
@@ -766,7 +896,7 @@ def compute(p: int):
     js = supersingular_js(F)
     A2 = isogeny_adjacency(F, js, 2)
     A3 = isogeny_adjacency(F, js, 3)
-    AB, lab_b, sig_b = borel3_graph(F, js)
+    AB, lab_b, sig_b, reps_b = borel3_graph(F, js)
     lab = [F.show(j) for j in js]
     idx = {j: k for k, j in enumerate(js)}
     sig = [idx[F.frob(j)] for j in js]
@@ -779,7 +909,7 @@ def compute(p: int):
     fp_b = [sig_b[k] == k for k in range(len(sig_b))]
     A25 = None
     if p != 5 and p <= LEVEL5_MAX_P:
-        A25, A35, lab_5, sig_5 = borel5_graph(F, js)
+        A25, A35, lab_5, sig_5, reps_5 = borel5_graph(F, js)
         fp_5 = [sig_5[k] == k for k in range(len(sig_5))]
     lam = {"2": second_eigenvalue([A2]), "23": second_eigenvalue([A2, A3]),
            "2b3": second_eigenvalue([AB]),
@@ -790,25 +920,37 @@ def compute(p: int):
                        ("23b5", 2 * 2 ** 0.5 + 2 * 3 ** 0.5)):
         if lam[key] is not None:
             assert lam[key] <= bound + 1e-6, (p, key, lam[key], bound)
+    # Frobenius on edges, and the folded graphs (the quotient by Frobenius).
+    e2, sv, se2 = base_edges(F, js, 2)
+    e3, _, se3 = base_edges(F, js, 3)
+    assert sv == sig
+    off = len(e2)
+    e23 = e2 + e3
+    se23 = se2 + [k + off for k in se3]
+    eb = level3_edges(F, reps_b, sig_b, AB)
+    jset_fp = {j for j in js if j[1] == 0}
     out = {
         "p": p,
         "nonresidue": F.r if F.r != p - 1 else -1,
         "n_level": len(lab_b),
         "graphs": {
-            "2": {"nodes": lab, "fp": fp, "links": links_from(A2, 2), "sigma": sig,
-                  "lambda2": lam["2"]},
-            "23": {"nodes": lab, "fp": fp,
+            "2": {"nodes": lab, "fp": fp, "jfp": fp, "links": links_from(A2, 2), "sigma": sig,
+                  "fold": fold_links(e2, sig, se2), "lambda2": lam["2"]},
+            "23": {"nodes": lab, "fp": fp, "jfp": fp,
                    "links": links_from(A2, 2) + links_from(A3, 3), "sigma": sig,
-                   "lambda2": lam["23"]},
-            "2b3": {"nodes": lab_b, "fp": fp_b, "links": links_from(AB, 2),
-                    "sigma": sig_b, "lambda2": lam["2b3"]},
+                   "fold": fold_links(e23, sig, se23), "lambda2": lam["23"]},
+            "2b3": {"nodes": lab_b, "fp": fp_b, "jfp": [r[3] in jset_fp for r in reps_b],
+                    "links": links_from(AB, 2), "sigma": sig_b,
+                    "fold": fold_links(eb[0], sig_b, eb[1]), "lambda2": lam["2b3"]},
         },
     }
     if A25 is not None:
+        e5, se5 = level5_edges(F, reps_5, sig_5, A25, A35)
         out["n_level5"] = len(lab_5)
         out["graphs"]["23b5"] = {
-            "nodes": lab_5, "fp": fp_5, "sigma": sig_5,
-            "links": links_from(A25, 2) + links_from(A35, 3), "lambda2": lam["23b5"]}
+            "nodes": lab_5, "fp": fp_5, "jfp": [r[4] in jset_fp for r in reps_5], "sigma": sig_5,
+            "links": links_from(A25, 2) + links_from(A35, 3),
+            "fold": fold_links(e5, sig_5, se5), "lambda2": lam["23b5"]}
     if p > LEVEL_MAX_P:
         del out["graphs"]["2b3"]
     return out
@@ -849,7 +991,7 @@ def write_index(out: Path, primes) -> None:
     spine = {}
     for p in primes:
         g = json.loads((out / f"p{p}.json").read_text())["graphs"]
-        spine[str(p)] = {k: sum(v["fp"]) for k, v in g.items()}
+        spine[str(p)] = {k: sum(v["jfp"]) for k, v in g.items()}
     (out / "index.json").write_text(json.dumps(
         {"primes": primes, "level_max_p": LEVEL_MAX_P, "level5_max_p": LEVEL5_MAX_P,
          "spine": spine}, separators=(",", ":")) + "\n")

@@ -22,6 +22,8 @@ website:
             text: Growing balls
           - href: animations/spines.qmd
             text: Spines
+          - href: animations/about.qmd
+            text: About these graphs
       # STATEMENTS: hidden from the public for now. To show it, copy the "Statements"
       # entry from _quarto-private.yml to this spot, and delete "draft: true" in each
       # statement you list.

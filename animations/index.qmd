@@ -12,4 +12,7 @@ Pictures of the supersingular isogeny graphs I work on. Every graph is computed 
 : A ball grows around a random curve until it contains a curve and its Frobenius conjugate. That takes about $\sqrt{n}$ vertices.
 
 [Spines](spines.qmd)
-: Pictures of the $\mathbb{F}_p$-rational part of each graph, for one prime in each residue class.
+: Pictures of the spine of each graph (the subgraph induced on the vertices with $j$-invariant in $\mathbb{F}_p$), for one prime in each residue class.
+
+[About these graphs](about.qmd)
+: Exact definitions: the four graphs, Frobenius on vertices and edges, the spine, the folded graph. The eye in the corner of each picture links here.

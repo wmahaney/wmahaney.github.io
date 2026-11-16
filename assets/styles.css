@@ -900,3 +900,47 @@ body.quarto-dark .quarto-color-scheme-toggle .bi::before,
 .wm-graph-glossary summary { cursor: pointer; font-weight: 600; color: var(--wm-accent); }
 .wm-graph-glossary dl { margin-top: 0.4rem; }
 .wm-graph:not(.wm-graph-ready) .wm-graph-glossary { display: none; }
+
+/* j-invariant labels on the vertices */
+.wm-g-label {
+  font: 600 9.5px/1 var(--wm-sans);
+  fill: var(--wm-ink);
+  stroke: var(--wm-surface);
+  stroke-width: 3px;
+  paint-order: stroke;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+.wm-g-label.wm-g-dim { opacity: 0.12; }
+.wm-ball-mode .wm-g-label.wm-g-out { opacity: 0.25; }
+.wm-graph-labels { display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer;
+  font: 600 0.85rem/1.2 var(--wm-sans); color: var(--wm-muted); }
+.wm-graph-labels input { accent-color: var(--wm-accent); margin: 0; }
+.wm-graph-labels:has(input:disabled) { opacity: 0.5; cursor: not-allowed; }
+
+/* The eye: "learn more about this graph", like the LMFDB's links to knowls */
+.wm-graph-eye {
+  position: absolute; top: 0.6rem; right: 0.6rem; z-index: 3;
+  display: grid; place-items: center;
+  width: 2.1rem; height: 2.1rem;
+  color: var(--wm-accent);
+  background: var(--wm-surface);
+  border: 1.5px solid var(--wm-line);
+  border-radius: 50%;
+  text-decoration: none;
+}
+.wm-graph-eye:hover, .wm-graph-eye:focus-visible { border-color: var(--wm-accent); outline: none; }
+.wm-graph-eye::after {
+  content: attr(data-tip);
+  position: absolute; right: 0; top: calc(100% + 6px);
+  white-space: nowrap;
+  padding: 0.3rem 0.6rem;
+  font: 600 0.75rem/1.2 var(--wm-sans);
+  color: var(--wm-surface);
+  background: var(--wm-ink);
+  border-radius: 0.5rem;
+  opacity: 0; pointer-events: none;
+  transform: translateY(-3px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.wm-graph-eye:hover::after, .wm-graph-eye:focus-visible::after { opacity: 1; transform: none; }

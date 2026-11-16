@@ -98,7 +98,7 @@ python3 _scripts/isogeny_graphs.py 101 431 1009
 
 then commit the new JSON files. The (2,3)-graph with Borel level-5 structure is stored only up to p = 3000 (`LEVEL5_MAX_P` in the script), and the page offers it only for those primes.
 
-Every graph carries `sigma`, the permutation induced by Frobenius. The page's **view** menu uses it: *folded* is the quotient by Frobenius, *spine* keeps the Frobenius-fixed vertices (the F_p-rational ones). The script checks its own output on every prime (class number
+Each graph's data has `sigma` (Frobenius on vertices), `jfp` (j-invariant in F_p) and `fold` (the edges of the quotient by Frobenius, computed from Frobenius on edges). The **view** menu: the *spine* is the subgraph induced on the vertices with j in F_p; the *folded* graph is the quotient by Frobenius. Exact definitions are on `animations/about.qmd`, which the eye icon on the graph links to. The script checks its own output on every prime (class number
 formula, modular polynomials, the mass formula, Brandt-matrix symmetry, and the Ramanujan bound)
 and stops if a check fails. The method is described at the top of the script.
 

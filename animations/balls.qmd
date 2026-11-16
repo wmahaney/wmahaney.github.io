@@ -21,7 +21,7 @@ So the ball stops growing when the two balls $B_r(v)$ and $B_r(\sigma(v))$ first
 
 ## Four examples
 
-Each picture is one ball, drawn by layer: the start in the middle, the vertices at distance $r$ on the $r$-th circle, and the edges between vertices of the ball (loops and repeated edges are not shown). Vertices defined over $\mathbb{F}_p$ are gold.
+Each picture is one ball, drawn by layer: the start in the middle, the vertices at distance $r$ on the $r$-th circle, and the edges between vertices of the ball (loops and repeated edges are not shown). Vertices with $j$-invariant in $\mathbb{F}_p$ are gold.
 
 ![Balls grown until they contain a conjugate pair, in four graphs.](../assets/img/ball/ball-examples.svg){fig-alt="Four panels. Each shows a ball drawn in concentric layers around a starting vertex, with the conjugate pair in red and the shortest paths to it in black. In all four examples the pair appears at radius 2."}
 
