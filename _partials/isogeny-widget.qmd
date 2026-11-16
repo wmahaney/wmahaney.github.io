@@ -18,7 +18,7 @@
     </section>
     <section data-anim="walk" data-title="Random walks" hidden>
       <p class="wm-anim-title">Random walk</p>
-      <p>A walker starts at a random vertex and moves along the edges. The laser is the step being taken and the trail is its recent history. <span class="wm-anim-which">This is the simple random walk: at each step every isogeny out of the current vertex is equally likely, and an arrow is followed only forwards.</span> The walk is switched off when the graph shown is not connected.</p>
+      <p>A walker starts at a random vertex and moves along the edges. The laser is the step being taken and the trail is its recent history. <span class="wm-anim-which">This is the Petersson walk: at each step every isogeny out of the current curve is equally likely, where isogenies are counted up to sign. A kernel leading to j = 0 then counts three times and one leading to j = 1728 twice, so the walk differs from choosing a kernel at random only next to those two curves.</span> The walk is switched off when the graph shown is not connected.</p>
       <p class="wm-anim-pi" aria-live="polite"></p>
       <p class="wm-anim-params"><span>Parameters</span> graph · view · p · history (how many recent steps stay highlighted) · speed</p>
     </section>
@@ -170,7 +170,7 @@
       <dt data-term="viewer">Graph viewer</dt>
       <dd>Just the graph: hover or tap a vertex for its label, drag to rearrange. The other entries of the animation menu animate it.</dd>
       <dt data-term="walk">Random walk</dt>
-      <dd>The simple random walk on the directed graph shown, starting from a random vertex: at each step the walker takes one of the edges out of its vertex, each with the same probability, and follows arrows only forwards. On G<sub>p</sub>(ℓ) each of the ℓ + 1 kernels is equally likely. The laser beam shows the step being taken; <em>history</em> is how many recent steps stay highlighted; <em>speed</em> is how fast it moves.</dd>
+      <dd>The walker starts at a random vertex. On G<sub>p</sub>(ℓ) and G<sub>p</sub>(L) without level structure it follows the <em>Petersson walk</em>: the probability of stepping from E to E′ is proportional to the number of isogenies from E to E′ of the degrees in use, counted up to sign. That number is the number of kernels times |Aut(E′)|/2, so a kernel leading to j = 0 counts three times and one leading to j = 1728 twice; everywhere else each kernel is equally likely. On the other graphs shown (level structure, the 𝔽<sub>p</sub>-subgraph, the quotient by Frobenius) it is the simple random walk: each edge out of the vertex is equally likely, and arrows are followed only forwards. The laser beam shows the step being taken; <em>history</em> is how many recent steps stay highlighted; <em>speed</em> is how fast it moves.</dd>
       <dt data-term="cycle">Blooming for collision</dt>
       <dd>A ball grows from a vertex one layer at a time (breadth-first search) until it collides with itself: an edge reaches a vertex already in the ball, closing a cycle (a loop counts as length 1, two parallel edges as length 2). The cycle is shown in bold. Works in every view; tap a vertex to start there.</dd>
       <dt data-term="ball">Blooming for conjugates</dt>

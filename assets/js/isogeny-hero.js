@@ -7,7 +7,7 @@ import {
 } from "./vendor/d3-force.min.js";
 import { createSpectral } from "./spectral.js";
 import {
-  adjacency, linkCounts, walkFor, stationary, relativeStationary, sampleStep,
+  adjacency, linkCounts, walkFor, walkName, stationary, relativeStationary, sampleStep,
 } from "./walk.js";
 
 const W = 600, H = 500, PAD = 40;
@@ -248,6 +248,16 @@ function init(root, index, base) {
   const legendArrow = root.querySelector(".wm-graph-legend-arrow");
   const playBtn = root.querySelector(".wm-graph-play");
   const piBox = root.querySelector(".wm-anim-pi");
+  const whichBox = root.querySelector(".wm-anim-which");
+  // One sentence saying which walk the walker follows on the graph shown.
+  const WALK_TEXT = {
+    petersson: "This is the Petersson walk: at each step every isogeny out of the current curve is " +
+      "equally likely, where isogenies are counted up to sign. A kernel leading to j = 0 then counts " +
+      "three times and one leading to j = 1728 twice, so the walk differs from choosing a kernel " +
+      "at random only next to those two curves.",
+    simple: "This is the simple random walk: at each step every edge out of the current vertex is " +
+      "equally likely, and an arrow is followed only forwards.",
+  };
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   // Whether the animation is running. With "reduce motion" set, the page starts with a
   // still picture and the Play button starts the animation; otherwise it starts playing
@@ -454,10 +464,10 @@ function init(root, index, base) {
     const rOf = (nd) => (nd.pair ? r * 1.35 : r);
     const arrowSize = n <= 45 ? 6 : n <= 110 ? 5 : n <= 300 ? 4.2 : 3;
     // The walk: its transition matrix, from the adjacency matrix of the graph shown.
-    // "centres" are the vertices with automorphisms other than +-1, j = 0 and j = 1728,
-    // known for the full graphs without level structure (see walk.js).
-    const centres = view === "full" && g.aut ? Object.keys(g.aut).map(Number) : [];
-    const P = walkFor(adjacency(n, d.links, directed), centres, g.aut);
+    // The Petersson walk on the full graphs without level structure, where the data has
+    // the automorphism groups (g.aut); the simple random walk on everything else shown.
+    const walkAut = view === "full" && g.aut ? g.aut : null;
+    const P = walkFor(adjacency(n, d.links, directed), walkAut);
     gEdges.replaceChildren();
     gNodes.replaceChildren();
     gLabels.replaceChildren();
@@ -482,6 +492,7 @@ function init(root, index, base) {
     gLabels.style.display = labelled && labelBox.checked ? "" : "none";
     Object.assign(state, { frobs, nodes, strands, adj, pinned: null, r, rOf, arrowSize, P,
                            graph: g, sigma: g.sigma, shownView: view, ballGraph: null });
+    if (whichBox) whichBox.textContent = WALK_TEXT[walkName(walkAut)];
     painted = [];
     hideTip();
 

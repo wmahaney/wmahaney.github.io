@@ -7,8 +7,8 @@ import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import {
-  adjacency, rowSum, simpleWalk, closedBalls, buildWalk, walkFor, WALK, PETERSSON_ROW,
-  stationary, stationaryResidual, relativeStationary, sampleStep, linkCounts,
+  adjacency, rowSum, simpleWalk, closedBalls, peterssonWalk, isogenyCounts, weightFrom,
+  walkFor, walkName, stationary, stationaryResidual, relativeStationary, sampleStep, linkCounts,
 } from "../assets/js/walk.js";
 
 const DATA = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "assets", "data", "isogeny");
@@ -56,7 +56,7 @@ test("the data: the vertices with extra automorphisms are j = 0 and j = 1728", (
 test("every row of P sums to 1", () => {
   for (const f of SMALL) {
     const g = load(f), A = adjacency(g.nodes.length, g.links);
-    const P = walkFor(A, centresOf(g), g.aut);
+    const P = walkFor(A, g.aut);
     P.forEach((row, v) => assert.ok(close(rowSum(row), 1), `${f}, vertex ${v}`));
   }
 });
@@ -65,7 +65,7 @@ test("P agrees with the simple random walk outside the closed 1-balls of j = 0 a
   for (const f of SMALL) {
     const g = load(f), A = adjacency(g.nodes.length, g.links);
     const centres = centresOf(g), ball = closedBalls(A, centres);
-    const P = walkFor(A, centres, g.aut), P0 = simpleWalk(A);
+    const P = walkFor(A, g.aut), P0 = simpleWalk(A);
     P.forEach((row, v) => {
       if (ball.has(v)) return;
       assert.equal(row.size, P0[v].size, `${f}, vertex ${v}`);
@@ -74,23 +74,62 @@ test("P agrees with the simple random walk outside the closed 1-balls of j = 0 a
   }
 });
 
-test("a rule changes the rows of the two 1-balls and no others", () => {
+test("Petersson walk: P[i][j] = A[i][j] w_j / s_i, and the matrix A[i][j] w_j is symmetric", () => {
+  for (const f of SMALL) {
+    const g = load(f), n = g.nodes.length, A = adjacency(n, g.links);
+    const w = weightFrom(g.aut), s = isogenyCounts(A, w), P = walkFor(A, g.aut);
+    assert.equal(walkName(g.aut), "petersson");
+    for (let v = 0; v < n; v++) {
+      for (const [u, a] of A[v]) {
+        assert.equal(a * w(u), (A[u].get(v) || 0) * w(v), `${f}: ${v} -> ${u}`);
+        assert.ok(close(P[v].get(u), (a * w(u)) / s[v]), `${f}: ${v} -> ${u}`);
+      }
+    }
+  }
+});
+
+test("Petersson walk: the rows near j = 0 and j = 1728 in G_431(2)", () => {
+  // Phi_2(0, Y) = (Y - 54000)^3 and Phi_2(1728, Y) = (Y - 1728)(Y - 287496)^2;
+  // modulo 431: 54000 = 125, 1728 = 4, 287496 = 19.
   const g = load("p431-2.json"), A = adjacency(g.nodes.length, g.links);
-  const centres = centresOf(g), ball = closedBalls(A, centres);
-  assert.deepEqual(centres.map((v) => g.nodes[v]).sort(), ["0", "4"]);   // 1728 = 4 mod 431
-  const touched = [];
-  // A stand-in rule, for the plumbing only: stay put with probability 1.
-  const P = buildWalk(A, { centres, row: (v) => { touched.push(v); return new Map([[v, 1]]); } });
-  assert.deepEqual(touched.sort((a, b) => a - b), [...ball].sort((a, b) => a - b));
-  const P0 = simpleWalk(A);
-  P.forEach((row, v) => { if (!ball.has(v)) assert.deepEqual([...row], [...P0[v]]); });
-  assert.throws(() => buildWalk(A, { centres, row: () => new Map([[0, 0.5]]) }), /sums to/);
+  const at = (j) => g.nodes.indexOf(String(j));
+  const [v0, v125, v1728, v19] = [0, 125, 4, 19].map(at);
+  const P = walkFor(A, g.aut);
+  assert.deepEqual([...A[v0]], [[v125, 3]]);
+  assert.deepEqual([...P[v0]], [[v125, 1]]);                       // one neighbour
+  assert.ok(close(P[v125].get(v0), 3 / 5));                        // 3 of the 5 isogenies
+  for (const [u, x] of P[v125]) if (u !== v0) assert.ok(close(x, A[v125].get(u) / 5));
+  assert.ok(close(P[v1728].get(v1728), 1 / 2));                    // the loop 1 + i, w = 2
+  assert.ok(close(P[v1728].get(v19), 1 / 2));
+  assert.ok(close(P[v19].get(v1728), 1 / 2));                      // 2 of the 4 isogenies
+  const { values, special } = relativeStationary(stationary(P));
+  assert.deepEqual(special, [v0, v125, v1728, v19].filter((v) => !close(values[v], 1, 1e-7)).sort((a, b) => a - b));
+  assert.ok(close(values[v0], 1, 1e-7));
+  assert.ok(close(values[v125], 5 / 3, 1e-7));
+  assert.ok(close(values[v1728], 4 / 3, 1e-7));
+  assert.ok(close(values[v19], 4 / 3, 1e-7));
+});
+
+test("Petersson walk: with no extra automorphisms (p = 1 mod 12) it is the simple random walk", () => {
+  const files = SMALL.filter((f) => Number(/^p(\d+)/.exec(f)[1]) % 12 === 1);
+  assert.ok(files.length > 0);
+  for (const f of files) {
+    const g = load(f), A = adjacency(g.nodes.length, g.links);
+    assert.deepEqual(centresOf(g), []);
+    assert.deepEqual(walkFor(A, g.aut).map((r) => [...r]), simpleWalk(A).map((r) => [...r]));
+  }
+});
+
+test("without automorphism data the walk is the simple random walk", () => {
+  const g = load("p431-2.json"), A = adjacency(g.nodes.length, g.links);
+  assert.equal(walkName(null), "simple");
+  assert.deepEqual(walkFor(A).map((r) => [...r]), simpleWalk(A).map((r) => [...r]));
 });
 
 test("the stationary vector solves pi P = pi", () => {
   for (const f of SMALL) {
     const g = load(f), A = adjacency(g.nodes.length, g.links);
-    const P = walkFor(A, centresOf(g), g.aut), pi = stationary(P);
+    const P = walkFor(A, g.aut), pi = stationary(P);
     assert.ok(pi, `${f}: no stationary vector`);
     assert.ok(close(pi.reduce((a, b) => a + b, 0), 1));
     assert.ok(stationaryResidual(P, pi) < 1e-10, f);
@@ -106,10 +145,21 @@ test("simple random walk: pi is proportional to 1 / |Aut| (1 generic, 1/2 at 172
   }
 });
 
-// The owner's values for the Petersson walk (entries near j = 0 and j = 1728 that differ
-// from 1, such as 5/6 and 3/4) go here once the rows of P are confirmed.
-test("Petersson walk: the stationary vector matches the owner's values", { todo: PETERSSON_ROW === null }, () => {
-  assert.equal(WALK, "petersson");
+test("Petersson walk: pi is proportional to s_i, the isogenies out of E_i counted up to sign", () => {
+  for (const f of SMALL) {
+    const g = load(f), kind = /-(\d+)\.json$/.exec(f)[1], A = adjacency(g.nodes.length, g.links);
+    const w = weightFrom(g.aut), s = isogenyCounts(A, w), total = s.reduce((a, b) => a + b, 0);
+    const P = peterssonWalk(A, w), pi = stationary(P);
+    pi.forEach((x, v) => assert.ok(close(x, s[v] / total, 1e-9), `${f}, vertex ${v}`));
+    // s_i = (number of kernels) + 2 A[i][j=0] + A[i][j=1728]: 1 away from the two 1-balls
+    const ball = closedBalls(A, centresOf(g));
+    s.forEach((x, v) => {
+      let extra = 0;
+      for (const [u, a] of A[v]) extra += a * (w(u) - 1);
+      assert.equal(x, DEGREE[kind] + extra);
+      if (!ball.has(v)) assert.equal(x, DEGREE[kind], `${f}, vertex ${v}`);
+    });
+  }
 });
 
 test("sampling follows the row", () => {

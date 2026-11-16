@@ -60,52 +60,51 @@ export function closedBalls(A, centres) {
   return ball;
 }
 
-// A walk that agrees with the simple random walk except on the closed 1-balls around
-// the vertices in "centres", where row(v, context) gives the transition probabilities
-// out of v as a Map from vertices to probabilities.
-//   context = { A, P0, centres: Set, ball: Set, aut }   (aut is passed through as given)
-// With no centres, or no rule, this is the simple random walk. Every row supplied by the
-// rule must be a probability vector supported on the vertices of the graph.
-export function buildWalk(A, { centres = [], row = null, aut = null } = {}) {
-  const P0 = simpleWalk(A);
-  if (!row || !centres.length) return P0;
-  const ball = closedBalls(A, centres);
-  const context = { A, P0, centres: new Set(centres), ball, aut };
-  return P0.map((r, v) => {
-    if (!ball.has(v)) return r;
-    const out = row(v, context);
-    if (!(out instanceof Map)) throw new Error(`walk: no row for vertex ${v}`);
-    let total = 0;
-    for (const [w, x] of out) {
-      if (!(Number.isInteger(w) && w >= 0 && w < A.length) || !(x >= 0)) {
-        throw new Error(`walk: bad entry (${w}, ${x}) in the row of vertex ${v}`);
-      }
-      total += x;
-    }
-    if (Math.abs(total - 1) > 1e-9) throw new Error(`walk: the row of vertex ${v} sums to ${total}`);
+// THE PETERSSON WALK. On the supersingular curves E_1, ..., E_n in characteristic p, the
+// pairing <E_i, E_j> = w_i if i = j and 0 otherwise, with w_i = |Aut(E_i)| / 2, makes the
+// Hecke operator T (T E_i = the sum of the targets of the isogenies out of E_i, one per
+// kernel) self-adjoint: <T E_i, E_j> = A[i][j] w_j = A[j][i] w_i (Kohel's thesis,
+// chapter 7, after Mestre and Oesterle). The Petersson walk takes its
+// transition probabilities from this pairing:
+//
+//     P[i][j] = <T E_i, E_j> / sum over k of <T E_i, E_k> = A[i][j] w_j / s_i,
+//     s_i = sum over k of A[i][k] w_k.
+//
+// A[i][j] w_j is the number of isogenies from E_i to E_j, counted up to sign instead of
+// up to the automorphisms of E_j, so the walk picks an isogeny out of E_i uniformly
+// where the simple random walk picks a kernel. The two agree at every vertex with no
+// neighbour of extra automorphisms, that is outside the closed 1-balls of j = 0 and
+// j = 1728. The matrix A[i][j] w_j is symmetric, so the walk is reversible and its
+// stationary vector is proportional to s_i (see isogenyCounts).
+//
+//   weight(v)  w_v, or any positive multiple of it (only ratios matter).
+export function peterssonWalk(A, weight) {
+  return A.map((row) => {
+    let s = 0;
+    for (const [w, a] of row) s += a * weight(w);
+    const out = new Map();
+    for (const [w, a] of row) out.set(w, (a * weight(w)) / s);
     return out;
   });
 }
 
-// THE PETERSSON WALK. It agrees with the simple random walk at distance at least 2 from
-// j = 0 and j = 1728, and differs from it on the closed 1-balls around those two
-// vertices. Its rows there have NOT been confirmed by the owner of this site, so no rule
-// is written here and the animation runs the simple random walk (see WALK below).
-//
-// To switch the animation to the Petersson walk, replace "null" by a function
-//     (v, { A, P0, centres, ball, aut }) => Map(vertex -> probability)
-// giving the row of each vertex v of the two closed 1-balls, add the expected
-// stationary values to _tests/walk.test.mjs (the test marked "todo"), and change the
-// "walk" entry of the widget's info panel in _partials/isogeny-widget.qmd.
-export const PETERSSON_ROW = null;
-
-// The walk the animation runs.
-//   centres  the vertices with automorphisms other than +-1 (j = 0, 1728), or [] for
-//            graphs where the walk is the simple random walk by definition.
-export function walkFor(A, centres = [], aut = null) {
-  return buildWalk(A, { centres, row: PETERSSON_ROW, aut });
+// s_i = sum over k of A[i][k] w_k: the isogenies out of E_i, counted up to sign. The
+// stationary vector of the Petersson walk is proportional to it.
+export function isogenyCounts(A, weight) {
+  return A.map((row) => { let s = 0; for (const [w, a] of row) s += a * weight(w); return s; });
 }
-export const WALK = PETERSSON_ROW ? "petersson" : "simple";
+
+// w_v from the "aut" field of a graph in the data files: {vertex: |Aut|} for the
+// vertices where |Aut| is not 2.
+export const weightFrom = (aut) => (v) => ((aut && aut[v]) || 2) / 2;
+
+// The walk the animation runs: the Petersson walk where the automorphism groups are
+// known (aut is given: the full graphs without level structure), and the simple random
+// walk on every other graph shown.
+export function walkFor(A, aut = null) {
+  return aut ? peterssonWalk(A, weightFrom(aut)) : simpleWalk(A);
+}
+export const walkName = (aut = null) => (aut ? "petersson" : "simple");
 
 // ---- stationary vector ---------------------------------------------------------
 
