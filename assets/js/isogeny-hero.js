@@ -255,6 +255,17 @@ function init(root, index, base) {
       "equally likely, where isogenies are counted up to sign. A kernel leading to j = 0 then counts " +
       "three times and one leading to j = 1728 twice, so the walk differs from choosing a kernel " +
       "at random only next to those two curves.",
+    peterssonLevel: "This is the Petersson walk: at each step every isogeny out of the current vertex is " +
+      "equally likely, where isogenies are counted up to sign and must carry the level structure along. " +
+      "A kernel leading to a vertex whose level structure is preserved by more automorphisms than \u00b11 " +
+      "counts that many times over (twice, into the two vertices over j = 1728 marked here), so the walk " +
+      "differs from choosing a kernel at random only next to those vertices.",
+    peterssonFlat: "This is the Petersson walk. With this level structure no automorphism other than \u00b11 " +
+      "preserves the level structure at any vertex, so all vertices weigh the same and the walk is the simple " +
+      "random walk: every edge out of the current vertex is equally likely, and an arrow is followed only forwards.",
+    peterssonTrivial: "This is the Petersson walk. No automorphism, not even \u22121, fixes a basis of E[4], so all " +
+      "vertices weigh the same and the walk is the simple random walk: every edge out of the current vertex is " +
+      "equally likely.",
     simple: "This is the simple random walk: at each step every edge out of the current vertex is " +
       "equally likely, and an arrow is followed only forwards.",
   };
@@ -464,10 +475,10 @@ function init(root, index, base) {
     const rOf = (nd) => (nd.pair ? r * 1.35 : r);
     const arrowSize = n <= 45 ? 6 : n <= 110 ? 5 : n <= 300 ? 4.2 : 3;
     // The walk: its transition matrix, from the adjacency matrix of the graph shown.
-    // The Petersson walk on the full graphs without level structure, where the data has
-    // the automorphism groups (g.aut); the simple random walk on everything else shown.
+    // The Petersson walk on the full graphs, with or without level structure, where the
+    // data has the automorphism orders (g.aut); the simple random walk on the other views.
     const walkAut = view === "full" && g.aut ? g.aut : null;
-    const P = walkFor(adjacency(n, d.links, directed), walkAut);
+    const P = walkFor(adjacency(n, d.links, directed), walkAut, g.autDefault);
     gEdges.replaceChildren();
     gNodes.replaceChildren();
     gLabels.replaceChildren();
@@ -492,7 +503,11 @@ function init(root, index, base) {
     gLabels.style.display = labelled && labelBox.checked ? "" : "none";
     Object.assign(state, { frobs, nodes, strands, adj, pinned: null, r, rOf, arrowSize, P,
                            graph: g, sigma: g.sigma, shownView: view, ballGraph: null });
-    if (whichBox) whichBox.textContent = WALK_TEXT[walkName(walkAut)];
+    if (whichBox) {
+      const which = !walkAut ? "simple" : !cfg.level ? "petersson"
+        : Object.keys(walkAut).length ? "peterssonLevel" : g.autDefault === 1 ? "peterssonTrivial" : "peterssonFlat";
+      whichBox.textContent = WALK_TEXT[which];
+    }
     painted = [];
     hideTip();
 

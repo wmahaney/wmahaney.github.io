@@ -162,6 +162,67 @@ test("Petersson walk: pi is proportional to s_i, the isogenies out of E_i counte
   }
 });
 
+// ---- level structure ----------------------------------------------------------
+
+// The level-structure graphs and the number of level structures on one curve: the
+// mass sum over v of 1/|Aut(v)| is (p - 1)/24 times that number.
+const LEVEL_KINDS = { "2b5": 6, "23b5": 6, "2g15": 12, "3g2": 6, "3g4": 96, "5g4": 96 };
+const LEVEL = readdirSync(DATA).filter((f) => {
+  const m = /^p(\d+)-(\w+)\.json$/.exec(f);
+  return m && LEVEL_KINDS[m[2]] && Number(m[1]) <= 1100;
+});
+const kindOf = (f) => /-(\w+)\.json$/.exec(f)[1];
+const primeOf = (f) => Number(/^p(\d+)/.exec(f)[1]);
+const orderOf = (g) => (v) => (g.aut[v] !== undefined ? g.aut[v] : g.autDefault || 2);
+
+test("level data: every graph has its automorphism orders, and they satisfy the mass formula", () => {
+  assert.ok(LEVEL.length > 0, "no level-structure data found");
+  for (const f of LEVEL) {
+    const g = load(f), n = g.nodes.length, aut = orderOf(g);
+    assert.ok(g.aut, `${f}: no aut field`);
+    let mass = 0;
+    for (let v = 0; v < n; v++) mass += 1 / aut(v);
+    assert.ok(close(mass, ((primeOf(f) - 1) / 24) * LEVEL_KINDS[kindOf(f)], 1e-9), `${f}: mass ${mass}`);
+  }
+});
+
+test("level data: the Brandt relation, twisted by <2> on Gamma_1(5)", () => {
+  for (const f of LEVEL) {
+    const g = load(f), n = g.nodes.length, A = adjacency(n, g.links, !!g.directed), w = weightFrom(g.aut, g.autDefault);
+    if (kindOf(f) === "2g15") {
+      // The column sums of A w: sum over v of A[v][u] w_u = s_u, the identity behind pi ~ s.
+      const s = isogenyCounts(A, w), col = new Array(n).fill(0);
+      A.forEach((row) => { for (const [u, a] of row) col[u] += a * w(u); });
+      col.forEach((x, u) => assert.ok(close(x, s[u]), `${f}: column ${u}`));
+      continue;
+    }
+    for (let v = 0; v < n; v++) {
+      for (const [u, a] of A[v]) assert.equal(a * w(u), (A[u].get(v) || 0) * w(v), `${f}: ${v} -> ${u}`);
+    }
+  }
+});
+
+test("level Petersson walk: rows sum to 1, and pi is proportional to s on the connected graphs", () => {
+  for (const f of LEVEL) {
+    const g = load(f), n = g.nodes.length, A = adjacency(n, g.links, !!g.directed);
+    const w = weightFrom(g.aut, g.autDefault), P = walkFor(A, g.aut, g.autDefault);
+    assert.equal(walkName(g.aut), "petersson");
+    P.forEach((row, v) => assert.ok(close(rowSum(row), 1), `${f}, vertex ${v}`));
+    if ((g.components || 1) > 1) continue;
+    const s = isogenyCounts(A, w), total = s.reduce((a, b) => a + b, 0), pi = stationary(P);
+    assert.ok(pi, `${f}: no stationary vector`);
+    pi.forEach((x, v) => assert.ok(close(x, s[v] / total, 1e-8), `${f}, vertex ${v}`));
+  }
+});
+
+test("level Petersson walk: equal to the simple walk where every vertex has the generic order", () => {
+  for (const f of LEVEL) {
+    const g = load(f), A = adjacency(g.nodes.length, g.links, !!g.directed);
+    if (Object.keys(g.aut).length) continue;
+    assert.deepEqual(walkFor(A, g.aut, g.autDefault).map((r) => [...r]), simpleWalk(A).map((r) => [...r]), f);
+  }
+});
+
 test("sampling follows the row", () => {
   const row = new Map([[5, 0.25], [7, 0.5], [9, 0.25]]);
   assert.equal(sampleStep(row, 0), 5);

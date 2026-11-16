@@ -262,11 +262,13 @@ each way) or `[s, t, ell, m, back]` where the two counts differ, and the picture
 edges with arrowheads. `animations/about.qmd#directed` states the rule.
 
 **The random walk.** The walker's steps are drawn from a transition matrix `P` built in
-`assets/js/walk.js` from the adjacency matrix `A`. On the graphs without level structure it is
-the Petersson walk, `P[i][j] = A[i][j] w_j / s_i` with `w_j = |Aut(E_j)| / 2` and
-`s_i = sum_k A[i][k] w_k` (`peterssonWalk`); on every other graph shown it is the simple random
+`assets/js/walk.js` from the adjacency matrix `A`. On the full graphs, with or without level structure, it is
+the Petersson walk, `P[i][j] = A[i][j] w_j / s_i` with `w_j = |Aut(E_j)| / 2` (with level
+structure, the automorphisms that preserve it) and
+`s_i = sum_k A[i][k] w_k` (`peterssonWalk`); on the other views (F_p-subgraph, quotient) it is the simple random
 walk (`simpleWalk`). `walkFor` chooses between them: it uses the Petersson walk when the graph's
-data file has an `aut` field. `animations/about.qmd#directed` states the definition.
+data file has an `aut` field, which every full graph has, with or without level structure
+(`|Aut(E, alpha)|` for the vertices whose order is not the generic one, `autDefault`, 2 unless stated). `animations/about.qmd#directed` states the definition.
 After changing that file, run the tests:
 
 ```

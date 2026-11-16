@@ -728,7 +728,7 @@ def borel5_graph(F, js):
     check_sigma(A2, sigma)
     check_sigma(A3, sigma)
     labels = [[F.show(r[4]), F.show(r[5])] for r in reps]
-    return A2, A3, labels, sigma, reps
+    return A2, A3, labels, sigma, reps, [int(x) for x in aut]
 
 
 # --------------------------------------------------------------------------
@@ -893,8 +893,9 @@ def gamma1_graph(F, js):
         else:
             raise AssertionError("no automorphism matches the conjugate point")
     se = edge_sigma(F, edges, sig, lambda v, key: F.mul(cs[v], F.frob(key)))
+    assert all(aut[dia[v]] == aut[v] for v in range(n)), "|Aut| is not invariant under <2>"
     labels = [[F.show(r[3]), F.show(r[4])] for r in reps]
-    return A, labels, sig, reps, edges, se
+    return A, labels, sig, reps, edges, se, [int(x) for x in aut]
 
 
 def full2_graph(F, js):
@@ -948,8 +949,9 @@ def full2_graph(F, js):
     sig = [verts[F.frob(r[5])] for r in reps]
     check_sigma(A, sig)
     se = level_sigma(F, edges, reps, sig, lambda r: [(r[2], 1), (r[3], 1)], {3: A})
+    assert all(x.denominator == 1 for x in aut)
     labels = [[F.show(r[4]), F.show(r[5])] for r in reps]
-    return A, labels, sig, reps, edges, se
+    return A, labels, sig, reps, edges, se, [int(x) for x in aut]
 
 
 # --------------------------------------------------------------------------
@@ -1304,6 +1306,15 @@ def second_eigenvalue(mats):
 RAMANUJAN = {2: 2 * 2 ** 0.5, 3: 2 * 3 ** 0.5, 5: 2 * 5 ** 0.5}
 
 
+def aut_dict(aut, generic: int = 2):
+    """The "aut" field of a graph: {vertex: |Aut(v)|} for the vertices where |Aut(v)| is
+    not the generic order. Without level structure Aut(v) = Aut(E); with level structure
+    it is the subgroup of Aut(E) preserving the level structure, for which the script
+    checks the mass formula and the Brandt relation. The generic order is 2 (+-1) unless
+    the graph has "autDefault"."""
+    return {str(k): a for k, a in enumerate(aut) if a != generic}
+
+
 def compute(p: int, level5: bool = True):
     F = Fp2(p)
     js = supersingular_js(F)
@@ -1338,24 +1349,27 @@ def compute(p: int, level5: bool = True):
         edges, se = join_edges(*((E[ell][0], E[ell][2]) for ell in ells))
         add(key, lab, fp, fp, sig, [(ell, A[ell]) for ell in ells], edges, se)
         # |Aut(E)| where it is not 2: {vertex: 4 or 6}, i.e. j = 1728 and j = 0.
-        graphs[key]["aut"] = {str(k): a for k, a in enumerate(aut) if a != 2}
+        graphs[key]["aut"] = aut_dict(aut)
     out = {"p": p, "nonresidue": F.r if F.r != p - 1 else -1, "graphs": graphs}
     jset_fp = {j for j in js if j[1] == 0}
     if level5 and p <= CAPS["2g15"]:
-        A1, lab_1, sig_1, reps_1, e1, se1 = gamma1_graph(F, js)
+        A1, lab_1, sig_1, reps_1, e1, se1, aut_1 = gamma1_graph(F, js)
         add("2g15", lab_1, [sig_1[k] == k for k in range(len(sig_1))],
             [r[3] in jset_fp for r in reps_1], sig_1, [(2, A1)], e1, se1, directed=True)
+        graphs["2g15"]["aut"] = aut_dict(aut_1)
     if level5 and p <= CAPS["3g2"]:
-        Ag, lab_g, sig_g, reps_g, eg, seg = full2_graph(F, js)
+        Ag, lab_g, sig_g, reps_g, eg, seg, aut_g = full2_graph(F, js)
         add("3g2", lab_g, [sig_g[k] == k for k in range(len(sig_g))],
             [r[4] in jset_fp for r in reps_g], sig_g, [(3, Ag)], eg, seg)
+        graphs["3g2"]["aut"] = aut_dict(aut_g)
     if level5 and p <= LEVEL5_MAX_P:
-        A25, A35, lab_5, sig_5, reps_5 = borel5_graph(F, js)
+        A25, A35, lab_5, sig_5, reps_5, aut_5 = borel5_graph(F, js)
         fp_5 = [sig_5[k] == k for k in range(len(sig_5))]
         jfp_5 = [r[4] in jset_fp for r in reps_5]
         e5, se5 = level5_edges(F, reps_5, sig_5, A25, A35)
         add("2b5", lab_5, fp_5, jfp_5, sig_5, [(2, A25)], *keep_ells(e5, se5, {2}))
         add("23b5", lab_5, fp_5, jfp_5, sig_5, [(2, A25), (3, A35)], e5, se5)
+        graphs["2b5"]["aut"] = graphs["23b5"]["aut"] = aut_dict(aut_5)
         out["n_level5"] = len(lab_5)
     return out
 
@@ -1372,7 +1386,10 @@ def compute_gamma4(p: int):
         graphs[f"{ell}g4"] = {
             "nodes": labels, "fp": fixed, "jfp": jfp, "sigma": sig, "cls": side,
             "links": links_from(A, ell), "fold": fold_links(edges, sig, se),
-            "lambda2": second_eigenvalue([A]), "components": 1 if ell == 3 else 2}
+            "lambda2": second_eigenvalue([A]), "components": 1 if ell == 3 else 2,
+            # No automorphism of E fixes a basis of E[4], not even -1: every vertex
+            # has the trivial group, so the generic order is 1.
+            "aut": {}, "autDefault": 1}
     return {"p": p, "nonresidue": F.r if F.r != p - 1 else -1, "graphs": graphs}
 
 

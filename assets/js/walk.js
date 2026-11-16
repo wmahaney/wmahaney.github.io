@@ -64,18 +64,29 @@ export function closedBalls(A, centres) {
 // pairing <E_i, E_j> = w_i if i = j and 0 otherwise, with w_i = |Aut(E_i)| / 2, makes the
 // Hecke operator T (T E_i = the sum of the targets of the isogenies out of E_i, one per
 // kernel) self-adjoint: <T E_i, E_j> = A[i][j] w_j = A[j][i] w_i (Kohel's thesis,
-// chapter 7, after Mestre and Oesterle). The Petersson walk takes its
-// transition probabilities from this pairing:
+// chapter 7, after Mestre and Oesterle). The Petersson walk takes its transition
+// probabilities from this pairing:
 //
 //     P[i][j] = <T E_i, E_j> / sum over k of <T E_i, E_k> = A[i][j] w_j / s_i,
 //     s_i = sum over k of A[i][k] w_k.
 //
 // A[i][j] w_j is the number of isogenies from E_i to E_j, counted up to sign instead of
 // up to the automorphisms of E_j, so the walk picks an isogeny out of E_i uniformly
-// where the simple random walk picks a kernel. The two agree at every vertex with no
-// neighbour of extra automorphisms, that is outside the closed 1-balls of j = 0 and
-// j = 1728. The matrix A[i][j] w_j is symmetric, so the walk is reversible and its
-// stationary vector is proportional to s_i (see isogenyCounts).
+// where the simple random walk picks a kernel. The two agree at every vertex none of
+// whose targets has automorphisms other than +-1.
+//
+// WITH LEVEL STRUCTURE the vertices are pairs v = (E, alpha) and the same definition is
+// used with w_v proportional to |Aut(E, alpha)|, the automorphisms of E that preserve
+// alpha. The script checks the mass formula for these orders and the Brandt relation:
+//   Gamma_0(5), Gamma(2)  A[v][w] w_w = A[w][v] w_v, as without level structure;
+//   Gamma_1(5)            A[v][w] w_w = A[w][<2>v] w_v, <2> the diamond operator
+//                         (+-P -> +-2P): on Gamma_1(N) the adjoint of T_l is <l>^-1 T_l;
+//   Gamma(4)              every |Aut(E, alpha)| is 1, so P is the simple random walk.
+//
+// Stationary vector. Since w is invariant under <2>, in every case
+//     sum over v of s_v P[v][w] = w_w sum over v of A[v][w] = s_w,
+// so pi is proportional to s (see isogenyCounts). Where the matrix A[v][w] w_w is
+// symmetric (all but Gamma_1(5)) the walk is moreover reversible.
 //
 //   weight(v)  w_v, or any positive multiple of it (only ratios matter).
 export function peterssonWalk(A, weight) {
@@ -88,21 +99,25 @@ export function peterssonWalk(A, weight) {
   });
 }
 
-// s_i = sum over k of A[i][k] w_k: the isogenies out of E_i, counted up to sign. The
-// stationary vector of the Petersson walk is proportional to it.
+// s_v = sum over k of A[v][k] w_k: the isogenies out of v, counted up to sign (with
+// w normalised to 1 at a generic vertex). The stationary vector of the Petersson walk
+// is proportional to it.
 export function isogenyCounts(A, weight) {
   return A.map((row) => { let s = 0; for (const [w, a] of row) s += a * weight(w); return s; });
 }
 
-// w_v from the "aut" field of a graph in the data files: {vertex: |Aut|} for the
-// vertices where |Aut| is not 2.
-export const weightFrom = (aut) => (v) => ((aut && aut[v]) || 2) / 2;
+// The weight of vertex v from the "aut" field of a graph in the data files: {vertex:
+// |Aut(v)|} for the vertices whose order is not the generic one, which is "autDefault"
+// (1 for Gamma(4)) or else 2. Normalised so that a generic vertex has weight 1.
+export const weightFrom = (aut, autDefault = 2) => (v) =>
+  ((aut && aut[v] !== undefined) ? aut[v] : autDefault) / autDefault;
 
 // The walk the animation runs: the Petersson walk where the automorphism groups are
-// known (aut is given: the full graphs without level structure), and the simple random
-// walk on every other graph shown.
-export function walkFor(A, aut = null) {
-  return aut ? peterssonWalk(A, weightFrom(aut)) : simpleWalk(A);
+// known (aut is given: the full graphs, with or without level structure), and the
+// simple random walk on the other views (the F_p-subgraph, the vertices over it, the
+// quotient by Frobenius), which are induced subgraphs or quotients with no such pairing.
+export function walkFor(A, aut = null, autDefault = 2) {
+  return aut ? peterssonWalk(A, weightFrom(aut, autDefault)) : simpleWalk(A);
 }
 export const walkName = (aut = null) => (aut ? "petersson" : "simple");
 
