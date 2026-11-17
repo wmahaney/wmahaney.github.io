@@ -20,7 +20,7 @@ This page states exactly what the [animations](walks.qmd) draw. Everything is co
 
 ### $G_p(2)$ {#graph-2}
 
-The vertex set is $S$, and every vertex has 3 outgoing edges. Apart from the trivial eigenvalue 3, every eigenvalue satisfies $\lvert\lambda\rvert \le 2\sqrt2$ (Pizer, via Deligne): this is a Ramanujan graph. The page shows the second-largest $\lvert\lambda\rvert$ (*checked* against the bound). It is offered for the same 221 primes as the two graphs below.
+The vertex set is $S$, and every vertex has 3 outgoing edges. Apart from the trivial eigenvalue 3, every eigenvalue satisfies $\lvert\lambda\rvert \le 2\sqrt2$ (Pizer): this is a Ramanujan graph. The page shows the second-largest $\lvert\lambda\rvert$ (*checked* against the bound). It is offered for the same 221 primes as the two graphs below.
 
 ### $G_p(\{2,3\})$ and $G_p(\{2,3,5\})$ {#graph-23}
 
