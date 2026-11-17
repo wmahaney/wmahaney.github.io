@@ -30,7 +30,7 @@ Let $k$ be an algebraically closed field. Then
 ::: {.proof}
 1) If $\mathfrak{m}$ is a maximal ideal then $k[x_1, \ldots, x_n]/\mathfrak{m}$ is a field that is finitely generated as a $k$-algebra, so by Zariski's lemma (@lem-zariski) it is an algebraic field extension of $k$. As $k$ is algebraically closed this field extension is trivial, so $k[x_1, \ldots, x_n]/\mathfrak{m} \cong k$. Then $\mathfrak{m}$ is the kernel of the surjective map $k[x_1, \ldots, x_n] \to k$ sending $x_i \mapsto a_i$ for some $a_i \in k$. Thus $\mathfrak{m} = (x_1 - a_1, \ldots, x_n - a_n)$.
 
-2) If $\mathfrak{a}$ is a proper ideal then $\mathfrak{a}$ is contained in some maximal ideal $\mathfrak{m}$. By part 1 we have $\mathfrak{m} = (x_1 - a_1, \ldots, x_n - a_n)$ for some $a_i \in k$. By the order reversing nature of the $V(\cdot)$ map we have
+2) If $\mathfrak{a}$ is a proper ideal then $\mathfrak{a}$ is contained in some maximal ideal $\mathfrak{m}$. By part 1 we have $\mathfrak{m} = (x_1 - a_1, \ldots, x_n - a_n)$ for some $a_i \in k$. By the order-reversing nature of the $V(\cdot)$ map we have
 
 $$
 \{ (a_1, \ldots, a_n)\} = V(\mathfrak{m}) \subset V(\mathfrak{a}),
