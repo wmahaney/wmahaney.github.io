@@ -15,7 +15,7 @@ description-meta: "The eigenvalues of the Hecke operator T_l on S_2(Gamma_0(p)) 
 <script type="module" src="../assets/js/isogeny-hero.js"></script>
 ```
 
-For a prime $\ell \neq p$, the adjacency matrix of the isogeny graph $G_p(\ell)$ has eigenvalue $\ell + 1$, and its other eigenvalues are those of the Hecke operator $T_\ell$ on the weight-2 cusp forms $S_2(\Gamma_0(p))$. Serre proved that, as $p \to \infty$, these eigenvalues become distributed according to the Kesten–McKay law of the $(\ell+1)$-regular tree. The animation shows this for $\ell = 2, 3, 5$ and about 100 primes from 101 to 20011, gliding from one to the next: the histogram of the eigenvalues, the Kesten–McKay density (red), and in the corner the Kolmogorov distance between the two, which shrinks as $p$ grows.
+For a prime $\ell \neq p$, the adjacency matrix of the isogeny graph $G_p(\ell)$ has eigenvalue $\ell + 1$, and its other eigenvalues are those of the Hecke operator $T_\ell$ on the weight-2 cusp forms $S_2(\Gamma_0(p))$. Serre proved that, as $p \to \infty$, these eigenvalues become distributed according to the Kesten–McKay law of the $(\ell+1)$-regular tree. The animation shows this for $\ell = 2, 3, 5$ and 129 primes from 101 to 49991, gliding from one to the next: the histogram of the eigenvalues, the Kesten–McKay density (red), and in the corner the Kolmogorov distance between the two, which shrinks as $p$ grows.
 
 Choosing $\ell$ = "2, 3" or "2, 3, 5" shows the eigenvalues of $T_2 + T_3$ or $T_2 + T_3 + T_5$, the adjacency matrices of $G_p(\{2,3\})$ and $G_p(\{2,3,5\})$, against the convolution of the Kesten–McKay laws: the joint law of the eigenvalues tends to the product measure, and the sum pushes it forward to the convolution ([details](about.qmd#joint)).
 
