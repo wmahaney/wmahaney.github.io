@@ -2,7 +2,7 @@
 
 ```{=html}
 <div class="wm-figure-scroll">
-<svg class="wm-ball-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" font-family="Inter, system-ui, -apple-system, Segoe UI, sans-serif" role="img" aria-label="Mean ball size against n on log-log axes; every graph follows a line of slope one half, between about one and two and a half times the square root of n.">
+<svg class="wm-ball-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" font-family="Inter, system-ui, -apple-system, Segoe UI, sans-serif" role="img" aria-label="Mean ball size against n on log-log axes; the points lie between about 0.8 and 3 times the square root of n.">
 <rect x="0.75" y="0.75" width="758.5" height="438.5" rx="16" fill="#FFFDF7" stroke="#E3D9C3" stroke-width="1.5"/>
 <text x="20" y="28" font-size="15" font-weight="700" fill="#1E2430">Size of the ball when it first contains a conjugate pair</text>
 <text x="20" y="46" font-size="12" fill="#5A6070">mean over every starting vertex, against the number of vertices n (both axes logarithmic)</text>

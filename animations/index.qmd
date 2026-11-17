@@ -3,16 +3,16 @@ title: "Animations"
 description-meta: "Interactive pictures of supersingular isogeny graphs: random walks, growing balls, and the spectral law of Hecke operators."
 ---
 
-Pictures of the supersingular isogeny graphs I work on: $G_p(2)$, $G_p(\{2,3\})$ and $G_p(\{2,3,5\})$ for 221 primes up to 49991, and graphs with level structure $\Gamma_0(5)$, $\Gamma_1(5)$, $\Gamma(2)$ and $\Gamma(4)$ (including a disconnected one). Every graph is computed from scratch (arithmetic in $\mathbb{F}_{p^2}$ and Vélu's formulas, with consistency checks). Each picture can be shown as the full graph, its $\mathbb{F}_p$-subgraph, or its quotient by Frobenius, and the menu under it switches from the plain **graph viewer** to the animations below.
+The supersingular isogeny graphs $G_p(2)$, $G_p(\{2,3\})$ and $G_p(\{2,3,5\})$ for 221 primes from 101 to 49991, and graphs with level structure $\Gamma_0(5)$, $\Gamma_1(5)$, $\Gamma(2)$ and $\Gamma(4)$. Each can be shown in full, as its $\mathbb{F}_p$-subgraph, or as its quotient by Frobenius.
 
 [Random walks](walks.qmd)
-: A random walk, drawn as a laser with a fading trail.
+: The Petersson walk on the full graphs; the simple random walk on the other views.
 
 [Blooming](balls.qmd)
-: A ball grows around a random curve until it collides with itself and closes a cycle (*blooming for collision*), or until it contains a Frobenius conjugate pair, or in the quotient by Frobenius collides with itself or reaches the $\mathbb{F}_p$-subgraph (*blooming for conjugates*). The second takes about $\sqrt{n}$ vertices.
+: Balls grown until they close a cycle, or until they contain a Frobenius-conjugate pair.
 
 [Spectral law](spectral.qmd)
-: The eigenvalues of the Hecke operator $T_\ell$ on $S_2(\Gamma_0(p))$ approach the Kesten–McKay law as $p \to \infty$ (129 primes up to 49991), and the eigenvalues of $T_2 + T_3$ and $T_2 + T_3 + T_5$ approach the convolutions of those laws.
+: The eigenvalues of $T_\ell$ on $S_2(\Gamma_0(p))$ against the Kesten–McKay law, and those of $T_2 + T_3$ and $T_2 + T_3 + T_5$ against its convolutions.
 
 [Read more](about.qmd)
-: Exact definitions: the graphs and their level structures, Frobenius on vertices and edges, the $\mathbb{F}_p$-subgraph (spine) with pictures, the quotient by Frobenius, and the spectral law. The eye in the corner of each picture links here.
+: Definitions, proofs and sources.

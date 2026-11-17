@@ -16,18 +16,18 @@
 <line x1="142.4" y1="199.8" x2="133.5" y2="117.8" stroke="#2B4FB8" stroke-width="1.3" opacity="0.55"/>
 <line x1="133.5" y1="348.2" x2="200.0" y2="299.5" stroke="#1E2430" stroke-width="3.4" stroke-linecap="round"/>
 <line x1="200.0" y1="233.0" x2="200.0" y2="299.5" stroke="#1E2430" stroke-width="3.4" stroke-linecap="round"/>
-<circle cx="200.0" cy="233.0" r="7.5" fill="#2B4FB8" stroke="#1E2430" stroke-width="2.5"><title>322 + 568i (distance 0)</title></circle>
-<circle cx="257.6" cy="199.8" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>478 + 585i (distance 1)</title></circle>
-<circle cx="200.0" cy="299.5" r="7.5" fill="#B93A2B" stroke="#1E2430" stroke-width="2.5"><title>563 + 895i (distance 1)</title></circle>
-<circle cx="142.4" cy="199.8" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>635 + 421i (distance 1)</title></circle>
-<circle cx="266.5" cy="117.8" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>792 + 1007i (distance 2)</title></circle>
-<circle cx="333.0" cy="233.0" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>882 + 1004i (distance 2)</title></circle>
-<circle cx="266.5" cy="348.2" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>231 + 226i (distance 2)</title></circle>
-<circle cx="133.5" cy="348.2" r="7.5" fill="#B93A2B" stroke="#1E2430" stroke-width="2.5"><title>563 + 114i (distance 2)</title></circle>
+<circle cx="200.0" cy="233.0" r="7.5" fill="#2B4FB8" stroke="#1E2430" stroke-width="2.5"><title>322 + 568√11 (distance 0)</title></circle>
+<circle cx="257.6" cy="199.8" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>478 + 585√11 (distance 1)</title></circle>
+<circle cx="200.0" cy="299.5" r="7.5" fill="#B93A2B" stroke="#1E2430" stroke-width="2.5"><title>563 + 895√11 (distance 1)</title></circle>
+<circle cx="142.4" cy="199.8" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>635 + 421√11 (distance 1)</title></circle>
+<circle cx="266.5" cy="117.8" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>792 + 1007√11 (distance 2)</title></circle>
+<circle cx="333.0" cy="233.0" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>882 + 1004√11 (distance 2)</title></circle>
+<circle cx="266.5" cy="348.2" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>231 + 226√11 (distance 2)</title></circle>
+<circle cx="133.5" cy="348.2" r="7.5" fill="#B93A2B" stroke="#1E2430" stroke-width="2.5"><title>563 + 114√11 (distance 2)</title></circle>
 <circle cx="67.0" cy="233.0" r="4.6" fill="#E5A11C" stroke="#FFFDF7" stroke-width="1.3"><title>155 (distance 2)</title></circle>
-<circle cx="133.5" cy="117.8" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>524 + 482i (distance 2)</title></circle>
-<text x="121.5" y="352.2" font-size="11.5" text-anchor="end" fill="#1E2430" stroke="#FFFDF7" stroke-width="3" paint-order="stroke">563 + 114i</text>
-<text x="212.0" y="303.5" font-size="11.5" text-anchor="start" fill="#1E2430" stroke="#FFFDF7" stroke-width="3" paint-order="stroke">563 + 895i</text>
+<circle cx="133.5" cy="117.8" r="4.6" fill="#2B4FB8" stroke="#FFFDF7" stroke-width="1.3"><title>524 + 482√11 (distance 2)</title></circle>
+<text x="121.5" y="352.2" font-size="11.5" text-anchor="end" fill="#1E2430" stroke="#FFFDF7" stroke-width="3" paint-order="stroke">563 + 114√11</text>
+<text x="212.0" y="303.5" font-size="11.5" text-anchor="start" fill="#1E2430" stroke="#FFFDF7" stroke-width="3" paint-order="stroke">563 + 895√11</text>
 <text x="200.0" y="255.0" font-size="11" text-anchor="middle" fill="#1E2430" stroke="#FFFDF7" stroke-width="3" paint-order="stroke">start</text></g>
 <g transform="translate(416,0)"><rect x="0.75" y="0.75" width="398.5" height="428.5" rx="16" fill="#FFFDF7" stroke="#E3D9C3" stroke-width="1.5"/>
 <text x="18" y="27" font-size="14" font-weight="700" fill="#1E2430">(2,3)-isogeny graph, p = 431</text>

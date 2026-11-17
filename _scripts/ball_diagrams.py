@@ -17,6 +17,7 @@ Pure Python, no dependencies.
 from __future__ import annotations
 
 import json
+import re
 import math
 import random
 from pathlib import Path
@@ -36,7 +37,13 @@ def load(p, kind):
     f = DATA / f"p{p}-{kind}.json"
     if not f.exists():
         return None
-    g = json.loads(f.read_text())["graph"]
+    doc = json.loads(f.read_text())
+    g, r = doc["graph"], doc["nonresidue"]
+    # Older data files write the square root of the non-residue r as "i" for every r;
+    # it is shown as i only when r = -1, and as √r otherwise.
+    if r != -1:
+        root = lambda s: re.sub(r"(\d*)i$", lambda m: f"{m.group(1)}√{r}", s)
+        g["nodes"] = [[root(x) for x in l] if isinstance(l, list) else root(l) for l in g["nodes"]]
     n = len(g["nodes"])
     adj = [dict() for _ in range(n)]          # neighbour -> list of ells
     for s, t, ell, m in ((l[0], l[1], l[2], max(l[3:])) for l in g["links"]):
@@ -322,8 +329,8 @@ def chart(rows):
     out += leg
     svg = (f'<svg class="wm-ball-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" '
            f'font-family="Inter, system-ui, -apple-system, Segoe UI, sans-serif" role="img" '
-           f'aria-label="Mean ball size against n on log-log axes; every graph follows a line of slope one half, '
-           f'between about one and two and a half times the square root of n.">\n' + "\n".join(out) + "\n</svg>")
+           f'aria-label="Mean ball size against n on log-log axes; the points lie between about 0.8 and 3 times '
+           f'the square root of n.">\n' + "\n".join(out) + "\n</svg>")
     table = ["| graph | p | n | mean radius | mean ball size | ball / √n |", "|---|--:|--:|--:|--:|--:|"]
     for kind, *_ in SERIES:
         for p, n, m, rad in rows[kind]:
