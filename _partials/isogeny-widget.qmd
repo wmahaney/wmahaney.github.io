@@ -34,7 +34,7 @@
     </section>
     <section data-anim="spectral" data-title="Spectral law" hidden>
       <p class="wm-anim-title">Spectral law (Kesten–McKay)</p>
-      <p>For a prime ℓ ≠ p, the eigenvalues of the Hecke operator T<sub>ℓ</sub> on the weight-2 cusp forms S<sub>2</sub>(Γ<sub>0</sub>(p)) are the eigenvalues of the adjacency matrix of G<sub>p</sub>(ℓ) other than ℓ + 1. The histogram shows them for about 100 primes p from 101 to 20011, against the Kesten–McKay density (red). The corner shows the Kolmogorov distance between the two. Serre proved that they agree in the limit p → ∞.</p>
+      <p>For a prime ℓ ≠ p, the eigenvalues of the Hecke operator T<sub>ℓ</sub> on the weight-2 cusp forms S<sub>2</sub>(Γ<sub>0</sub>(p)) are the eigenvalues of the adjacency matrix of G<sub>p</sub>(ℓ) other than ℓ + 1. The histogram shows them for 129 primes p from 101 to 49991, against the Kesten–McKay density (red). The corner shows the Kolmogorov distance between the two. Serre proved that they agree in the limit p → ∞. With ℓ = 2, 3 or 2, 3, 5 the histogram is of the sums λ<sub>2</sub> + λ<sub>3</sub> (+ λ<sub>5</sub>) over the eigenforms, the eigenvalues of T<sub>2</sub> + T<sub>3</sub> (+ T<sub>5</sub>); the red curve is then the convolution of the Kesten–McKay laws, and for 2, 3 a small grid shows the joint histogram of the pairs (λ<sub>2</sub>, λ<sub>3</sub>).</p>
       <p class="wm-anim-params"><span>Parameters</span> ℓ · speed</p>
     </section>
   </div>
@@ -90,9 +90,11 @@
         <option value="2" selected>2</option>
         <option value="3">3</option>
         <option value="5">5</option>
+        <option value="23">2, 3</option>
+        <option value="235">2, 3, 5</option>
       </select>
     </label>
-    <button type="button" class="wm-q" data-terms="viewer walk cycle ball until spectral km" aria-label="What do the animations show?" aria-expanded="false">?</button>
+    <button type="button" class="wm-q" data-terms="viewer walk cycle ball until spectral km sums" aria-label="What do the animations show?" aria-expanded="false">?</button>
     <label class="wm-graph-history">history
       <select class="wm-graph-trail-len" aria-label="Number of recent steps to keep highlighted">
         <option value="10" selected>10 steps</option>
@@ -187,6 +189,8 @@
       <dd>The eigenvalues of the Hecke operator T<sub>ℓ</sub> on S<sub>2</sub>(Γ<sub>0</sub>(p)), the weight-2 cusp forms of level p, are the eigenvalues of the adjacency matrix of G<sub>p</sub>(ℓ) other than ℓ + 1. The animation shows their histogram for larger and larger p, against the Kesten–McKay density, and the Kolmogorov distance between the two.</dd>
       <dt data-term="km">Kesten–McKay law</dt>
       <dd>The distribution with density (ℓ+1)√(4ℓ − x²) / (2π((ℓ+1)² − x²)) on [−2√ℓ, 2√ℓ]: the spectral measure of the infinite (ℓ+1)-regular tree. Serre proved that the eigenvalues of T<sub>ℓ</sub> on S<sub>2</sub>(Γ<sub>0</sub>(p)) become distributed according to it as p → ∞.</dd>
+      <dt data-term="sums">Sums: the joint law pushed forward</dt>
+      <dd>The operators T<sub>2</sub>, T<sub>3</sub>, T<sub>5</sub> commute, so each eigenform has a triple of eigenvalues (λ<sub>2</sub>, λ<sub>3</sub>, λ<sub>5</sub>), and the adjacency matrix of G<sub>p</sub>({2, 3}) has the eigenvalues λ<sub>2</sub> + λ<sub>3</sub>. Serre's theorem holds for several primes at once: the tuples become distributed according to the product of the Kesten–McKay laws, as if the coordinates were independent. Pushing the product forward under the sum gives the convolution μ<sub>2</sub> ∗ μ<sub>3</sub> (∗ μ<sub>5</sub>), the red curve. Its second moment is the sum of the ℓ + 1: 7 for {2, 3} and 13 for {2, 3, 5}; the picture shows the mean of λ² and the correlation of λ<sub>2</sub> and λ<sub>3</sub> for comparison.</dd>
       <dt data-term="lambda">Second-largest eigenvalue</dt>
       <dd>The largest eigenvalue of the adjacency matrix is the number of edges at each vertex; the next largest in absolute value measures how fast random walks spread out (smaller is faster). For a single ℓ it is at most 2√ℓ, the Ramanujan bound (Pizer, using Deligne's bound), so at most 2√2 for ℓ = 2. With several ℓ the adjacency matrices commute, so it is at most the sum of these bounds: 2√2 + 2√3 for ℓ = 2, 3, and 2√2 + 2√3 + 2√5 for ℓ = 2, 3, 5. That sum is larger than the Ramanujan bound for a graph of the combined degree, so only the graphs with a single ℓ are called Ramanujan here.</dd>
     </dl>

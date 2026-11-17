@@ -9,6 +9,13 @@
 // become equidistributed in [-2 sqrt l, 2 sqrt l] for the Kesten-McKay law of the
 // (l + 1)-regular tree,
 //     f(x) = (l + 1) / (2 pi) * sqrt(4 l - x^2) / ((l + 1)^2 - x^2).
+//
+// Sums. The T_l commute, so each eigenform has a tuple (lambda_2, lambda_3, lambda_5),
+// and the adjacency matrix of G_p({2,3}) has the eigenvalues lambda_2 + lambda_3. Serre's
+// theorem holds jointly: the tuples become equidistributed for the product measure
+// mu_2 x mu_3 x mu_5. Pushing that forward under the sum gives the convolution
+// mu_2 * mu_3 (* mu_5), which is the limit law drawn for "2, 3" and "2, 3, 5". For
+// "2, 3" a small grid also shows the joint histogram of (lambda_2, lambda_3).
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 const el = (name, attrs = {}, parent) => {
@@ -30,13 +37,55 @@ export function kmDensity(q, x) {
   return r <= 0 ? 0 : ((q + 1) / (2 * Math.PI)) * Math.sqrt(r) / ((q + 1) ** 2 - x * x);
 }
 
+// The choices of the menu: one Hecke operator, or a sum of them.
+export const LAWS = { 2: [2], 3: [3], 5: [5], 23: [2, 3], 235: [2, 3, 5] };
+
+// The limit law for a list of primes: { a, density(x) } on [-a, a], a = sum of 2 sqrt(l).
+// One prime: the Kesten-McKay density. Several: the convolution of the densities,
+// by discrete convolution of midpoint samples on a grid of step h.
+export function limitLaw(ells, h = 0.01) {
+  if (ells.length === 1) {
+    const q = ells[0];
+    return { a: 2 * Math.sqrt(q), density: (x) => kmDensity(q, x) };
+  }
+  let mass = null, half = 0;
+  for (const q of ells) {
+    const m = Math.ceil((2 * Math.sqrt(q)) / h), w = new Float64Array(2 * m);
+    let sum = 0;
+    for (let i = 0; i < 2 * m; i++) { w[i] = kmDensity(q, (i - m + 0.5) * h); sum += w[i]; }
+    for (let i = 0; i < 2 * m; i++) w[i] /= sum;
+    if (!mass) mass = w;
+    else {
+      const out = new Float64Array(mass.length + w.length - 1);
+      for (let i = 0; i < mass.length; i++) {
+        const mi = mass[i];
+        if (mi) for (let j = 0; j < w.length; j++) out[i + j] += mi * w[j];
+      }
+      mass = out;
+    }
+    half += m * h;
+  }
+  // mass[i] belongs to the cell centred at -half + (i + k / 2) h for k factors
+  const shift = -half + (ells.length / 2) * h;
+  const density = (x) => {
+    const t = (x - shift) / h, i = Math.floor(t), f = t - i;
+    const at = (k) => (k >= 0 && k < mass.length ? mass[k] / h : 0);
+    return at(i) * (1 - f) + at(i + 1) * f;
+  };
+  return { a: ells.reduce((acc, q) => acc + 2 * Math.sqrt(q), 0), density };
+}
+const opName = (ells) => ells.map((q) => `T${SUB[q]}`).join(" + ");
+const lawName = (ells) => (ells.length === 1 ? "the Kesten–McKay law"
+  : `the convolution ${ells.map((q) => `μ${SUB[q]}`).join(" ∗ ")}`);
+const edgeName = (ells) => ells.map((q) => `2√${q}`).join("+");
+
 // still(): true while the animation is paused (a still picture is wanted).
 export function createSpectral({ svg, base, W, H, onStatus, still }) {
   const g = el("g", { class: "wm-spec" }, svg);
   g.style.display = "none";
   let data = null, ell = 2, idx = 0, t0 = 0, holdUntil = 0, active = false;
   let bars = [], shown = [], from = [], to = [], tweenStart = 0, tweenMs = 1;
-  let label = {}, inset = null;
+  let label = {}, inset = null, law = null, ells = [2], grid = null;
 
   async function ensure() {
     if (!data) {
@@ -64,12 +113,14 @@ export function createSpectral({ svg, base, W, H, onStatus, still }) {
   // Axes, curve and empty bars: once per choice of l.
   function scaffold() {
     const q = ell;
-    a = 2 * Math.sqrt(q);
+    ells = LAWS[q] || [2];
+    law = limitLaw(ells);
+    a = law.a;
     w = (2 * a) / DISPLAY_BINS;
     const xmax = a * 1.1;
     X = (x) => L + ((x + xmax) / (2 * xmax)) * (R - L);
     let peak = 0;
-    for (let i = 0; i <= 400; i++) peak = Math.max(peak, kmDensity(q, -a + (2 * a * i) / 400));
+    for (let i = 0; i <= 400; i++) peak = Math.max(peak, law.density(-a + (2 * a * i) / 400));
     const ymax = peak * 1.75;
     Y = (y) => B - (Math.min(y, ymax) / ymax) * (B - T);
     g.replaceChildren();
@@ -82,24 +133,45 @@ export function createSpectral({ svg, base, W, H, onStatus, still }) {
     let d = "";
     for (let i = 0; i <= 300; i++) {
       const x = -a + (2 * a * i) / 300;
-      d += `${i ? "L" : "M"}${X(x).toFixed(1)},${Y(kmDensity(q, x)).toFixed(1)}`;
+      d += `${i ? "L" : "M"}${X(x).toFixed(1)},${Y(law.density(x)).toFixed(1)}`;
     }
     el("path", { class: "wm-spec-curve", d }, g);
     el("line", { class: "wm-spec-axis", x1: L, x2: R, y1: B, y2: B }, g);
-    for (let t = -Math.floor(xmax); t <= Math.floor(xmax); t++) {
+    const tickStep = a > 8 ? 2 : 1, tmax = Math.floor(xmax / tickStep) * tickStep;
+    for (let t = -tmax; t <= tmax; t += tickStep) {
       el("line", { class: "wm-spec-tick", x1: X(t), x2: X(t), y1: B, y2: B + 5 }, g);
       text(g, X(t), B + 18, t < 0 ? `−${-t}` : String(t), { class: "wm-spec-label", "text-anchor": "middle" });
     }
     for (const s of [-1, 1]) {
       el("line", { class: "wm-spec-edge", x1: X(s * a), x2: X(s * a), y1: T - 6, y2: B }, g);
-      text(g, X(s * a), T - 10, `${s < 0 ? "−" : ""}2√${q}`, { class: "wm-spec-label", "text-anchor": "middle" });
+      text(g, X(s * a), T - 10, `${s < 0 ? "−" : ""}${ells.length > 1 ? "(" : ""}${edgeName(ells)}${ells.length > 1 ? ")" : ""}`,
+        { class: "wm-spec-label", "text-anchor": "middle" });
     }
-    text(g, (L + R) / 2, H - 14, `eigenvalue λ of T${SUB[q]}`, { class: "wm-spec-label", "text-anchor": "middle" });
+    text(g, (L + R) / 2, H - 14, `eigenvalue λ of ${opName(ells)}`, { class: "wm-spec-label", "text-anchor": "middle" });
     label = {
       p: text(g, L, 34, "", { class: "wm-spec-big" }),
       dim: text(g, L, 56, "", { class: "wm-spec-label" }),
       ks: text(g, L, 76, "", { class: "wm-spec-label" }),
+      joint: text(g, L, 96, "", { class: "wm-spec-label" }),
     };
+    // "2, 3": the joint histogram of (λ₂, λ₃), in the empty corner past the left edge.
+    grid = null;
+    const nb = data.jointBins;
+    if (q === 23 && nb && data.primes[0].joint23) {
+      const side = 84, cell = side / nb, gx = X(-a) + 12, gy = T + 20;
+      text(g, gx, gy - 6, "joint law of (λ₂, λ₃)", { class: "wm-spec-small" });
+      el("rect", { class: "wm-spec-inset", x: gx - 1, y: gy - 1, width: side + 2, height: side + 2 }, g);
+      grid = [];
+      for (let i = 0; i < nb; i++) {          // i: bin of λ₂ (across), j: bin of λ₃ (upwards)
+        for (let j = 0; j < nb; j++) {
+          grid.push(el("rect", { class: "wm-spec-cell", x: (gx + i * cell).toFixed(1),
+            y: (gy + (nb - 1 - j) * cell).toFixed(1), width: cell.toFixed(1), height: cell.toFixed(1), opacity: 0 }, g));
+        }
+      }
+      text(g, gx + side / 2, gy + side + 12, "λ₂ →", { class: "wm-spec-small", "text-anchor": "middle" });
+      text(g, gx + side + 5, gy + side / 2, "λ₃ ↑", { class: "wm-spec-small" });
+      label.corr = text(g, gx, gy + side + 26, "", { class: "wm-spec-small" });
+    }
     // inset: the distance against p (log scale), for the primes shown so far
     const ix0 = W - 250, ix1 = W - 76, iy0 = 22, iy1 = 76;   // clear of the eye icon
     const lp = Math.log, pmin = lp(data.primes[0].p), pmax = lp(data.primes[data.primes.length - 1].p);
@@ -132,6 +204,17 @@ export function createSpectral({ svg, base, W, H, onStatus, still }) {
     label.p.textContent = `p = ${row.p}`;
     label.dim.textContent = `${row.dim} eigenvalues = dim S₂(Γ₀(p))`;
     label.ks.textContent = `Kolmogorov distance ${D.toFixed(3)}`;
+    if (ells.length > 1 && row.m2) {
+      const limit = ells.reduce((acc, q) => acc + q + 1, 0);
+      label.joint.textContent = `mean of λ² = ${row.m2[ell].toFixed(2)} (limit ${limit})`;
+    } else label.joint.textContent = "";
+    if (label.corr) {
+      label.corr.textContent = row.corr && row.corr["23"] != null ? `correlation ${row.corr["23"].toFixed(3)}` : "";
+    }
+    if (grid && row.joint23) {
+      const top = Math.max(1, ...row.joint23);
+      row.joint23.forEach((c, k) => grid[k].setAttribute("opacity", (0.9 * c / top).toFixed(3)));
+    }
     let path = "";
     for (let i = 0; i <= k; i++) {
       const r = data.primes[i];
@@ -146,8 +229,8 @@ export function createSpectral({ svg, base, W, H, onStatus, still }) {
     tweenMs = Math.max(1, ms * 0.85);
     if (still()) { shown = to.slice(); paintBars(shown); }
     const last = k === data.primes.length - 1;
-    onStatus(`T${SUB[ell]} on S₂(Γ₀(${row.p})): ${row.dim} eigenvalues. ` +
-      `Kolmogorov distance to the Kesten–McKay law: ${D.toFixed(3)}` +
+    onStatus(`${opName(ells)} on S₂(Γ₀(${row.p})): ${row.dim} eigenvalues. ` +
+      `Kolmogorov distance to ${lawName(ells)}: ${D.toFixed(3)}` +
       (last ? " (largest p shown; the animation starts again)." : "."));
   }
 

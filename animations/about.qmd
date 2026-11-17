@@ -20,11 +20,11 @@ This page states exactly what the [animations](walks.qmd) draw. Everything is co
 
 ### $G_p(2)$ {#graph-2}
 
-The vertex set is $S$, and every vertex has 3 outgoing edges. Apart from the trivial eigenvalue 3, every eigenvalue satisfies $\lvert\lambda\rvert \le 2\sqrt2$ (Pizer, via Deligne): this is a Ramanujan graph. The page shows the second-largest $\lvert\lambda\rvert$ (*checked* against the bound). It is offered up to $p = 20011$.
+The vertex set is $S$, and every vertex has 3 outgoing edges. Apart from the trivial eigenvalue 3, every eigenvalue satisfies $\lvert\lambda\rvert \le 2\sqrt2$ (Pizer, via Deligne): this is a Ramanujan graph. The page shows the second-largest $\lvert\lambda\rvert$ (*checked* against the bound). It is offered for the same 221 primes as the two graphs below.
 
 ### $G_p(\{2,3\})$ and $G_p(\{2,3,5\})$ {#graph-23}
 
-The same vertices, with adjacency $A_2 + A_3$, respectively $A_2 + A_3 + A_5$. Every vertex has $3 + 4$, respectively $3 + 4 + 6$, outgoing edges. The $A_\ell$ commute, so the nontrivial eigenvalues are at most $\sum 2\sqrt\ell$ in absolute value (*checked*). The 5-isogenies use the kernel polynomial $x^2 - sx + q$ of each subgroup of order 5; for them the script checks that the target is supersingular and that the Brandt symmetry holds. Both graphs are offered up to $p = 20011$. []{#graph-235}
+The same vertices, with adjacency $A_2 + A_3$, respectively $A_2 + A_3 + A_5$. Every vertex has $3 + 4$, respectively $3 + 4 + 6$, outgoing edges. The $A_\ell$ commute, so the nontrivial eigenvalues are at most $\sum 2\sqrt\ell$ in absolute value (*checked*). The 5-isogenies use the kernel polynomial $x^2 - sx + q$ of each subgroup of order 5; for them the script checks that the target is supersingular and that the Brandt symmetry holds. They are offered for 221 primes up to $p = 49991$: the 21 primes that also have graphs with level structure, and a sample of 200 primes spread roughly geometrically from 103 to 49991, with $p \equiv 1, 5, 7, 11 \pmod{12}$ equally often, so that every combination of $j = 0$ and $j = 1728$ being supersingular appears. []{#graph-235}
 
 ### Level structure $\Gamma_0(5)$: $G_p(2)$ and $G_p(\{2,3\})$ {#graph-2b5}
 
@@ -149,7 +149,19 @@ For $\ell \neq p$ the adjacency matrix of $G_p(\ell)$ is the Brandt matrix $B(\e
 $$\mu_\ell = \frac{\ell+1}{2\pi}\,\frac{\sqrt{4\ell - x^2}}{(\ell+1)^2 - x^2}\,dx \quad\text{on } [-2\sqrt\ell, 2\sqrt\ell],$$
 the spectral measure of the $(\ell+1)$-regular tree (Kesten, McKay).
 
-The animation shows the histogram of the eigenvalues for 99 primes, roughly geometrically spaced from 101 to 20011, with the density of $\mu_\ell$ in red. Between two primes the bars move continuously from one histogram to the next. The script stores a 60-bin histogram and the distance for each prime, rather than the eigenvalues, which keeps the file small. The inset tracks the Kolmogorov distance $\sup_x \lvert F_p(x) - F_\ell(x)\rvert$ between the empirical distribution function and that of $\mu_\ell$. For $\ell = 2$ it falls from 0.125 at $p = 101$ to 0.006 at $p = 20011$; for $\ell = 3$ from 0.197 to 0.007; for $\ell = 5$ from 0.232 to 0.007. The data is in `assets/data/isogeny/spectra.json`.
+The animation shows the histogram of the eigenvalues for 129 primes from 101 to 49991 (99 roughly geometrically spaced up to 20011, then the 30 sample primes above that), with the density of $\mu_\ell$ in red. Between two primes the bars move continuously from one histogram to the next. The script stores a 60-bin histogram and the distance for each prime, rather than the eigenvalues, which keeps the file small. The inset tracks the Kolmogorov distance $\sup_x \lvert F_p(x) - F_\ell(x)\rvert$ between the empirical distribution function and that of $\mu_\ell$. For $\ell = 2$ it falls from 0.125 at $p = 101$ to 0.006 at $p = 20011$ and 0.004 at $p = 49991$; for $\ell = 3$ from 0.197 to 0.007 and 0.005; for $\ell = 5$ from 0.232 to 0.007 and 0.006. The data is in `assets/data/isogeny/spectra.json`.
+
+### Sums of Hecke operators: the joint law pushed forward {#joint}
+
+The operators $T_2, T_3, T_5$ commute and are self-adjoint for the Petersson pairing, so $S_2(\Gamma_0(p))$ has a basis of simultaneous eigenvectors, each with a triple $(\lambda_2, \lambda_3, \lambda_5)$. The adjacency matrix of $G_p(L)$ is $\sum_{\ell \in L} B(\ell)$, so its eigenvalues other than $\sum_{\ell\in L}(\ell+1)$ are the sums $\sum_{\ell \in L} \lambda_\ell$ over that basis.
+
+Serre's theorem holds for finitely many primes at once (Serre, 1997): as $p \to \infty$ the tuples $(\lambda_\ell)_{\ell \in L}$ become equidistributed for the product measure $\bigotimes_{\ell\in L} \mu_\ell$. The coordinates behave as independent in the limit. The spectrum of $G_p(L)$ is the image of the tuples under $s(x) = \sum_\ell x_\ell$, so its limit is the push-forward
+$$s_*\Big(\bigotimes_{\ell \in L} \mu_\ell\Big) = \mathop{\ast}_{\ell\in L}\, \mu_\ell ,$$
+the convolution of the Kesten–McKay laws, supported on $\big[-\sum_\ell 2\sqrt\ell,\ \sum_\ell 2\sqrt\ell\big]$. With $\ell$ set to "2, 3" or "2, 3, 5" the animation draws the histogram of the sums against this convolution, computed numerically (*checked*: total mass 1, and the second moments below).
+
+Two numbers summarise the comparison. The second moment of $\mu_\ell$ is $\ell + 1$, the number of closed walks of length 2 at a vertex of the $(\ell+1)$-regular tree, and the laws are symmetric, so the convolution has second moment $\sum_\ell (\ell+1)$: $7$ for $\{2,3\}$ and $13$ for $\{2,3,5\}$. At $p = 49991$ the eigenvalues give $7.001$ and $13.003$, the correlations of the pairs $(\lambda_2,\lambda_3)$, $(\lambda_2,\lambda_5)$, $(\lambda_3,\lambda_5)$ are all below $0.001$ in absolute value, and the Kolmogorov distances to the convolutions are about $0.005$ (*checked*; the numbers are in `spectra.json`). For "2, 3" a $12 \times 12$ grid shows the joint histogram of $(\lambda_2, \lambda_3)$, which fills out to the product density.
+
+The script finds the triples by diagonalising one generic combination $S_2 + \sqrt2\,S_3 + \sqrt3\,S_5$ of the symmetrised matrices and checks that its eigenvectors are eigenvectors of each $S_\ell$.
 
 ## When the $\mathbb{F}_p$-subgraph is empty {#fixed-level}
 

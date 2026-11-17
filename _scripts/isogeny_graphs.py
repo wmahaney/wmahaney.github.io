@@ -68,13 +68,49 @@ Checks run on every prime (the script aborts if one fails):
 from __future__ import annotations
 
 import json
+import math
 import random
 import sys
 from fractions import Fraction
 from pathlib import Path
 
-DEFAULT_PRIMES = [101, 157, 211, 307, 431, 599, 827, 1009, 1499, 1999, 2503,
-                  2999, 3511, 4001, 4507, 4999, 6007, 8009, 10007, 15013, 20011]
+# The primes that get every graph, with level structure up to the caps below.
+LEVEL_PRIMES = [101, 157, 211, 307, 431, 599, 827, 1009, 1499, 1999, 2503,
+                2999, 3511, 4001, 4507, 4999, 6007, 8009, 10007, 15013, 20011]
+
+
+def _primes_upto(n: int) -> list[int]:
+    sieve = bytearray([1]) * (n + 1)
+    sieve[0] = sieve[1] = 0
+    for i in range(2, int(n ** 0.5) + 1):
+        if sieve[i]:
+            sieve[i * i::i] = bytearray(len(sieve[i * i::i]))
+    return [i for i in range(n + 1) if sieve[i]]
+
+
+def sample_primes(count: int = 200, lo: int = 101, hi: int = 50000) -> list[int]:
+    """A spread-out sample of primes for the graphs without level structure: `count`
+    primes, roughly geometric from lo to hi, cycling through p = 1, 5, 7, 11 (mod 12)
+    so that every case of j = 0 and j = 1728 being supersingular appears equally often.
+    Each is the prime of the wanted class nearest the target that is not taken yet.
+    Deterministic, so a full regeneration reproduces the same files."""
+    pool = _primes_upto(hi + 2000)
+    taken = set(LEVEL_PRIMES)
+    out: list[int] = []
+    classes = [1, 5, 7, 11]
+    for k in range(count):
+        target = math.exp(math.log(lo) + (math.log(hi) - math.log(lo)) * k / (count - 1))
+        want = classes[k % 4]
+        cands = [p for p in pool if p >= lo and p % 12 == want and p not in taken]
+        p = min(cands, key=lambda q: abs(q - target))
+        taken.add(p)
+        out.append(p)
+    return sorted(out)
+
+
+# The sample gets the three graphs without level structure only (2, 23, 235).
+SAMPLE_PRIMES = sample_primes()
+DEFAULT_PRIMES = sorted(set(LEVEL_PRIMES) | set(SAMPLE_PRIMES))
 # Largest p for each graph (recorded in index.json, which the page reads). The graphs
 # with level structure have 6 (Gamma_0(5)) or 12 (Gamma_1(5)) times as many vertices as
 # G_p(2); the full level-2 graph is a small example.
@@ -93,7 +129,8 @@ def _spectra_primes(lo=101, hi=20011, count=100):
     return out
 
 
-SPECTRA_PRIMES = _spectra_primes()
+# ... and, beyond 20011, the sample primes, whose graphs are in the data files anyway.
+SPECTRA_PRIMES = _spectra_primes() + [p for p in SAMPLE_PRIMES if p > 20011]
 SPECTRA_BINS = 60       # histogram bins over [-2 sqrt l, 2 sqrt l]
 
 # j-invariants of the CM curves with class number one: discriminant -> j
@@ -1393,44 +1430,125 @@ def compute_gamma4(p: int):
     return {"p": p, "nonresidue": F.r if F.r != p - 1 else -1, "graphs": graphs}
 
 
-def hecke_spectra(p: int):
-    """Eigenvalues of T_l on S_2(Gamma_0(p)) for l = 2, 3, 5: the eigenvalues of the
-    Brandt matrix (the adjacency matrix of G_p(l)) with the eigenvalue l + 1 of the
-    Eisenstein series removed. A D is symmetric (D = diag |Aut|), so
-    D^(-1/2) (A D) D^(-1/2) is a symmetric matrix similar to A."""
+JOINT_BINS = 12         # the joint histogram of (lambda_2, lambda_3) is JOINT_BINS x JOINT_BINS
+SUMS = {"23": (2, 3), "235": (2, 3, 5)}
+
+
+def km_density(q, xs):
+    """Density of the Kesten-McKay law of the (q + 1)-regular tree at the points xs."""
     import numpy as np
+    return (q + 1) / (2 * np.pi) * np.sqrt(np.maximum(4 * q - xs ** 2, 0)) / ((q + 1) ** 2 - xs ** 2)
+
+
+_LAW_CDF = {}
+
+
+def law_cdf(key: str):
+    """(xs, cdf) of the limit law for `key`: the Kesten-McKay law mu_l for "2", "3", "5",
+    and for "23", "235" the convolution of the mu_l, which is the push-forward of the
+    product measure under (x_l) -> sum of the x_l. Computed on a grid of step H by
+    discrete convolution of midpoint samples."""
+    import numpy as np
+    if key in _LAW_CDF:
+        return _LAW_CDF[key]
+    H = 0.002
+    mass = None
+    half = 0.0
+    for q in (SUMS[key] if key in SUMS else (int(key),)):
+        a = 2 * q ** 0.5
+        m = int(np.ceil(a / H))
+        mids = (np.arange(-m, m) + 0.5) * H
+        w = km_density(q, mids) * H
+        w /= w.sum()
+        mass = w if mass is None else np.convolve(mass, w)
+        half += m * H
+    # mass[i] sits on the cell starting at -half + i H (a sum of cells, each of width H,
+    # spreads over one more cell; that error is below H per factor)
+    xs = -half + np.arange(len(mass) + 1) * H
+    cdf = np.concatenate([[0.0], np.cumsum(mass)])
+    _LAW_CDF[key] = (xs, cdf)
+    return xs, cdf
+
+
+def spectra_row(p: int, aut, mats):
+    """One row of spectra.json from the adjacency matrices mats = {l: A_l} of G_p(l),
+    l = 2, 3, 5, and the orders aut of the automorphism groups.
+
+    A_l D is symmetric (D = diag |Aut|), so S_l = D^(-1/2) (A_l D) D^(-1/2) is symmetric
+    and similar to A_l. The S_l commute, so one orthonormal basis diagonalises all three:
+    the eigenvectors of a generic combination. That gives, for every eigenform, the
+    triple (lambda_2, lambda_3, lambda_5) of its Hecke eigenvalues: the joint law."""
+    import numpy as np
+    n = len(aut)
+    autf = np.array(aut, dtype=float)
+    d = np.sqrt(autf)
+    S = {}
+    for ell in (2, 3, 5):
+        A = np.array(mats[ell], dtype=float)
+        assert np.all(A.sum(axis=1) == ell + 1), "a row of A does not sum to l + 1"
+        S[ell] = (A * autf[None, :]) / d[:, None] / d[None, :]
+        assert np.allclose(S[ell], S[ell].T)
+    _, V = np.linalg.eigh(S[2] + 2 ** 0.5 * S[3] + 3 ** 0.5 * S[5])
+    lam = {}
+    for ell in (2, 3, 5):
+        W = S[ell] @ V
+        lam[ell] = np.einsum("ij,ij->j", V, W)
+        assert np.max(np.abs(W - V * lam[ell][None, :])) < 1e-6, "not a joint eigenbasis"
+    # The Eisenstein vector has eigenvalues (3, 4, 6); the rest is S_2(Gamma_0(p)).
+    eis = int(np.argmax(lam[2] + lam[3] + lam[5]))
+    assert all(abs(lam[ell][eis] - (ell + 1)) < 1e-7 for ell in (2, 3, 5)), "no Eisenstein vector"
+    keep = np.arange(n) != eis
+    lam = {ell: v[keep] for ell, v in lam.items()}
+    for ell, v in lam.items():
+        assert np.all(np.abs(v) <= 2 * ell ** 0.5 + 1e-7), "an eigenvalue exceeds 2 sqrt(l)"
+    values = {str(ell): v for ell, v in lam.items()}
+    for key, ells in SUMS.items():
+        values[key] = sum(lam[ell] for ell in ells)
+    # Fine histograms and Kolmogorov distances, not the eigenvalues, to keep the file small.
+    hist, ks = {}, {}
+    m = n - 1
+    i = np.arange(m)
+    for key, v in values.items():
+        a = sum(2 * q ** 0.5 for q in (SUMS[key] if key in SUMS else (int(key),)))
+        counts, _ = np.histogram(np.clip(v, -a, a), bins=SPECTRA_BINS, range=(-a, a))
+        hist[key] = [int(c) for c in counts]
+        xs, cdf = law_cdf(key)
+        F_at = np.interp(np.sort(v), xs, cdf)
+        ks[key] = round(float(max(np.max(np.abs((i + 1) / m - F_at)), np.max(np.abs(i / m - F_at)))), 4)
+    a2, a3 = 2 * 2 ** 0.5, 2 * 3 ** 0.5
+    joint, _, _ = np.histogram2d(np.clip(lam[2], -a2, a2), np.clip(lam[3], -a3, a3),
+                                 bins=JOINT_BINS, range=((-a2, a2), (-a3, a3)))
+    corr = {f"{x}{y}": round(float(np.corrcoef(lam[x], lam[y])[0, 1]), 4)
+            for x, y in ((2, 3), (2, 5), (3, 5))} if m > 2 else {}
+    # Second moments of the sums; under independence they tend to the sum of l + 1.
+    var = {key: round(float(np.mean(values[key] ** 2)), 4) for key in SUMS}
+    return {"p": p, "dim": m, "hist": hist, "ks": ks,
+            "joint23": [int(c) for c in joint.ravel()], "corr": corr, "m2": var}
+
+
+def hecke_spectra(p: int):
+    """The row of spectra.json for p, computing the graphs G_p(2), G_p(3), G_p(5)."""
     F = Fp2(p)
     js = supersingular_js(F)
     n = len(js)
     aut = [aut_order(F, j) for j in js]
-    d = np.sqrt(np.array(aut, dtype=float))
-    out = {}
-    for ell in (2, 3, 5):
-        A = np.array(adjacency_from(base_edges(F, js, ell)[0], n, ell, aut), dtype=float)
-        S = (A * np.array(aut, dtype=float)[None, :]) / d[:, None] / d[None, :]
-        assert np.allclose(S, S.T)
-        ev = np.sort(np.linalg.eigvalsh(S))
-        assert abs(ev[-1] - (ell + 1)) < 1e-8, "the top eigenvalue is not l + 1"
-        cusp = ev[:-1]
-        assert np.all(np.abs(cusp) <= 2 * ell ** 0.5 + 1e-8), "an eigenvalue exceeds 2 sqrt(l)"
-        out[str(ell)] = cusp
-    # Store a fine histogram and the Kolmogorov distance to the Kesten-McKay law, not the
-    # eigenvalues themselves, so the file stays small with many primes.
-    hist, ks = {}, {}
-    for ell, cusp in out.items():
-        q = int(ell)
-        a = 2 * q ** 0.5
-        counts, _ = np.histogram(np.clip(cusp, -a, a), bins=SPECTRA_BINS, range=(-a, a))
-        hist[ell] = [int(c) for c in counts]
-        xs = np.linspace(-a, a, 20001)
-        dens = (q + 1) / (2 * np.pi) * np.sqrt(np.maximum(4 * q - xs ** 2, 0)) / ((q + 1) ** 2 - xs ** 2)
-        cdf = np.concatenate([[0], np.cumsum((dens[1:] + dens[:-1]) / 2 * np.diff(xs))])
-        cdf /= cdf[-1]
-        F_at = np.interp(np.sort(cusp), xs, cdf)
-        m = len(cusp)
-        i = np.arange(m)
-        ks[ell] = round(float(max(np.max(np.abs((i + 1) / m - F_at)), np.max(np.abs(i / m - F_at)))), 4)
-    return {"p": p, "dim": n - 1, "hist": hist, "ks": ks}
+    mats = {ell: adjacency_from(base_edges(F, js, ell)[0], n, ell, aut) for ell in (2, 3, 5)}
+    return spectra_row(p, aut, mats)
+
+
+def spectra_from_file(out: Path, p: int):
+    """The same row from the data file p<p>-235.json, when the graphs are already there."""
+    g = json.loads((out / f"p{p}-235.json").read_text())["graph"]
+    n = len(g["nodes"])
+    aut = [int(g["aut"].get(str(v), 2)) for v in range(n)]
+    mats = {ell: [[0] * n for _ in range(n)] for ell in (2, 3, 5)}
+    for link in g["links"]:
+        s_, t_, ell, m = link[:4]
+        back = link[4] if len(link) > 4 else m
+        mats[ell][s_][t_] += m
+        if s_ != t_:
+            mats[ell][t_][s_] += back
+    return spectra_row(p, aut, mats)
 
 
 def is_prime(n: int) -> bool:
@@ -1453,7 +1571,7 @@ def main():
         old.unlink()
     total = 0
     for p in primes:
-        res = compute(p)
+        res = compute(p, level5=p in LEVEL_PRIMES)
         g = res["graphs"]
         print(f"p = {p:5d}: {len(g['2']['nodes']):4d} curves, "
               f"{res.get('n_level5', '-'):>4} level-5 vertices, "
@@ -1474,10 +1592,11 @@ def write_spectra(out: Path) -> None:
     T_2, T_3, T_5 on S_2(Gamma_0(p)) and their Kolmogorov distances to Kesten-McKay."""
     spectra = []
     for p in SPECTRA_PRIMES:
-        spectra.append(hecke_spectra(p))
+        have = (out / f"p{p}-235.json").exists()
+        spectra.append(spectra_from_file(out, p) if have else hecke_spectra(p))
         print(f"spectra: p = {p}, dim S_2 = {spectra[-1]['dim']}", flush=True)
     (out / "spectra.json").write_text(json.dumps(
-        {"bins": SPECTRA_BINS, "primes": spectra}, separators=(",", ":")) + "\n")
+        {"bins": SPECTRA_BINS, "jointBins": JOINT_BINS, "primes": spectra}, separators=(",", ":")) + "\n")
 
 
 def write_prime(out: Path, res) -> int:

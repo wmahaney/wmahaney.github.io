@@ -249,12 +249,23 @@ python3 _scripts/isogeny_graphs.py                    # the default list
 ```
 
 and commit the files it writes: one `p<prime>-<graph>.json` per prime and graph, plus
-`index.json`. It also rewrites `spectra.json` (the eigenvalue histograms for the spectral law);
-add `--skip-spectra` to leave that file alone, or `--spectra-only` to remake only it. The
-default list takes about twenty minutes. The script needs Python 3 and `numpy`, and it checks its
-own output on every prime (class number formulas, modular polynomials, mass formulas, the Brandt
-relation, the eigenvalue bounds) and stops if a check fails. The graphs it computes, and the
-largest prime for each, are listed at the top of the script.
+`index.json`. It also rewrites `spectra.json` (for the spectral law: histograms of the eigenvalues of T_2, T_3, T_5 and of the sums T_2 + T_3 and T_2 + T_3 + T_5, the joint histogram of (λ_2, λ_3), correlations and second moments; `spectra_row` in the script);
+add `--skip-spectra` to leave that file alone, or `--spectra-only` to remake only it. The script
+needs Python 3 and `numpy`, and it checks its own output on every prime (class number formulas,
+modular polynomials, mass formulas, the Brandt relation, the eigenvalue bounds) and stops if a
+check fails. The graphs it computes, and the largest prime for each, are listed at the top of the
+script.
+
+The default list has two parts, both at the top of the script. `LEVEL_PRIMES` are the 21 primes
+that get every graph, with level structure up to the caps. `SAMPLE_PRIMES` are 200 more primes
+for the graphs without level structure only: `sample_primes()` spreads them roughly
+geometrically from 101 to 50000 and cycles through p mod 12, and it is deterministic, so a
+full run reproduces the same files. The full default run takes about two hours on one core
+(the sample's largest primes take four to six minutes each). The run deletes all graph files
+first, so to add primes without remaking everything, call `compute(p, level5=False)` and
+`write_prime` from Python for the new primes, then `write_index`. Graphs above 2500 vertices
+(p beyond about 30000) get a lighter layout in the browser (`HUGE` in
+`assets/js/isogeny-hero.js`).
 
 **Directed edges.** Edges are counted by kernels, so the adjacency matrix is not symmetric next
 to a vertex with automorphisms other than ±1. A link in the data is `[s, t, ell, m]` (m edges
