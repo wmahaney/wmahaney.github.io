@@ -25,14 +25,13 @@
 #
 # TO SWITCH A TOOL ON, once its page loads at "url":
 #   1. here, change its "status: hidden" to "status: live";
-#   2. in code/basic-tools.qmd, delete the line "draft: true" (first tool only);
-#   3. in _quarto-public.yml and _quarto-private.yml, replace the plain "Code" link by the
-#      commented "Code" menu just below it, keeping one entry per live tool.
+#   2. in _quarto-public.yml and _quarto-private.yml, add an entry for it to the "Code"
+#      menu, next to the cropmark and travel_notes entries.
 
 - name: cropmark
   id: cropmark
   kind: basic-tool
-  status: hidden
+  status: live
   summary: "Crop a photo and mark it up in the browser."
   url: "https://wmahaney.github.io/cropmark-ai/"
   source: "https://github.com/wmahaney/cropmark-ai"
@@ -57,7 +56,7 @@
 - name: travel_notes
   id: travel-notes
   kind: basic-tool
-  status: hidden
+  status: live
   summary: "Markdown notes with LaTeX math, downloadable as Markdown or PDF."
   url: "https://wmahaney.github.io/travel_notes-ai/"
   source: "https://github.com/wmahaney/travel_notes-ai"

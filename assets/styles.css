@@ -163,6 +163,151 @@ h1, h2, h3, h4, h5, h6,
   gap: 0.75rem;
 }
 
+/* ---- Home page: profile photo in the hero ------------------------------ */
+/* The photo is images/profile/profile.jpg. Until it exists the frame shows the
+   initials (index.qmd swaps them in when the image fails to load). */
+.wm-hero-photo {
+  flex: none;
+  width: clamp(140px, 20vw, 220px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: var(--wm-tint);
+  border: 4px solid var(--wm-surface);
+  box-shadow: 0 0 0 1.5px var(--wm-line), 0 12px 32px rgba(30, 36, 48, 0.10);
+}
+.wm-hero-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.wm-hero-initials {
+  display: none;
+  font: 700 clamp(2rem, 4vw, 3rem)/1 Georgia, "Times New Roman", serif;
+  letter-spacing: 0.04em;
+  color: var(--wm-accent);
+}
+.wm-photo-missing .wm-hero-initials { display: block; }
+
+/* ---- Home page: side panel holding the isogeny graphs ------------------- */
+/* Opened by the tab on the right edge (assets/js/side-panel.js); on a phone the tab
+   is a button at the bottom right. On a screen at least 1600px wide the page and the
+   menu bar move left to make room; on a narrower one the panel covers the page.
+   --wm-side-w is the panel's width. */
+:root { --wm-side-w: min(560px, 100vw); }
+.wm-side {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1045;
+  width: var(--wm-side-w);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 1.25rem 1.5rem;
+  background: var(--wm-bg);
+  border-left: 1.5px solid var(--wm-line);
+  box-shadow: -12px 0 32px rgba(30, 36, 48, 0.14);
+  transform: translateX(100%);
+  visibility: hidden;
+  transition: transform 0.28s ease, visibility 0s linear 0.28s;
+}
+.wm-side-open .wm-side {
+  transform: none;
+  visibility: visible;
+  transition: transform 0.28s ease;
+}
+.wm-side .wm-graph { max-width: none; }
+.wm-side-head {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 -1.25rem 0.9rem;
+  padding: 0.85rem 1.25rem 0.7rem;
+  background: var(--wm-bg);
+  border-bottom: 1px solid var(--wm-line);
+  font-family: var(--wm-sans);
+}
+.wm-side-title {
+  flex: 1;
+  margin: 0;
+  font: 600 0.78rem/1.2 var(--wm-sans);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--wm-accent);
+}
+.wm-side-more { font-size: 0.85rem; }
+.wm-side-close {
+  padding: 0.05rem 0.45rem;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--wm-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 0.4rem;
+  cursor: pointer;
+}
+.wm-side-close:hover { color: var(--wm-ink); background: var(--wm-tint); }
+.wm-side-tab {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  z-index: 1040;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 1rem 0.55rem;
+  writing-mode: vertical-rl;
+  font: 600 0.8rem/1 var(--wm-sans);
+  letter-spacing: 0.06em;
+  color: var(--wm-accent-ink);
+  background: var(--wm-accent);
+  border: 0;
+  border-radius: 0.75rem 0 0 0.75rem;
+  box-shadow: -4px 4px 16px rgba(30, 36, 48, 0.18);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: padding 0.15s ease, transform 0.28s ease;
+}
+.wm-side-tab[hidden] { display: none; }
+.wm-side-tab:hover { padding-right: 0.8rem; }
+.wm-side-tab svg { writing-mode: horizontal-tb; flex: none; }
+.wm-side-open .wm-side-tab { transform: translate(100%, -50%); }
+body.wm-side-ready,
+.wm-side-ready #quarto-header { transition: margin-right 0.28s ease, right 0.28s ease; }
+@media (max-width: 576px) {
+  .wm-side { padding: 0 1rem 1.25rem; }
+  .wm-side-head { margin: 0 -1rem 0.9rem; padding: 0.75rem 1rem 0.6rem; }
+  .wm-side-tab {
+    top: auto;
+    right: 1rem;
+    bottom: 1rem;
+    padding: 0.7rem 1rem;
+    writing-mode: horizontal-tb;
+    border-radius: 999px;
+    transform: none;
+  }
+  .wm-side-tab:hover { padding-right: 1rem; }
+  .wm-side-open .wm-side-tab { transform: translateY(200%); }
+}
+@media (min-width: 1600px) {
+  .wm-side { box-shadow: none; }
+  body.wm-side-open { margin-right: var(--wm-side-w); }
+  .wm-side-open #quarto-header { right: var(--wm-side-w); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wm-side, .wm-side-open .wm-side, .wm-side-tab,
+  body.wm-side-ready, .wm-side-ready #quarto-header { transition: none; }
+}
+@media print {
+  .wm-side, .wm-side-tab { display: none !important; }
+}
+
 /* ---- Home page: interactive isogeny graph ------------------------------ */
 .wm-graph {
   position: relative;
@@ -407,21 +552,13 @@ h1, h2, h3, h4, h5, h6,
   color: var(--wm-muted);
 }
 
-/* ---- Home page: about box, with an optional photo ------------------------- */
+/* ---- Home page: about box --------------------------------------------------- */
 .wm-about {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 1.25rem 2rem;
   padding: 1.5rem 1.75rem;
-}
-.wm-about-photo {
-  flex: none;
-  width: 132px;
-  height: 132px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid var(--wm-surface);
 }
 .wm-about-text {
   flex: 1 1 18rem;
