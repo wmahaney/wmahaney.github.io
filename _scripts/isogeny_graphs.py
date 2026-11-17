@@ -68,13 +68,49 @@ Checks run on every prime (the script aborts if one fails):
 from __future__ import annotations
 
 import json
+import math
 import random
 import sys
 from fractions import Fraction
 from pathlib import Path
 
-DEFAULT_PRIMES = [101, 157, 211, 307, 431, 599, 827, 1009, 1499, 1999, 2503,
-                  2999, 3511, 4001, 4507, 4999, 6007, 8009, 10007, 15013, 20011]
+# The primes that get every graph, with level structure up to the caps below.
+LEVEL_PRIMES = [101, 157, 211, 307, 431, 599, 827, 1009, 1499, 1999, 2503,
+                2999, 3511, 4001, 4507, 4999, 6007, 8009, 10007, 15013, 20011]
+
+
+def _primes_upto(n: int) -> list[int]:
+    sieve = bytearray([1]) * (n + 1)
+    sieve[0] = sieve[1] = 0
+    for i in range(2, int(n ** 0.5) + 1):
+        if sieve[i]:
+            sieve[i * i::i] = bytearray(len(sieve[i * i::i]))
+    return [i for i in range(n + 1) if sieve[i]]
+
+
+def sample_primes(count: int = 200, lo: int = 101, hi: int = 50000) -> list[int]:
+    """A spread-out sample of primes for the graphs without level structure: `count`
+    primes, roughly geometric from lo to hi, cycling through p = 1, 5, 7, 11 (mod 12)
+    so that every case of j = 0 and j = 1728 being supersingular appears equally often.
+    Each is the prime of the wanted class nearest the target that is not taken yet.
+    Deterministic, so a full regeneration reproduces the same files."""
+    pool = _primes_upto(hi + 2000)
+    taken = set(LEVEL_PRIMES)
+    out: list[int] = []
+    classes = [1, 5, 7, 11]
+    for k in range(count):
+        target = math.exp(math.log(lo) + (math.log(hi) - math.log(lo)) * k / (count - 1))
+        want = classes[k % 4]
+        cands = [p for p in pool if p >= lo and p % 12 == want and p not in taken]
+        p = min(cands, key=lambda q: abs(q - target))
+        taken.add(p)
+        out.append(p)
+    return sorted(out)
+
+
+# The sample gets the three graphs without level structure only (2, 23, 235).
+SAMPLE_PRIMES = sample_primes()
+DEFAULT_PRIMES = sorted(set(LEVEL_PRIMES) | set(SAMPLE_PRIMES))
 # Largest p for each graph (recorded in index.json, which the page reads). The graphs
 # with level structure have 6 (Gamma_0(5)) or 12 (Gamma_1(5)) times as many vertices as
 # G_p(2); the full level-2 graph is a small example.
@@ -1453,7 +1489,7 @@ def main():
         old.unlink()
     total = 0
     for p in primes:
-        res = compute(p)
+        res = compute(p, level5=p in LEVEL_PRIMES)
         g = res["graphs"]
         print(f"p = {p:5d}: {len(g['2']['nodes']):4d} curves, "
               f"{res.get('n_level5', '-'):>4} level-5 vertices, "
