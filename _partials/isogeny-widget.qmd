@@ -6,6 +6,38 @@
 
 ```{=html}
 <figure class="wm-graph" id="wm-graph">
+  <!-- THE INFO PANEL. One block per entry of the animation menu (data-anim is the entry's
+       value). The script shows the block of the animation that is running, so the title,
+       description and parameters always belong to what is on screen. To change what is
+       said about an animation, edit its block here. -->
+  <div class="wm-anim-info">
+    <section data-anim="view" data-title="Graph viewer" hidden>
+      <p class="wm-anim-title">Graph viewer</p>
+      <p>The graph, with nothing moving. A vertex is a supersingular elliptic curve up to isomorphism over the algebraic closure of F<sub>p</sub>, labelled by its j-invariant; an edge is an ℓ-isogeny. Where the numbers of isogenies in the two directions differ, each one is drawn with an arrowhead; this happens next to a vertex with automorphisms other than ±1, and everywhere in the Γ<sub>1</sub>(5) graph. Hover or tap a vertex for its label, and drag to rearrange.</p>
+      <p class="wm-anim-params"><span>Parameters</span> graph · view · p · j labels</p>
+    </section>
+    <section data-anim="walk" data-title="Random walks" hidden>
+      <p class="wm-anim-title">Random walk</p>
+      <p>A walker starts at a random vertex and moves along the edges. The laser is the step being taken and the trail is its recent history. <span class="wm-anim-which">This is the Petersson walk: at each step every isogeny out of the current curve is equally likely, where isogenies are counted up to sign. A kernel leading to j = 0 then counts three times and one leading to j = 1728 twice, so the walk differs from choosing a kernel at random only next to those two curves.</span> The walk is switched off when the graph shown is not connected.</p>
+      <p class="wm-anim-pi" aria-live="polite"></p>
+      <p class="wm-anim-params"><span>Parameters</span> graph · view · p · history (how many recent steps stay highlighted) · speed</p>
+    </section>
+    <section data-anim="cycle" data-title="Blooming for collision" hidden>
+      <p class="wm-anim-title">Blooming for collision</p>
+      <p>A ball grows around a vertex one layer at a time (breadth-first search) and stops when it runs into itself: an edge reaches a vertex already in the ball, other than along the edge it came in by. That closes a cycle, shown in bold. A loop counts as a cycle of length 1, and two parallel edges as one of length 2. Tap a vertex to start from it.</p>
+      <p class="wm-anim-params"><span>Parameters</span> graph · view · p · speed</p>
+    </section>
+    <section data-anim="ball" data-title="Blooming for conjugates" hidden>
+      <p class="wm-anim-title">Blooming for conjugates</p>
+      <p>A ball grows around a vertex one layer at a time and stops when it contains a vertex w together with its Frobenius conjugate w<sup>(p)</sup> ≠ w. Where it stopped is red, and the shortest paths from the centre are bold. In the quotient by Frobenius it stops when it reaches a vertex a second time by the other lift, or reaches a vertex fixed by Frobenius. Tap a vertex to start from it.</p>
+      <p class="wm-anim-params"><span>Parameters</span> graph · view (full graph or quotient by Frobenius) · p · speed</p>
+    </section>
+    <section data-anim="spectral" data-title="Spectral law" hidden>
+      <p class="wm-anim-title">Spectral law (Kesten–McKay)</p>
+      <p>For a prime ℓ ≠ p, the eigenvalues of the Hecke operator T<sub>ℓ</sub> on the weight-2 cusp forms S<sub>2</sub>(Γ<sub>0</sub>(p)) are the eigenvalues of the adjacency matrix of G<sub>p</sub>(ℓ) other than ℓ + 1. The histogram shows them for about 100 primes p from 101 to 20011, against the Kesten–McKay density (red). The corner shows the Kolmogorov distance between the two. Serre proved that they agree in the limit p → ∞.</p>
+      <p class="wm-anim-params"><span>Parameters</span> ℓ · speed</p>
+    </section>
+  </div>
   <div class="wm-graph-controls">
     <div class="wm-graph-kinds">
     <div class="wm-seg" role="group" aria-label="Which isogeny graph to draw">
@@ -19,7 +51,7 @@
       <button type="button" data-kind="3g4" aria-pressed="false">3 · Γ(4)</button>
       <button type="button" data-kind="5g4" aria-pressed="false">5 · Γ(4)</button>
     </div>
-    <button type="button" class="wm-q" data-terms="supersingular isogeny graph2 level loops" aria-label="What are these graphs?" aria-expanded="false">?</button>
+    <button type="button" class="wm-q" data-terms="supersingular isogeny graph2 level loops directed" aria-label="What are these graphs?" aria-expanded="false">?</button>
     </div>
     <div class="wm-graph-selects">
       <label class="wm-graph-view">view
@@ -70,6 +102,7 @@
         <option value="250">250 steps</option>
       </select>
     </label>
+    <button type="button" class="wm-graph-play" aria-label="Pause the animation">Pause</button>
     <label class="wm-graph-speed-label">speed
       <select class="wm-graph-speed" aria-label="Speed of the random walk">
         <option value="calm">calm</option>
@@ -87,6 +120,7 @@
       <span class="wm-graph-legend-pair" hidden><i class="wm-key wm-key-pair"></i>conjugate pair {E, E<sup>(p)</sup>}</span>
       <span class="wm-graph-legend-fp"><i class="wm-key wm-key-fp"></i><span>fixed by Frobenius</span></span>
       <span><i class="wm-key wm-key-2"></i>2-isogeny</span>
+      <span class="wm-graph-legend-arrow" hidden><i class="wm-key wm-key-arrow"></i>one isogeny, in the direction of the arrow</span>
       <span class="wm-graph-legend-3" hidden><i class="wm-key wm-key-3"></i>3-isogeny</span>
       <span class="wm-graph-legend-cls" hidden><i class="wm-key wm-key-node"></i><i class="wm-key wm-key-c1"></i>the two Weil-pairing classes</span>
       <span class="wm-graph-legend-frob" hidden><i class="wm-key wm-key-frob"></i>Frobenius</span>
@@ -94,19 +128,19 @@
       <span class="wm-graph-legend-spec"><i class="wm-key wm-key-bar"></i>eigenvalues (histogram) <i class="wm-key wm-key-3"></i>Kesten–McKay density</span>
       <span class="wm-graph-legend-ball"><i class="wm-key wm-key-ball"></i>ball <i class="wm-key wm-key-hit"></i>shortest paths to the conjugate pair (red)</span>
       <span class="wm-graph-legend-walk"><i class="wm-key wm-key-walk"></i><i class="wm-key wm-key-trail"></i>laser walker; trail of the last <span class="wm-trail-n">10</span> steps</span>
-      <button type="button" class="wm-q" data-terms="supersingular fp pair lambda" aria-label="What do the colours and numbers mean?" aria-expanded="false">?</button>
+      <button type="button" class="wm-q" data-terms="supersingular fp pair directed lambda" aria-label="What do the colours and numbers mean?" aria-expanded="false">?</button>
     </span>
     <span class="wm-graph-field"></span>
-    <span class="wm-graph-hint">Hover or tap a vertex for its j-invariant; drag to rearrange. In the growing-ball animation, tap a vertex to grow a ball from it. <a href="/animations/">More animations →</a></span>
+    <span class="wm-graph-hint"><a href="/animations/">More animations →</a></span>
   </figcaption>
   <div class="wm-graph-pop" role="dialog" aria-label="Explanation" hidden></div>
   <details class="wm-graph-glossary">
     <summary>What do these terms mean?</summary>
     <dl>
       <dt data-term="supersingular">Supersingular curve (a vertex)</dt>
-      <dd>An elliptic curve in characteristic p with no point of order p, even over the algebraic closure. Up to isomorphism there are about p/12 of them, and all are defined over F<sub>p²</sub>.</dd>
+      <dd>An elliptic curve in characteristic p with no point of order p, even over the algebraic closure. Up to isomorphism over the algebraic closure there are about p/12 of them, and each has a model defined over F<sub>p²</sub>.</dd>
       <dt data-term="jinv">j-invariant</dt>
-      <dd>A number that identifies a curve up to isomorphism; it labels the vertices (switch labels off with <em>j labels</em>; on big graphs, hover instead). It lies in F<sub>p²</sub> and is written a + bi, with i as in the note under the graph; a ± bi labels a conjugate pair in the quotient by Frobenius. With level structure the label is j(E).</dd>
+      <dd>A number that identifies an elliptic curve up to isomorphism over the algebraic closure of F<sub>p</sub> (over a finite field, two curves with the same j-invariant can be twists that are not isomorphic); it labels the vertices (switch labels off with <em>j labels</em>; on big graphs, hover instead). It lies in F<sub>p²</sub> and is written a + bi, with i as in the note under the graph; a ± bi labels a conjugate pair in the quotient by Frobenius. With level structure the label is j(E).</dd>
       <dt data-term="isogeny">ℓ-isogeny (an edge)</dt>
       <dd>A map between two curves, given by rational functions, that respects the group law and has a kernel of ℓ points. A curve has ℓ + 1 of them, one for each subgroup of order ℓ: three 2-isogenies (blue), four 3-isogenies (red), six 5-isogenies (green).</dd>
       <dt data-term="graph2">ℓ = 2; ℓ = 2, 3; ℓ = 2, 3, 5</dt>
@@ -115,12 +149,14 @@
       <dd>A vertex is a curve E with extra data, which an isogeny φ: E → E′ of degree prime to the level carries along. <strong>Γ<sub>0</sub>(5)</strong>: a subgroup C of order 5, edge (E, C) → (E′, φ(C)); about 6 vertices per curve. <strong>Γ<sub>1</sub>(5)</strong>: a point P of order 5 up to sign, edge (E, ±P) → (E′, ±φ(P)); about 12 vertices per curve. This graph is directed, because the dual isogeny leads back to (E, ±2P). <strong>Γ(2)</strong> (full level 2): an ordered basis (P, Q) of E[2]; these are the Legendre invariants λ, (p − 1)/2 of them. <strong>Γ(4)</strong> (full level 4): an ordered basis of E[4], 4(p − 1) vertices; the Weil pairing e<sub>4</sub>(P, Q) = ±i splits them into two classes, which 3-isogenies swap and 5-isogenies preserve, so "5 · Γ(4)" is disconnected. The label before the · says which isogenies are edges.</dd>
       <dt data-term="loops">Loops and parallel edges</dt>
       <dd>Two curves can be joined by several isogenies, drawn as parallel arcs, and an isogeny from a curve to itself is drawn as a loop.</dd>
+      <dt data-term="directed">Arrowheads</dt>
+      <dd>Edges are counted by kernels, so the graph is directed: A<sub>ij</sub> is the number of subgroups K of E<sub>i</sub> with E<sub>i</sub>/K ≅ E<sub>j</sub>. For most pairs A<sub>ij</sub> = A<sub>ji</sub>, and each such pair of opposite isogenies is drawn as one plain edge. Next to a vertex with automorphisms other than ±1 (without level structure: j = 0 and j = 1728) the two counts differ. There every isogeny is drawn on its own, with an arrowhead. The Γ<sub>1</sub>(5) graph is directed everywhere.</dd>
       <dt data-term="p">p</dt>
       <dd>The characteristic, a prime: the curves live over finite fields with p<sup>k</sup> elements. The graph has about p/12 vertices, so a larger p gives a larger graph.</dd>
       <dt data-term="fp">Fixed by Frobenius (gold)</dt>
       <dd>A vertex isomorphic to its Frobenius image. Without level structure this means its j-invariant lies in F<sub>p</sub> (b = 0). With level structure Frobenius moves the level structure too, so it is a stronger condition: (E, C) ≅ (E<sup>(p)</sup>, C<sup>(p)</sup>), i.e. the pair is defined over F<sub>p</sub>.</dd>
       <dt data-term="frobenius">Frobenius</dt>
-      <dd>Raising every coordinate to the p-th power sends a curve E to a curve E<sup>(p)</sup> and a subgroup K of E to a subgroup K<sup>(p)</sup> of E<sup>(p)</sup>; on j-invariants it is a + bi ↦ a − bi. It sends the edge E → E/K to the edge E<sup>(p)</sup> → E<sup>(p)</sup>/K<sup>(p)</sup>, so it is a symmetry of the whole graph, on vertices and on edges, and applying it twice gives back every vertex and edge.</dd>
+      <dd>Raising every coordinate to the p-th power sends a curve E to a curve E<sup>(p)</sup> and a subgroup K of E to a subgroup K<sup>(p)</sup> of E<sup>(p)</sup>; on j-invariants it is a + bi ↦ a − bi. It sends the edge E → E/K to the edge E<sup>(p)</sup> → E<sup>(p)</sup>/K<sup>(p)</sup>, so it is a symmetry of the whole graph, on vertices and on edges. Applying it twice gives back every vertex and edge, except with Γ<sub>1</sub>(5) structure when p ≡ ±2 (mod 5), where it takes four applications.</dd>
       <dt data-term="pair">Conjugate pair</dt>
       <dd>A vertex E and its Frobenius image E<sup>(p)</sup>, when the two are different.</dd>
       <dt data-term="full">Full graph</dt>
@@ -134,7 +170,7 @@
       <dt data-term="viewer">Graph viewer</dt>
       <dd>Just the graph: hover or tap a vertex for its label, drag to rearrange. The other entries of the animation menu animate it.</dd>
       <dt data-term="walk">Random walk</dt>
-      <dd>At each step the walker moves along an edge chosen at random, starting from a random vertex. The laser beam shows the step being taken; <em>history</em> is how many recent steps stay highlighted; <em>speed</em> is how fast it moves.</dd>
+      <dd>The walker starts at a random vertex and follows the <em>Petersson walk</em> on the full graphs, with or without level structure: the probability of stepping from v to w is proportional to the number of isogenies from v to w of the degrees in use, counted up to sign. That number is the number of kernels times |Aut(w)|/2, where Aut(w) is the group of automorphisms of the curve that preserve its level structure. Without level structure a kernel leading to j = 0 counts three times and one leading to j = 1728 twice. With Γ<sub>0</sub>(5) structure two vertices over j = 1728 count twice (when j = 1728 is supersingular); with Γ<sub>1</sub>(5), Γ(2) and Γ(4) structure every vertex weighs the same, so the walk is the simple random walk. On the other views (the 𝔽<sub>p</sub>-subgraph, the vertices over it, the quotient by Frobenius) it is the simple random walk: each edge out of the vertex is equally likely, and arrows are followed only forwards. The laser beam shows the step being taken; <em>history</em> is how many recent steps stay highlighted; <em>speed</em> is how fast it moves.</dd>
       <dt data-term="cycle">Blooming for collision</dt>
       <dd>A ball grows from a vertex one layer at a time (breadth-first search) until it collides with itself: an edge reaches a vertex already in the ball, closing a cycle (a loop counts as length 1, two parallel edges as length 2). The cycle is shown in bold. Works in every view; tap a vertex to start there.</dd>
       <dt data-term="ball">Blooming for conjugates</dt>
@@ -144,7 +180,7 @@
       <dt data-term="km">Kesten–McKay law</dt>
       <dd>The distribution with density (ℓ+1)√(4ℓ − x²) / (2π((ℓ+1)² − x²)) on [−2√ℓ, 2√ℓ]: the spectral measure of the infinite (ℓ+1)-regular tree. Serre proved that the eigenvalues of T<sub>ℓ</sub> on S<sub>2</sub>(Γ<sub>0</sub>(p)) become distributed according to it as p → ∞.</dd>
       <dt data-term="lambda">Second-largest eigenvalue</dt>
-      <dd>The largest eigenvalue of the adjacency matrix is the number of edges at each vertex; the next largest in absolute value measures how fast random walks spread out (smaller is faster). These graphs are Ramanujan graphs: it is at most 2√ℓ for each ℓ, so at most 2√2 for ℓ = 2, 2√2 + 2√3 for ℓ = 2, 3, and 2√2 + 2√3 + 2√5 for ℓ = 2, 3, 5.</dd>
+      <dd>The largest eigenvalue of the adjacency matrix is the number of edges at each vertex; the next largest in absolute value measures how fast random walks spread out (smaller is faster). For a single ℓ it is at most 2√ℓ, the Ramanujan bound (Pizer, using Deligne's bound), so at most 2√2 for ℓ = 2. With several ℓ the adjacency matrices commute, so it is at most the sum of these bounds: 2√2 + 2√3 for ℓ = 2, 3, and 2√2 + 2√3 + 2√5 for ℓ = 2, 3, 5. That sum is larger than the Ramanujan bound for a graph of the combined degree, so only the graphs with a single ℓ are called Ramanujan here.</dd>
     </dl>
   </details>
 </figure>

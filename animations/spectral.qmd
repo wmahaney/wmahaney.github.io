@@ -3,7 +3,9 @@ title: "Spectral law"
 description-meta: "The eigenvalues of the Hecke operator T_l on S_2(Gamma_0(p)) approach the Kesten-McKay law as p grows."
 ---
 
-For a prime $\ell \neq p$, the adjacency matrix of the isogeny graph $G_p(\ell)$ has eigenvalue $\ell + 1$, and its other eigenvalues are those of the Hecke operator $T_\ell$ on the weight-2 cusp forms $S_2(\Gamma_0(p))$. Serre proved that, as $p \to \infty$, these eigenvalues become distributed according to the Kesten–McKay law of the $(\ell+1)$-regular tree. The animation shows this for $\ell = 2, 3, 5$ and about 100 primes from 101 to 20011, gliding from one to the next: the histogram of the eigenvalues, the Kesten–McKay density (red), and in the corner the Kolmogorov distance between the two, which shrinks as $p$ grows.
+<!-- The description of each animation is in the box at the top of the picture. Its text
+     is in _partials/isogeny-widget.qmd, one block per animation, and it changes when the
+     animation menu changes. -->
 
 ::: {data-mode="spectral"}
 {{< include /_partials/isogeny-widget.qmd >}}
@@ -12,5 +14,7 @@ For a prime $\ell \neq p$, the adjacency matrix of the isogeny graph $G_p(\ell)$
 ```{=html}
 <script type="module" src="../assets/js/isogeny-hero.js"></script>
 ```
+
+For a prime $\ell \neq p$, the adjacency matrix of the isogeny graph $G_p(\ell)$ has eigenvalue $\ell + 1$, and its other eigenvalues are those of the Hecke operator $T_\ell$ on the weight-2 cusp forms $S_2(\Gamma_0(p))$. Serre proved that, as $p \to \infty$, these eigenvalues become distributed according to the Kesten–McKay law of the $(\ell+1)$-regular tree. The animation shows this for $\ell = 2, 3, 5$ and about 100 primes from 101 to 20011, gliding from one to the next: the histogram of the eigenvalues, the Kesten–McKay density (red), and in the corner the Kolmogorov distance between the two, which shrinks as $p$ grows.
 
 The statement and the numbers are on the [Read more](about.qmd#spectral) page.

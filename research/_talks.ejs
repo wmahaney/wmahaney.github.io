@@ -1,0 +1,18 @@
+```{=html}
+<%
+// The list of talks, from research/talks.yml. A talk with a "slides" file name gets a
+// Slides link to files/talks/<name>; a talk without one gets nothing.
+const esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+%>
+<ul class="wm-talks">
+<% for (const talk of items) { const slides = String(talk.slides || "").trim(); %>
+  <li>
+    <span class="wm-talk-year"><%= esc(talk.year) %></span>
+    <div class="wm-talk-body">
+      <div class="wm-talk-title"><%= esc(talk.title) %></div>
+      <div class="wm-talk-venue"><%= esc(talk.venue) %><% if (slides) { %> <a class="wm-chip" href="../files/talks/<%= encodeURI(slides) %>">Slides</a><% } %></div>
+    </div>
+  </li>
+<% } %>
+</ul>
+```

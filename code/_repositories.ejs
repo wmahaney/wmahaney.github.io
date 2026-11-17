@@ -1,0 +1,35 @@
+```{=html}
+<%
+// The Code overview: a link to Basic Tools when a tool is live, and the list of
+// repositories. Sections with nothing to show are left out, headings included.
+const esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const live = items.filter((it) => it.status === "live");
+const tools = live.filter((it) => it.kind === "basic-tool");
+const repos = live.filter((it) => it.source);
+const KIND = { "basic-tool": "Browser tool", research: "Research code", other: "Other" };
+%>
+<% if (tools.length) { %>
+<div class="wm-box wm-code-tools">
+  <span class="wm-box-label">Basic Tools</span>
+  <p>Small tools that run in your browser: <% tools.forEach((it, k) => { %><a href="basic-tools.html#<%= esc(it.id) %>"><%= esc(it.name) %></a><%= k < tools.length - 1 ? ", " : "" %><% }) %>. <a href="basic-tools.html">What each one does →</a></p>
+</div>
+<% } %>
+<% if (repos.length) { %>
+<h2 id="repositories">Repositories</h2>
+<ul class="wm-repos">
+  <% for (const it of repos) { %>
+  <li class="wm-repo">
+    <div class="wm-repo-meta"><%= esc(KIND[it.kind] || it.kind) %><% if (it.license) { %> · <%= esc(it.license) %><% } %></div>
+    <div class="wm-repo-name"><a href="<%= esc(it.source) %>"><%= esc(it.name) %></a></div>
+    <div class="wm-repo-summary"><%= esc(it.summary) %></div>
+    <% if (it.paper || (it.kind === "basic-tool" && it.url)) { %>
+    <div class="wm-paper-links">
+      <% if (it.paper) { %><a class="wm-chip" href="<%= esc(it.paper) %>">Paper</a><% } %>
+      <% if (it.kind === "basic-tool" && it.url) { %><a class="wm-chip" href="basic-tools.html#<%= esc(it.id) %>">About this tool</a><% } %>
+    </div>
+    <% } %>
+  </li>
+  <% } %>
+</ul>
+<% } %>
+```

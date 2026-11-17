@@ -1,0 +1,31 @@
+```{=html}
+<%
+// One section per live basic tool, from code/projects.yml.
+const esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const tools = items.filter((it) => it.kind === "basic-tool" && it.status === "live");
+%>
+<% for (const it of tools) { %>
+<section class="wm-tool" id="<%= esc(it.id) %>" aria-labelledby="<%= esc(it.id) %>-title">
+  <h2 class="wm-tool-title" id="<%= esc(it.id) %>-title"><%= esc(it.name) %></h2>
+  <p class="wm-tool-about"><%= esc(it.about || it.summary) %></p>
+  <% if (it.usage && it.usage.length) { %>
+  <h3 class="wm-tool-label">How to use it</h3>
+  <ol class="wm-tool-list">
+    <% for (const step of it.usage) { %><li><%= esc(step) %></li><% } %>
+  </ol>
+  <% } %>
+  <% if (it.limits && it.limits.length) { %>
+  <h3 class="wm-tool-label">Limits</h3>
+  <ul class="wm-tool-list">
+    <% for (const lim of it.limits) { %><li><%= esc(lim) %></li><% } %>
+  </ul>
+  <% } %>
+  <p class="wm-tool-facts">Runs in your browser, nothing is uploaded. Built with Claude.<% if (it.license) { %> License: <%= esc(it.license) %>.<% } %></p>
+  <p class="wm-tool-actions">
+    <a class="wm-btn wm-btn-fill" href="<%= esc(it.url) %>">Open <%= esc(it.name) %></a>
+    <% if (it.source) { %><a class="wm-btn wm-btn-outline" href="<%= esc(it.source) %>">Source</a><% } %>
+    <% for (const more of (it.also || [])) { %><a class="wm-chip" href="<%= esc(more.url) %>"><%= esc(more.label) %></a><% } %>
+  </p>
+</section>
+<% } %>
+```

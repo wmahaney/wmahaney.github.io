@@ -30,7 +30,8 @@ export function kmDensity(q, x) {
   return r <= 0 ? 0 : ((q + 1) / (2 * Math.PI)) * Math.sqrt(r) / ((q + 1) ** 2 - x * x);
 }
 
-export function createSpectral({ svg, base, W, H, onStatus, reduced }) {
+// still(): true while the animation is paused (a still picture is wanted).
+export function createSpectral({ svg, base, W, H, onStatus, still }) {
   const g = el("g", { class: "wm-spec" }, svg);
   g.style.display = "none";
   let data = null, ell = 2, idx = 0, t0 = 0, holdUntil = 0, active = false;
@@ -143,7 +144,7 @@ export function createSpectral({ svg, base, W, H, onStatus, reduced }) {
     to = heights(k);
     tweenStart = now;
     tweenMs = Math.max(1, ms * 0.85);
-    if (reduced) { shown = to.slice(); paintBars(shown); }
+    if (still()) { shown = to.slice(); paintBars(shown); }
     const last = k === data.primes.length - 1;
     onStatus(`T${SUB[ell]} on S₂(Γ₀(${row.p})): ${row.dim} eigenvalues. ` +
       `Kolmogorov distance to the Kesten–McKay law: ${D.toFixed(3)}` +
@@ -162,7 +163,15 @@ export function createSpectral({ svg, base, W, H, onStatus, reduced }) {
       g.style.display = "";
       scaffold();
       t0 = performance.now(); holdUntil = 0;
-      goTo(reduced ? data.primes.length - 1 : 0, t0, 600);
+      // Paused: the largest prime, where the histogram is closest to the law.
+      goTo(still() ? data.primes.length - 1 : 0, t0, 600);
+    },
+    // Play pressed: run through the primes from the first one.
+    restart() {
+      if (!active || !data) return;
+      shown = new Array(DISPLAY_BINS).fill(0);
+      t0 = performance.now(); holdUntil = 0;
+      goTo(0, t0, 600);
     },
     hide() { active = false; g.style.display = "none"; },
     setEll(l) {
@@ -170,11 +179,11 @@ export function createSpectral({ svg, base, W, H, onStatus, reduced }) {
       if (active && data) {
         scaffold();
         goTo(idx, performance.now(), 600);
-        if (reduced) paintBars(shown);
+        if (still()) paintBars(shown);
       }
     },
     step(now, ms) {
-      if (!active || !data || reduced) return;
+      if (!active || !data || still()) return;
       // the glide between two histograms
       const t = Math.min(1, (now - tweenStart) / tweenMs), e = t * t * (3 - 2 * t);
       shown = from.map((f, k) => f + (to[k] - f) * e);
