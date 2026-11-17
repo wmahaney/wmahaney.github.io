@@ -249,7 +249,7 @@ python3 _scripts/isogeny_graphs.py                    # the default list
 ```
 
 and commit the files it writes: one `p<prime>-<graph>.json` per prime and graph, plus
-`index.json`. It also rewrites `spectra.json` (the eigenvalue histograms for the spectral law);
+`index.json`. It also rewrites `spectra.json` (for the spectral law: histograms of the eigenvalues of T_2, T_3, T_5 and of the sums T_2 + T_3 and T_2 + T_3 + T_5, the joint histogram of (λ_2, λ_3), correlations and second moments; `spectra_row` in the script);
 add `--skip-spectra` to leave that file alone, or `--spectra-only` to remake only it. The script
 needs Python 3 and `numpy`, and it checks its own output on every prime (class number formulas,
 modular polynomials, mass formulas, the Brandt relation, the eigenvalue bounds) and stops if a

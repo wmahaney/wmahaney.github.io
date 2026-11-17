@@ -984,6 +984,7 @@ body.quarto-dark .quarto-color-scheme-toggle .bi::before,
 .wm-spec-inset { fill: var(--wm-tint); stroke: var(--wm-line); }
 .wm-spec-trace { fill: none; stroke: var(--wm-accent); stroke-width: 1.6; }
 .wm-spec-dot { fill: var(--wm-accent); }
+.wm-spec-cell { fill: var(--wm-accent); }
 .wm-spec-dot.wm-spec-now { fill: var(--wm-red); }
 .wm-key-bar { width: 0.7rem; height: 0.7rem; border-radius: 2px; background: var(--wm-accent); opacity: 0.6; }
 
