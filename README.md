@@ -77,8 +77,8 @@ File: `index.qmd`.
 | News | The list inside `::: {.wm-news}`. Newest first, three or four items. Each item is `- [date]{.wm-news-date} text`. Delete the whole block to hide News |
 | The four cards (Research, Writing, Code, Teaching) | The `<section class="wm-cards">` block. Each card is one `<a class="wm-card" ...> ... </a>`. Icon names come from [Bootstrap Icons](https://icons.getbootstrap.com) |
 | About me | The paragraphs inside `::: {.wm-about-text}` |
-| Profile photo | Upload `images/profile/profile.jpg` (see the note in that folder). Until it exists, no photo is shown |
-| The graph next to your name | See [Animations and the isogeny graphs](#animations-and-the-isogeny-graphs) |
+| Profile photo (the circle beside your name) | Upload `images/profile/profile.jpg` (see the note in that folder). Until it exists, the circle shows the initials WEM |
+| The isogeny graphs | They sit in a side panel, opened by the "Isogeny graphs" tab on the right edge of the page (a button at the bottom right on a phone). The panel is the block at the end of `index.qmd`; it opens and closes with `assets/js/side-panel.js`, and its look is under "side panel" in `assets/styles.css`. On a screen at least 1600px wide the page moves over to make room; on a narrower one the panel covers it. For the graph itself see [Animations and the isogeny graphs](#animations-and-the-isogeny-graphs) |
 
 ## Menu bar and profile links
 
@@ -159,9 +159,10 @@ overview shows its introduction only, with no empty heading.
 **Switch a browser tool on**, once its page loads at its `url`:
 
 1. in `code/projects.yml`, change its `status: hidden` to `status: live`;
-2. in `code/basic-tools.qmd`, delete the line `draft: true` (needed for the first tool only);
-3. in `_quarto-public.yml` and `_quarto-private.yml`, replace the plain `Code` link by the
-   commented `Code` menu just below it, keeping one entry per live tool.
+2. in `_quarto-public.yml` and `_quarto-private.yml`, add an entry for it to the `Code` menu,
+   next to the cropmark and travel_notes entries.
+
+To take a tool off the site, set it back to `status: hidden` and delete its menu entry.
 
 **Move a tool** (a renamed repository, a custom domain): change its `url:` and `source:` in
 `code/projects.yml`. The address is written nowhere else.
@@ -219,7 +220,7 @@ page (`statements/index.qmd`) are drafts too, and work the same way. To add an A
 
 ## Animations and the isogeny graphs
 
-The interactive graph on the home page and on the Animations pages is one shared piece:
+The interactive graph in the home page's side panel and on the Animations pages is one shared piece:
 
 | Part | File |
 |---|---|

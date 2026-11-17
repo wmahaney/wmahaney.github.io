@@ -1,10 +1,6 @@
 ---
 title: "Basic Tools"
 description-meta: "Small tools by William E. Mahaney that run in the browser."
-# HIDDEN UNTIL A TOOL IS LIVE. While the next line says "draft: true" this page is not
-# published. Delete the line when the first tool in code/projects.yml is set to
-# "status: live" (the steps are at the top of that file).
-draft: true
 listing:
   id: basic-tools
   contents: projects.yml

@@ -10,6 +10,15 @@ aliases:
 
 ::: {.wm-hero}
 
+```{=html}
+<!-- PROFILE PHOTO: upload a file named profile.jpg to the folder images/profile/
+     and it appears here automatically. Until then the frame shows the initials WEM. -->
+<div class="wm-hero-photo">
+  <img src="images/profile/profile.jpg" alt="Photo of William E. Mahaney" onerror="this.parentNode.classList.add('wm-photo-missing'); this.remove()">
+  <span class="wm-hero-initials" aria-hidden="true">WEM</span>
+</div>
+```
+
 ::: {.wm-hero-text}
 
 ```{=html}
@@ -36,18 +45,6 @@ I study stochastic problems in Number Theory and Cryptography, particularly rela
 :::
 
 :::
-
-<!-- ISOGENY GRAPHS. The markup is in _partials/isogeny-widget.qmd (shared with the
-     Animations pages); the picture is drawn by assets/js/isogeny-hero.js from the data in
-     assets/data/isogeny/. To change the primes on offer, run
-         python3 _scripts/isogeny_graphs.py 101 431 1009
-     (any list of primes) and commit the new files. -->
-
-{{< include /_partials/isogeny-widget.qmd >}}
-
-```{=html}
-<script type="module" src="assets/js/isogeny-hero.js"></script>
-```
 
 :::
 
@@ -94,12 +91,6 @@ I study stochastic problems in Number Theory and Cryptography, particularly rela
 
 ::: {.wm-box .wm-about}
 
-```{=html}
-<!-- PROFILE PHOTO: upload a file named profile.jpg to the folder images/profile/
-     and it appears here automatically. Until then nothing is shown. -->
-<img class="wm-about-photo" src="images/profile/profile.jpg" alt="Photo of William E. Mahaney" onerror="this.remove()">
-```
-
 ::: {.wm-about-text}
 [About me]{.wm-box-label}
 
@@ -119,3 +110,31 @@ Claude was used while designing this website. [AI disclosure](ai-disclosure/inde
 :::
 
 :::
+
+<!-- ISOGENY GRAPHS, IN A SIDE PANEL. The tab on the right edge of the page opens the panel
+     (assets/js/side-panel.js). The graph's markup is in _partials/isogeny-widget.qmd (shared
+     with the Animations pages); the picture is drawn by assets/js/isogeny-hero.js from the
+     data in assets/data/isogeny/. To change the primes on offer, run
+         python3 _scripts/isogeny_graphs.py 101 431 1009
+     (any list of primes) and commit the new files. -->
+
+```{=html}
+<button type="button" class="wm-side-tab" aria-controls="wm-side" aria-expanded="false" hidden>
+  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 6 12 3l7 3-2 8-5 7-5-7Z"/><path d="M5 6l7 6 7-6M12 12v9M7 14l5-2 5 2"/></g><g fill="currentColor"><circle cx="5" cy="6" r="1.9"/><circle cx="12" cy="3" r="1.9"/><circle cx="19" cy="6" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="7" cy="14" r="1.9"/><circle cx="17" cy="14" r="1.9"/><circle cx="12" cy="21" r="1.9"/></g></svg>
+  <span>Isogeny graphs</span>
+</button>
+<div class="wm-side" id="wm-side" role="region" aria-label="Isogeny graphs">
+  <div class="wm-side-head">
+    <p class="wm-side-title">Isogeny graphs</p>
+    <a class="wm-side-more" href="animations/walks.html">Full page →</a>
+    <button type="button" class="wm-side-close" aria-label="Close the isogeny graphs">×</button>
+  </div>
+```
+
+{{< include /_partials/isogeny-widget.qmd >}}
+
+```{=html}
+</div>
+<script type="module" src="assets/js/side-panel.js"></script>
+<script type="module" src="assets/js/isogeny-hero.js"></script>
+```

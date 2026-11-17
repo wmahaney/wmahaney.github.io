@@ -14,22 +14,18 @@ website:
             text: Blog
           - href: notes/index.qmd
             text: Expository Notes
-      # CODE. No tool is live yet, so Code is a plain link to the overview. When a tool in
-      # code/projects.yml is set to "status: live", delete the two lines below and
-      # uncomment the menu under them, keeping one "href" entry per live tool. Each entry
-      # goes to that tool's section of the Basic Tools page.
-      - href: code/index.qmd
-        text: Code
-      # - text: Code
-      #   menu:
-      #     - href: code/index.qmd
-      #       text: Overview
-      #     - text: "---"
-      #     - text: "Basic Tools"
-      #     - href: code/basic-tools.qmd#cropmark
-      #       text: cropmark
-      #     - href: code/basic-tools.qmd#travel-notes
-      #       text: travel_notes
+      # CODE. One "href" entry per live tool in code/projects.yml, each going to that
+      # tool's section of the Basic Tools page.
+      - text: Code
+        menu:
+          - href: code/index.qmd
+            text: Overview
+          - text: "---"
+          - text: "Basic Tools"
+          - href: code/basic-tools.qmd#cropmark
+            text: cropmark
+          - href: code/basic-tools.qmd#travel-notes
+            text: travel_notes
       - text: Animations
         menu:
           - href: animations/walks.qmd
