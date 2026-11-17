@@ -133,6 +133,14 @@ Both blooming animations grow a ball from a vertex $v$ by breadth-first search, 
   - **On the quotient by Frobenius** the ball is the image of the ball upstairs, and it remembers which lift it reached each vertex by. It stops at the first self-collision, when a vertex is reached again by a different lift (the condition above), or when it reaches the $\mathbb{F}_p$-subgraph (a vertex fixed by Frobenius), whichever comes first.
 - On the disconnected $\Gamma(4)$ graph a ball can fill its whole component without stopping, since Frobenius swaps the components; the animation says so.
 
+## Until the $\mathbb{F}_p$-subgraph {#until}
+
+The **until** menu replaces each animation's own stopping rule by one shared rule: stop at the $\mathbb{F}_p$-subgraph, the vertices fixed by Frobenius (with level structure, fixed together with their level structure).
+
+- **Random walk:** the walker starts at a uniformly random vertex outside the $\mathbb{F}_p$-subgraph and walks, with the walk named in the info panel, until it first lands on a vertex fixed by Frobenius. The page shows the number of steps and the mean over the walks run since the graph was drawn. This mean estimates the hitting time of the $\mathbb{F}_p$-subgraph from a random start; it is an empirical average, not a computed expectation.
+- **Both bloomings:** the ball grows from a vertex outside the $\mathbb{F}_p$-subgraph, one layer at a time, until it contains a vertex fixed by Frobenius. The radius at that moment is the distance from the centre to the $\mathbb{F}_p$-subgraph.
+- The menu is off when no vertex shown is fixed by Frobenius (some level structures) or when every vertex is (the $\mathbb{F}_p$-subgraph view).
+
 ## The spectral law {#spectral}
 
 For $\ell \neq p$ the adjacency matrix of $G_p(\ell)$ is the Brandt matrix $B(\ell)$. It has the eigenvalue $\ell + 1$ (the Eisenstein series), and its other $n - 1$ eigenvalues are those of the Hecke operator $T_\ell$ on $S_2(\Gamma_0(p))$, a space of dimension $n - 1$, the genus of $X_0(p)$ (Eichler; see Gross). They lie in $[-2\sqrt\ell, 2\sqrt\ell]$ (*checked*).

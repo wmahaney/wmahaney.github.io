@@ -247,6 +247,11 @@ function init(root, index, base) {
   const fieldNote = root.querySelector(".wm-graph-field");
   const legendArrow = root.querySelector(".wm-graph-legend-arrow");
   const playBtn = root.querySelector(".wm-graph-play");
+  // "until": run the walk or the blooming until it reaches the F_p-subgraph, then start
+  // again; the first option is each animation's own stopping rule.
+  const untilSel = root.querySelector(".wm-graph-until-sel");
+  const UNTIL_OWN = { walk: "forever", cycle: "a cycle closes", ball: "conjugates meet" };
+  const toFp = () => !!untilSel && untilSel.value === "fp" && !untilSel.disabled;
   const piBox = root.querySelector(".wm-anim-pi");
   const whichBox = root.querySelector(".wm-anim-which");
   // One sentence saying which walk the walker follows on the graph shown.
@@ -274,6 +279,8 @@ function init(root, index, base) {
   // still picture and the Play button starts the animation; otherwise it starts playing
   // and the button pauses it.
   let playing = !reduced;
+  let pausedAt = 0;          // when Pause was pressed, so that Play resumes where it stopped
+  let builtStill = false;    // the picture was built while paused: Play starts it afresh
 
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   // A glow for the laser: blur the shape and lay the sharp shape on top. The filter
@@ -524,11 +531,12 @@ function init(root, index, base) {
       .stop();
     // Large graphs do most of their layout up front, so they settle in a moment.
     if (n > 700 && !reduced) state.sim.alpha(0.4);
-    state.sim.tick(reduced ? 300 : n > 700 ? 160 : n > 300 ? 120 : 40);
+    state.sim.tick(reduced || !playing ? 300 : n > 700 ? 160 : n > 300 ? 120 : 40);
     svg.classList.toggle("wm-dense", n > 300);
     state.view = null;          // snap the view to the new graph
     draw();
-    if (!reduced && visible) state.sim.restart();
+    if (!reduced && visible && playing) state.sim.restart();
+    builtStill = !playing;
 
     const nFull = g.nodes.length;
     const nComp = components(n, d.links);
@@ -590,24 +598,37 @@ function init(root, index, base) {
 
     const movable = nodes.filter((nd) => adj[nd.i].length);
     const bloom = mode === "ball" || mode === "cycle";
+    if (untilSel) {
+      // Stopping at the F_p-subgraph needs vertices on it and vertices off it.
+      const onFp = nodes.filter((nd) => nd.fp).length;
+      untilSel.options[0].textContent = UNTIL_OWN[mode] || "forever";
+      untilSel.disabled = onFp === 0 || onFp === nodes.length;
+      untilSel.parentNode.title = onFp === 0 ? "This graph has no vertex fixed by Frobenius."
+        : onFp === nodes.length ? "Every vertex shown is in the F_p-subgraph." : "";
+    }
     svg.classList.toggle("wm-ball-mode", bloom);
     ball = null;
-    ballStatus.hidden = !bloom;
-    if (bloom) {
-      if (!playing) {             // no animation: show one finished ball
-        startBloom(0);
-        while (!ball.done) stepBloom(0);
-      } else ballStatus.textContent = "";
+    ballStatus.hidden = !(bloom || (mode === "walk" && toFp()));
+    ballStatus.textContent = "";
+    if (bloom && !playing) {      // no animation: show one finished ball
+      startBloom(0);
+      while (!ball.done) stepBloom(0);
+      ball.still = true;
     }
     // A fresh, uniformly random starting vertex every time a graph is drawn.
     const seed = new Uint32Array(1);
     crypto.getRandomValues(seed);
-    walker = { at: movable.length ? movable[seed[0] % movable.length].i : 0,
-               next: null, strand: null, t0: 0 };
+    // To time the walk to the F_p-subgraph it starts off it.
+    const starts = toFp() ? movable.filter((nd) => !nd.fp) : movable;
+    walker = { at: starts.length ? starts[seed[0] % starts.length].i : 0,
+               next: null, strand: null, t0: 0, steps: 0, start: null, hit: null };
+    walker.start = walker.at;
+    state.hits = [];
     const walkOn = strands.length && mode === "walk" && !state.walkOff;
     walkerDot.style.display = walkOn ? "" : "none";
     beamGlow.style.display = beamCore.style.display = walkOn ? "" : "none";
-    if (walkOn) { parkWalker(); showStationary(); }
+    if (walkOn) { parkWalker(); showStationary(); if (toFp()) markWalk(); }
+    else if (mode === "walk") ballStatus.hidden = true;
   }
 
   // The walker at rest on its vertex: the still picture before Play is pressed.
@@ -749,6 +770,11 @@ function init(root, index, base) {
   function positionWalker(now) {
     if (!walker || !state.nodes.length || state.walkOff) return;
     if (!playing) return;
+    if (walker.hit) {                      // resting on the F_p-subgraph; then start again
+      if (now < walker.hit.holdUntil) return;
+      restartWalkToFp();
+      return;
+    }
     if (walker.next == null) {
       // The next vertex is drawn from the walker's row of the transition matrix P, and
       // from nothing else. Among parallel strands to that vertex, which one lights up
@@ -768,7 +794,15 @@ function init(root, index, base) {
     let t = (now - walker.t0) / hopMs;
     if (t >= 1) {
       walker.at = walker.next; walker.next = null;
+      walker.steps += 1;
       t = 1;
+      if (toFp()) {
+        if (state.nodes[walker.at].fp) {
+          walker.hit = { holdUntil: now + BALL_HOLD };
+          state.hits.push(walker.steps);
+          markWalk();
+        } else if (walker.steps % 5 === 0) markWalk();
+      }
     }
     const ease = 0.5 * t + 0.5 * t * t * (3 - 2 * t);   // quick, with a slight pause at each curve
     const geo = geometry(walker.strand);
@@ -785,6 +819,37 @@ function init(root, index, base) {
     beamGlow.setAttribute("d", d);
     beamCore.setAttribute("d", d);
   }
+  // The walk to the F_p-subgraph: its start, where it hit, and the running mean.
+  function markWalk() {
+    const h = walker.hit ? walker.at : null;
+    for (const nd of state.nodes) {
+      nd.circle.classList.toggle("wm-g-center", nd.i === walker.start);
+      nd.circle.classList.toggle("wm-g-hit", nd.i === h);
+    }
+    const from = nodeLabel(walker.start);
+    if (!walker.hit) {
+      ballStatus.textContent = `Walking from ${from} until it reaches the F_p-subgraph: ${walker.steps} steps so far.`;
+      return;
+    }
+    const k = state.hits.length, mean = state.hits.reduce((a, b) => a + b, 0) / k;
+    ballStatus.textContent = `From ${from}, the walk reached the F_p-subgraph at ${nodeLabel(h)} after ` +
+      `${walker.steps} step${walker.steps === 1 ? "" : "s"}. ` +
+      (k > 1 ? `Mean over the ${k} walks so far: ${mean.toFixed(1)} steps.` : "");
+  }
+  function restartWalkToFp() {
+    const off = state.nodes.filter((nd) => !nd.fp && state.adj[nd.i].length);
+    if (!off.length) return;
+    const seed = new Uint32Array(1);
+    crypto.getRandomValues(seed);
+    Object.assign(walker, { at: off[seed[0] % off.length].i, next: null, strand: null,
+                            steps: 0, hit: null });
+    walker.start = walker.at;
+    trail.length = 0;
+    paintTrail();
+    parkWalker();
+    markWalk();
+  }
+
   // Strength 1 for the step being taken now, fading to 0.15 for the oldest in the window.
   // A strand walked more than once shows its most recent step.
   function paintTrail() {
@@ -933,20 +998,20 @@ function init(root, index, base) {
     state.ballGraph = { up: up.map((x) => [...x].sort((u, v) => u - v)), orbitOf, strandOf, members };
     return state.ballGraph;
   }
-  function startBall(now, at) {
+  function startBall(now, at, toSpine = false) {
     const g = state.graph, quotient = state.shownView === "folded", fixed = g.fp;
     let center;
     if (at != null) center = state.nodes[at].members[0];
     else {
       const all = [...g.nodes.keys()], off = all.filter((i) => !fixed[i]);
-      const pool = quotient && off.length ? off : all;
+      const pool = (quotient || toSpine) && off.length ? off : all;
       const seed = new Uint32Array(1);
       crypto.getRandomValues(seed);
       center = pool[seed[0] % pool.length];
     }
-    ball = { center, quotient, dist: new Map([[center, 0]]), parent: new Map(), layers: [[center]],
+    ball = { center, quotient, toSpine, dist: new Map([[center, 0]]), parent: new Map(), layers: [[center]],
              r: 0, t0: now, done: null, holdUntil: 0 };
-    if (quotient && fixed[center]) { ball.done = { fp: center }; ball.holdUntil = now + BALL_HOLD; }
+    if ((quotient || toSpine) && fixed[center]) { ball.done = { fp: center }; ball.holdUntil = now + BALL_HOLD; }
     paintBall();
   }
   function stepBall(now) {
@@ -968,12 +1033,12 @@ function init(root, index, base) {
       let pair = null, fp = null;
       for (const w of next) {
         // another member of w's Frobenius orbit already in the ball?
-        for (const c of ballGraph().members[w]) {
+        if (!b.toSpine) for (const c of ballGraph().members[w]) {
           if (c === w || !b.dist.has(c)) continue;
           const score = b.dist.get(w) + b.dist.get(c);
           if (!pair || score < pair.score) pair = { w, c, score };
         }
-        if (b.quotient && fp == null && fixed[w]) fp = w;
+        if ((b.quotient || b.toSpine) && fp == null && fixed[w]) fp = w;
       }
       if (pair || fp != null) b.done = { pair, fp };
     }
@@ -982,8 +1047,11 @@ function init(root, index, base) {
   }
   // The two kinds of blooming share the clock: "ball" = blooming for conjugates,
   // "cycle" = blooming for collision.
-  const startBloom = (now, at) => (mode === "cycle" ? startCycle(now, at) : startBall(now, at));
-  const stepBloom = (now) => (mode === "cycle" ? stepCycle(now) : stepBall(now));
+  // With "until it reaches the F_p-subgraph" both grow the plain ball and stop there.
+  const startBloom = (now, at) => (toFp() ? startBall(now, at, true)
+    : mode === "cycle" ? startCycle(now, at) : startBall(now, at));
+  const stepBloom = (now) => (ball && ball.toSpine ? stepBall(now)
+    : mode === "cycle" ? stepCycle(now) : stepBall(now));
   function growBall(now) {
     if (!state.nodes.length) return;
     if (!ball) { startBloom(now); return; }
@@ -1165,11 +1233,31 @@ function init(root, index, base) {
       playBtn.textContent = on ? "Pause" : "Play";
       playBtn.setAttribute("aria-label", on ? "Pause the animation" : "Play the animation");
     }
-    if (!on) { if (raf) { cancelAnimationFrame(raf); raf = 0; } return; }
-    // Starting from a still picture: the blooming and the spectral law begin again.
-    if (mode === "ball" || mode === "cycle") { if (ball && ball.done) ball = null; }
-    else if (mode === "spectral") spectral.restart();
-    else if (walker && walker.next != null) walker.t0 = performance.now();
+    if (!on) {
+      // Pause freezes everything: the frame loop and the layout.
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      if (state.sim) state.sim.stop();
+      pausedAt = performance.now();
+      return;
+    }
+    // Play resumes where Pause stopped: clocks move on by the time spent paused. A
+    // picture built while paused (reduced motion, or a graph changed while paused)
+    // starts afresh instead.
+    const now = performance.now(), dt = pausedAt ? now - pausedAt : 0;
+    pausedAt = 0;
+    if (mode === "ball" || mode === "cycle") {
+      if (ball && ball.still) ball = null;
+      else if (ball) { ball.t0 += dt; ball.holdUntil += dt; }
+    } else if (mode === "spectral") {
+      if (builtStill) spectral.restart();
+    } else if (walker) {
+      if (walker.next != null) walker.t0 += dt;
+      if (walker.hit) walker.hit.holdUntil += dt;
+    }
+    builtStill = false;
+    if (state.sim && !reduced && visible && mode !== "spectral" && state.sim.alpha() > state.sim.alphaMin()) {
+      state.sim.restart();
+    }
     startLoop();
   }
 
@@ -1228,7 +1316,7 @@ function init(root, index, base) {
       const [x, y] = toLocal(ev);
       if (Math.hypot(x - nd.x, y - nd.y) * state.view.k > 3) moved = true;
       [nd.fx, nd.fy] = [x, y];
-      if (reduced) { nd.x = x; nd.y = y; draw(); } else state.sim.alphaTarget(0.25).restart();
+      if (reduced || !playing) { nd.x = x; nd.y = y; draw(); } else state.sim.alphaTarget(0.25).restart();
       if (!tip.hidden) showTip(nd);
     });
     const end = () => {
@@ -1238,7 +1326,7 @@ function init(root, index, base) {
       if (!reduced) state.sim.alphaTarget(0);
       if (!moved && (mode === "ball" || mode === "cycle")) {   // a tap grows a ball from that vertex
         startBloom(performance.now(), nd.i);
-        if (!playing) while (!ball.done) stepBloom(0);
+        if (!playing) { while (!ball.done) stepBloom(0); ball.still = true; }
         return;
       }
       if (!moved) {            // a tap or click pins the label
@@ -1275,6 +1363,7 @@ function init(root, index, base) {
   });
   animSelect.addEventListener("change", () => { mode = animSelect.value; build().then(startLoop); });
   speedSelect.addEventListener("change", () => { hopMs = SPEEDS[speedSelect.value]; });
+  if (untilSel) untilSel.addEventListener("change", () => { build().then(startLoop); });
   if (playBtn) {
     playBtn.addEventListener("click", () => setPlaying(!playing));
     setPlaying(playing);
@@ -1286,7 +1375,7 @@ function init(root, index, base) {
       visible = entry.isIntersecting;
       if (!state.sim) return;
       if (visible) {
-        if (!reduced && mode !== "spectral" && state.sim.alpha() > 0.02) state.sim.restart();
+        if (!reduced && playing && mode !== "spectral" && state.sim.alpha() > 0.02) state.sim.restart();
         startLoop();
       }
       else state.sim.stop();

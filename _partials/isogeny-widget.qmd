@@ -92,7 +92,7 @@
         <option value="5">5</option>
       </select>
     </label>
-    <button type="button" class="wm-q" data-terms="viewer walk cycle ball spectral km" aria-label="What do the animations show?" aria-expanded="false">?</button>
+    <button type="button" class="wm-q" data-terms="viewer walk cycle ball until spectral km" aria-label="What do the animations show?" aria-expanded="false">?</button>
     <label class="wm-graph-history">history
       <select class="wm-graph-trail-len" aria-label="Number of recent steps to keep highlighted">
         <option value="10" selected>10 steps</option>
@@ -100,6 +100,12 @@
         <option value="50">50 steps</option>
         <option value="100">100 steps</option>
         <option value="250">250 steps</option>
+      </select>
+    </label>
+    <label class="wm-graph-until">until
+      <select class="wm-graph-until-sel" aria-label="When the animation stops and starts again">
+        <option value="own" selected>forever</option>
+        <option value="fp">it reaches the 𝔽ₚ-subgraph</option>
       </select>
     </label>
     <button type="button" class="wm-graph-play" aria-label="Pause the animation">Pause</button>
@@ -171,6 +177,8 @@
       <dd>Just the graph: hover or tap a vertex for its label, drag to rearrange. The other entries of the animation menu animate it.</dd>
       <dt data-term="walk">Random walk</dt>
       <dd>The walker starts at a random vertex and follows the <em>Petersson walk</em> on the full graphs, with or without level structure: the probability of stepping from v to w is proportional to the number of isogenies from v to w of the degrees in use, counted up to sign. That number is the number of kernels times |Aut(w)|/2, where Aut(w) is the group of automorphisms of the curve that preserve its level structure. Without level structure a kernel leading to j = 0 counts three times and one leading to j = 1728 twice. With Γ<sub>0</sub>(5) structure two vertices over j = 1728 count twice (when j = 1728 is supersingular); with Γ<sub>1</sub>(5), Γ(2) and Γ(4) structure every vertex weighs the same, so the walk is the simple random walk. On the other views (the 𝔽<sub>p</sub>-subgraph, the vertices over it, the quotient by Frobenius) it is the simple random walk: each edge out of the vertex is equally likely, and arrows are followed only forwards. The laser beam shows the step being taken; <em>history</em> is how many recent steps stay highlighted; <em>speed</em> is how fast it moves.</dd>
+      <dt data-term="until">Until</dt>
+      <dd>When the animation stops and starts again. <em>Forever</em>, <em>a cycle closes</em> and <em>conjugates meet</em> are each animation's own rule. <em>It reaches the 𝔽<sub>p</sub>-subgraph</em> starts the random walk at a random vertex outside the 𝔽<sub>p</sub>-subgraph and stops it at the first vertex fixed by Frobenius, showing the number of steps and the mean over the walks so far: an empirical hitting time. For the bloomings it grows the ball from a vertex outside the 𝔽<sub>p</sub>-subgraph until the ball contains a vertex of it. It is off when no vertex shown is fixed by Frobenius, or when every vertex is.</dd>
       <dt data-term="cycle">Blooming for collision</dt>
       <dd>A ball grows from a vertex one layer at a time (breadth-first search) until it collides with itself: an edge reaches a vertex already in the ball, closing a cycle (a loop counts as length 1, two parallel edges as length 2). The cycle is shown in bold. Works in every view; tap a vertex to start there.</dd>
       <dt data-term="ball">Blooming for conjugates</dt>

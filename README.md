@@ -261,6 +261,8 @@ to a vertex with automorphisms other than ±1. A link in the data is `[s, t, ell
 each way) or `[s, t, ell, m, back]` where the two counts differ, and the picture draws those
 edges with arrowheads. `animations/about.qmd#directed` states the rule.
 
+**Pause and "until".** Pause freezes the frame loop and the layout, and Play resumes where it stopped (`setPlaying` in `assets/js/isogeny-hero.js`). The "until" menu (`.wm-graph-until-sel`) switches the walk and the bloomings to stopping at the F_p-subgraph; `animations/about.qmd#until` states the rule.
+
 **The random walk.** The walker's steps are drawn from a transition matrix `P` built in
 `assets/js/walk.js` from the adjacency matrix `A`. On the full graphs, with or without level structure, it is
 the Petersson walk, `P[i][j] = A[i][j] w_j / s_i` with `w_j = |Aut(E_j)| / 2` (with level

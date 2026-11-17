@@ -993,6 +993,8 @@ body.quarto-dark .quarto-color-scheme-toggle .bi::before,
 
 /* Graph viewer: no animation controls */
 .wm-graph[data-mode="view"] .wm-graph-history,
+.wm-graph[data-mode="view"] .wm-graph-until,
+.wm-graph[data-mode="spectral"] .wm-graph-until,
 .wm-graph[data-mode="view"] .wm-graph-speed-label,
 .wm-graph[data-mode="view"] .wm-graph-legend-walk { display: none; }
 /* Gamma(4): the second Weil-pairing class */
