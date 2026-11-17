@@ -162,9 +162,18 @@ function cycles(perm) {
   return out;
 }
 
-// The j-invariant(s) to write next to a vertex. Labels are strings "a", "a + bi", "bi"
+// F_{p^2} = F_p(√r) for a non-residue r. The square root is written "i" only when
+// r = −1 (p ≡ 3 mod 4); otherwise it is written √r, so that "i" never stands for the
+// square root of anything but −1. Older data files write "i" for every r; showRoot
+// rewrites their labels when a file is loaded.
+function showRoot(label, r) {
+  if (r === -1) return label;
+  const one = (s) => s.replace(/(\d*)i$/, (_, b) => `${b}√${r}`);
+  return Array.isArray(label) ? label.map(one) : one(label);
+}
+// The j-invariant(s) to write next to a vertex. Labels are strings "a", "a + b√r", "b√r"
 // (or pairs [j(E), j(E/C)] with level structure, where j(E) is used). A conjugate pair
-// {a + bi, a - bi} is written a ± bi.
+// {a + b√r, a − b√r} is written a ± b√r.
 const jOf = (label) => (Array.isArray(label) ? label[0] : label);
 function shortJ(nodes, nd) {
   const js = [...new Set(nd.members.map((m) => jOf(nodes[m])))];
@@ -172,12 +181,12 @@ function shortJ(nodes, nd) {
   if (js.length > 2) return js.join(" / ");
   const [j1, j2] = js;
   const parse = (j) => {
-    const m = /^(?:(\d+) \+ )?(\d*)i$/.exec(j);
-    return m ? [m[1] || "0", Number(m[2] || 1)] : null;
+    const m = /^(?:(\d+) \+ )?(\d*)(i|√\d+)$/.exec(j);
+    return m ? [m[1] || "0", Number(m[2] || 1), m[3]] : null;
   };
   const u = parse(j1), v = parse(j2);
   if (!u || !v || u[0] !== v[0]) return `${j1} / ${j2}`;
-  const b = Math.min(u[1], v[1]), bi = b === 1 ? "i" : `${b}i`;
+  const b = Math.min(u[1], v[1]), bi = b === 1 ? u[2] : `${b}${u[2]}`;
   return u[0] === "0" ? `±${bi}` : `${u[0]} ± ${bi}`;
 }
 // Labels are drawn only for graphs up to this many vertices; beyond that, hover instead.
@@ -331,6 +340,10 @@ function init(root, index, base) {
     if (!cache.has(key)) {
       cache.set(key, fetch(`${base}/${key}.json`)
         .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then((e) => {
+          e.graph.nodes = e.graph.nodes.map((l) => showRoot(l, e.nonresidue));
+          return e;
+        })
         .catch((e) => { cache.delete(key); throw e; }));
     }
     return cache.get(key);
@@ -597,8 +610,9 @@ function init(root, index, base) {
     showEmpty(view === "spine" && (n === 0 || nEdges === 0)
       ? { kind, p, n, alternative: nearestNonempty() } : null);
     const nr = entry.nonresidue;
-    fieldNote.replaceChildren("Labels are j-invariants in F", sub("p"), "(i), i",
-      sup("2"), ` = ${nr < 0 ? "−" + (-nr) : nr}.`);
+    fieldNote.replaceChildren("Labels are j-invariants in F", sub("p²"), " = F", sub("p"),
+      ...(nr === -1 ? ["(i), i", sup("2"), " = −1."]
+        : [`(√${nr}); ${nr} is a quadratic non-residue mod ${p}.`]));
     root.dataset.kind = kind;
     if (eye) {
       eye.href = `${eye.dataset.base}#graph-${kind}`;

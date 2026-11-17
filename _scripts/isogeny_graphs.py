@@ -141,13 +141,14 @@ CM_J = {
 
 
 # --------------------------------------------------------------------------
-# F_{p^2} = F_p[i] / (i^2 - r), r a quadratic non-residue. Elements: (a, b).
+# F_{p^2} = F_p[x] / (x^2 - r), r a quadratic non-residue: r = -1 when p = 3 (mod 4),
+# otherwise the smallest non-residue. Elements: (a, b) = a + b sqrt(r).
 # --------------------------------------------------------------------------
 class Fp2:
     def __init__(self, p: int):
         self.p = p
         if p % 4 == 3:
-            r = p - 1  # i^2 = -1
+            r = p - 1  # -1 is a non-residue exactly when p = 3 (mod 4)
         else:
             r = next(n for n in range(2, p) if pow(n, (p - 1) // 2, p) == p - 1)
         self.r = r
@@ -200,12 +201,15 @@ class Fp2:
         return (random.randrange(self.p), random.randrange(self.p))
 
     def show(self, x) -> str:
+        # a + b√r. The root is written "i" only when r = -1, so that "i" never stands
+        # for the square root of anything else.
         a, b = x
+        root = "i" if self.r == self.p - 1 else f"√{self.r}"
         if b == 0:
             return str(a)
         if a == 0:
-            return "i" if b == 1 else f"{b}i"
-        return f"{a} + i" if b == 1 else f"{a} + {b}i"
+            return root if b == 1 else f"{b}{root}"
+        return f"{a} + {root}" if b == 1 else f"{a} + {b}{root}"
 
 
 # --------------------------------------------------------------------------

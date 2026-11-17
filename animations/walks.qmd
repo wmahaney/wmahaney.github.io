@@ -15,8 +15,4 @@ description-meta: "A random walk on supersingular isogeny graphs: the full graph
 <script type="module" src="../assets/js/isogeny-hero.js"></script>
 ```
 
-The box above the picture describes the animation that is running. The **animation** menu under the picture switches to the [blooming](balls.qmd) animations or the [spectral law](spectral.qmd), and the box and the page title change with it.
-
-Choose the graph and the prime $p$ above the picture. The **view** menu shows the **full graph**, the **$\mathbb{F}_p$-subgraph** (the subgraph induced on the vertices fixed by Frobenius, which acts on the level structure too), or the **quotient by Frobenius** (vertices and edges are Frobenius-orbits). Vertices are labelled by $j$-invariants on graphs of up to 60 vertices; hover for the others. The eye in the corner links to [exact definitions](about.qmd).
-
-The graph tabs: **2**, **2, 3** and **2, 3, 5** are $G_p(\ell)$ with those isogenies. **2 · Γ₀(5)** and **2, 3 · Γ₀(5)** carry a subgroup of order 5, **2 · Γ₁(5)** a point of order 5 up to sign (a directed graph), **3 · Γ(2)** a basis of the 2-torsion (the supersingular Legendre invariants), and **3 · Γ(4)**, **5 · Γ(4)** a basis of the 4-torsion: the first is connected and bipartite, the second has two components (the two values of the Weil pairing, coloured differently). Where the two directions between a pair of vertices carry different numbers of isogenies, each isogeny is drawn with an arrowhead; [Read more](about.qmd#directed) says where that happens. The "?" buttons explain each control.
+Definitions, proofs and sources: [Read more](about.qmd). The "?" buttons explain each control.
