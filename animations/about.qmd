@@ -20,11 +20,11 @@ This page states exactly what the [animations](walks.qmd) draw. Everything is co
 
 ### $G_p(2)$ {#graph-2}
 
-The vertex set is $S$, and every vertex has 3 outgoing edges. Apart from the trivial eigenvalue 3, every eigenvalue satisfies $\lvert\lambda\rvert \le 2\sqrt2$ (Pizer, via Deligne): this is a Ramanujan graph. The page shows the second-largest $\lvert\lambda\rvert$ (*checked* against the bound). It is offered up to $p = 20011$.
+The vertex set is $S$, and every vertex has 3 outgoing edges. Apart from the trivial eigenvalue 3, every eigenvalue satisfies $\lvert\lambda\rvert \le 2\sqrt2$ (Pizer, via Deligne): this is a Ramanujan graph. The page shows the second-largest $\lvert\lambda\rvert$ (*checked* against the bound). It is offered for the same 221 primes as the two graphs below.
 
 ### $G_p(\{2,3\})$ and $G_p(\{2,3,5\})$ {#graph-23}
 
-The same vertices, with adjacency $A_2 + A_3$, respectively $A_2 + A_3 + A_5$. Every vertex has $3 + 4$, respectively $3 + 4 + 6$, outgoing edges. The $A_\ell$ commute, so the nontrivial eigenvalues are at most $\sum 2\sqrt\ell$ in absolute value (*checked*). The 5-isogenies use the kernel polynomial $x^2 - sx + q$ of each subgroup of order 5; for them the script checks that the target is supersingular and that the Brandt symmetry holds. Both graphs are offered up to $p = 20011$. []{#graph-235}
+The same vertices, with adjacency $A_2 + A_3$, respectively $A_2 + A_3 + A_5$. Every vertex has $3 + 4$, respectively $3 + 4 + 6$, outgoing edges. The $A_\ell$ commute, so the nontrivial eigenvalues are at most $\sum 2\sqrt\ell$ in absolute value (*checked*). The 5-isogenies use the kernel polynomial $x^2 - sx + q$ of each subgroup of order 5; for them the script checks that the target is supersingular and that the Brandt symmetry holds. They are offered for 221 primes up to $p = 49991$: the 21 primes that also have graphs with level structure, and a sample of 200 primes spread roughly geometrically from 103 to 49991, with $p \equiv 1, 5, 7, 11 \pmod{12}$ equally often, so that every combination of $j = 0$ and $j = 1728$ being supersingular appears. []{#graph-235}
 
 ### Level structure $\Gamma_0(5)$: $G_p(2)$ and $G_p(\{2,3\})$ {#graph-2b5}
 

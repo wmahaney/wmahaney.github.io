@@ -8,6 +8,7 @@ import {
 import { createSpectral } from "./spectral.js";
 import {
   adjacency, linkCounts, walkFor, walkName, stationary, relativeStationary, sampleStep,
+  isogenyCounts, weightFrom,
 } from "./walk.js";
 
 const W = 600, H = 500, PAD = 40;
@@ -221,6 +222,8 @@ const SPEC_MS = { calm: 900, fast: 450, frantic: 200 };
 // found a conjugate pair before starting again somewhere else.
 const BALL_MS = { calm: 1400, fast: 750, frantic: 330 };
 const BALL_HOLD = 3200;
+// Graphs with more vertices than this get a lighter layout (see build).
+const HUGE = 2500;
 
 function init(root, index, base) {
   const svg = root.querySelector("svg");
@@ -485,7 +488,11 @@ function init(root, index, base) {
     // The Petersson walk on the full graphs, with or without level structure, where the
     // data has the automorphism orders (g.aut); the simple random walk on the other views.
     const walkAut = view === "full" && g.aut ? g.aut : null;
-    const P = walkFor(adjacency(n, d.links, directed), walkAut, g.autDefault);
+    const A = adjacency(n, d.links, directed);
+    const P = walkFor(A, walkAut, g.autDefault);
+    // The Petersson walk's stationary vector is known exactly: pi is proportional to s,
+    // the isogeny counts (see walk.js). Other walks are solved numerically, if small.
+    state.exactPi = walkAut ? isogenyCounts(A, weightFrom(walkAut, g.autDefault)) : null;
     gEdges.replaceChildren();
     gNodes.replaceChildren();
     gLabels.replaceChildren();
@@ -520,18 +527,22 @@ function init(root, index, base) {
 
     if (state.sim) state.sim.stop();
     const dist = Math.max(22, Math.min(90, 520 / Math.sqrt(n)));
+    // Above HUGE vertices (p beyond about 30000) the layout is lightened: no collision
+    // force, a coarser approximation of the repulsion, fewer and faster-cooling steps.
+    // The full layout there costs seconds of a visitor's processor.
+    const huge = n > HUGE;
     state.sim = forceSimulation(nodes)
       .force("link", forceLink(simLinks).distance(dist).strength(0.5))
-      .force("charge", forceManyBody().strength(-Math.max(60, 5200 / n)).distanceMax(320))
-      .force("collide", forceCollide((nd) => rOf(nd) + (n > 300 ? 1.5 : 3)))
+      .force("charge", forceManyBody().strength(-Math.max(60, 5200 / n)).distanceMax(320).theta(huge ? 1.3 : 0.9))
+      .force("collide", huge ? null : forceCollide((nd) => rOf(nd) + (n > 300 ? 1.5 : 3)))
       .force("x", forceX(W / 2).strength(0.06))
       .force("y", forceY(H / 2).strength(0.075))
-      .alphaDecay(n > 700 ? 0.06 : n > 300 ? 0.03 : 0.035)
+      .alphaDecay(huge ? 0.12 : n > 700 ? 0.06 : n > 300 ? 0.03 : 0.035)
       .on("tick", draw)
       .stop();
     // Large graphs do most of their layout up front, so they settle in a moment.
     if (n > 700 && !reduced) state.sim.alpha(0.4);
-    state.sim.tick(reduced || !playing ? 300 : n > 700 ? 160 : n > 300 ? 120 : 40);
+    state.sim.tick(huge ? 60 : reduced || !playing ? 300 : n > 700 ? 160 : n > 300 ? 120 : 40);
     svg.classList.toggle("wm-dense", n > 300);
     state.view = null;          // snap the view to the new graph
     draw();
@@ -644,8 +655,12 @@ function init(root, index, base) {
   function showStationary() {
     if (!piBox) return;
     piBox.textContent = "";
-    if (state.nComp !== 1 || state.nodes.length > 6000) return;
-    const pi = stationary(state.P, { maxIter: 4000 });
+    if (state.nComp !== 1) return;
+    let pi = null;
+    if (state.exactPi) {
+      const total = state.exactPi.reduce((a, b) => a + b, 0);
+      pi = state.exactPi.map((x) => x / total);
+    } else if (state.nodes.length <= 2500) pi = stationary(state.P, { maxIter: 4000 });
     if (!pi) return;
     const { values, special } = relativeStationary(pi);
     const name = (v) => {
@@ -1269,15 +1284,23 @@ function init(root, index, base) {
     if (!nd.pair) return one(nd.label);
     return `Frobenius orbit: ${nd.members.map((m) => one(state.graph.nodes[m])).join("  ~  ")}`;
   }
+  // Hovering a vertex dims the rest of the graph through one class on the picture and
+  // marks only the vertex, its neighbours and its edges, so the cost does not grow
+  // with the size of the graph (thousands of elements for large p).
+  let near = [];
+  function clearNear() {
+    for (const el of near) el.classList.remove("wm-g-near", "wm-g-focus");
+    near = [];
+  }
   function showTip(nd) {
-    const nbrs = new Set(state.adj[nd.i].map((e) => e.to));
-    nbrs.add(nd.i);
-    const hot = new Set(state.adj[nd.i].map((e) => e.strand));
-    state.nodes.forEach((m) => {
-      m.circle.classList.toggle("wm-g-dim", !nbrs.has(m.i));
-      if (m.text) m.text.classList.toggle("wm-g-dim", !nbrs.has(m.i));
-    });
-    state.strands.forEach((s) => s.path.classList.toggle("wm-g-dim", !hot.has(s)));
+    clearNear();
+    const mark = (el) => { if (el) { el.classList.add("wm-g-near"); near.push(el); } };
+    mark(nd.circle); mark(nd.text);
+    for (const e of state.adj[nd.i]) {
+      const m = state.nodes[e.to];
+      mark(m.circle); mark(m.text); mark(e.strand.path);
+    }
+    svg.classList.add("wm-g-hovering");
     nd.circle.classList.add("wm-g-focus");
     tip.replaceChildren(labelOf(nd), ...(nd.fp ? [" · fixed by Frobenius"] : []));
     tip.hidden = false;
@@ -1289,12 +1312,19 @@ function init(root, index, base) {
   }
   function hideTip() {
     tip.hidden = true;
-    state.nodes.forEach((m) => {
-      m.circle.classList.remove("wm-g-dim", "wm-g-focus");
-      if (m.text) m.text.classList.remove("wm-g-dim");
-    });
-    state.strands.forEach((s) => s.path.classList.remove("wm-g-dim"));
+    svg.classList.remove("wm-g-hovering");
+    clearNear();
   }
+  // Only a pointer that moves shows or hides a label. When vertices slide under a
+  // pointer that stands still, the browser reports entering and leaving them at the
+  // same pointer position; on a large graph answering those would cost every frame.
+  let lastX = null, lastY = null;
+  const pointerMoved = (ev) => {
+    const moved = ev.clientX !== lastX || ev.clientY !== lastY;
+    lastX = ev.clientX; lastY = ev.clientY;
+    return moved;
+  };
+  svg.addEventListener("pointermove", (ev) => { lastX = ev.clientX; lastY = ev.clientY; });
   function attachNodeEvents(nd) {
     const c = nd.circle;
     let dragging = false, moved = false;
@@ -1303,8 +1333,12 @@ function init(root, index, base) {
       return [(((ev.clientX - box.left) / box.width) * W - v.tx) / v.k,
               (((ev.clientY - box.top) / box.height) * H - v.ty) / v.k];
     };
-    c.addEventListener("pointerenter", () => { if (state.pinned == null) { hideTip(); showTip(nd); } });
-    c.addEventListener("pointerleave", () => { if (state.pinned == null && !dragging) hideTip(); });
+    c.addEventListener("pointerenter", (ev) => {
+      if (pointerMoved(ev) && state.pinned == null) { hideTip(); showTip(nd); }
+    });
+    c.addEventListener("pointerleave", (ev) => {
+      if (pointerMoved(ev) && state.pinned == null && !dragging) hideTip();
+    });
     c.addEventListener("pointerdown", (ev) => {
       dragging = state.dragging = true; moved = false;
       c.setPointerCapture(ev.pointerId);

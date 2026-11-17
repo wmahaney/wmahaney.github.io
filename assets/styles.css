@@ -247,6 +247,7 @@ h1, h2, h3, h4, h5, h6,
   aspect-ratio: 6 / 5;
 }
 .wm-g-edge {
+  pointer-events: none;     /* edges have no handlers; skipping them keeps hover cheap */
   fill: none;
   stroke-width: 1.4;
   stroke-linecap: round;
@@ -283,8 +284,8 @@ h1, h2, h3, h4, h5, h6,
 .wm-g-node-pair { stroke: var(--wm-accent2); stroke-width: 2; }
 .wm-g-node:active { cursor: grabbing; }
 .wm-g-focus { stroke: var(--wm-ink); stroke-width: 2.5; }
-.wm-g-edge.wm-g-dim,
-.wm-g-node.wm-g-dim { opacity: 0.12; }
+.wm-g-hovering .wm-g-edge:not(.wm-g-near),
+.wm-g-hovering .wm-g-node:not(.wm-g-near) { opacity: 0.12; }
 .wm-g-walker {
   fill: var(--wm-surface);
   stroke: var(--wm-ink);
@@ -913,7 +914,7 @@ body.quarto-dark .quarto-color-scheme-toggle .bi::before,
   pointer-events: none;
   transition: opacity 0.15s ease;
 }
-.wm-g-label.wm-g-dim { opacity: 0.12; }
+.wm-g-hovering .wm-g-label:not(.wm-g-near) { opacity: 0.12; }
 .wm-ball-mode .wm-g-label.wm-g-out { opacity: 0.25; }
 .wm-graph-labels { display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer;
   font: 600 0.85rem/1.2 var(--wm-sans); color: var(--wm-muted); }

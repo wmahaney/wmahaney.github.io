@@ -3,7 +3,7 @@ title: "Animations"
 description-meta: "Interactive pictures of supersingular isogeny graphs: random walks, growing balls, and the spectral law of Hecke operators."
 ---
 
-Pictures of the supersingular isogeny graphs I work on: $G_p(2)$, $G_p(\{2,3\})$ and $G_p(\{2,3,5\})$ for primes up to 20011, and graphs with level structure $\Gamma_0(5)$, $\Gamma_1(5)$, $\Gamma(2)$ and $\Gamma(4)$ (including a disconnected one). Every graph is computed from scratch (arithmetic in $\mathbb{F}_{p^2}$ and Vélu's formulas, with consistency checks). Each picture can be shown as the full graph, its $\mathbb{F}_p$-subgraph, or its quotient by Frobenius, and the menu under it switches from the plain **graph viewer** to the animations below.
+Pictures of the supersingular isogeny graphs I work on: $G_p(2)$, $G_p(\{2,3\})$ and $G_p(\{2,3,5\})$ for 221 primes up to 49991, and graphs with level structure $\Gamma_0(5)$, $\Gamma_1(5)$, $\Gamma(2)$ and $\Gamma(4)$ (including a disconnected one). Every graph is computed from scratch (arithmetic in $\mathbb{F}_{p^2}$ and Vélu's formulas, with consistency checks). Each picture can be shown as the full graph, its $\mathbb{F}_p$-subgraph, or its quotient by Frobenius, and the menu under it switches from the plain **graph viewer** to the animations below.
 
 [Random walks](walks.qmd)
 : A random walk, drawn as a laser with a fading trail.
