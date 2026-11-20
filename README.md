@@ -312,6 +312,7 @@ the isogeny widget (`createKmSt` in `assets/js/limits.js`, called from `assets/j
 ```
 python3 _scripts/limit_laws.py                      # everything, about an hour on one core
 python3 _scripts/limit_laws.py planar diagonal      # only some files
+PARI_STACK=6000000000 python3 _scripts/limit_laws.py planar   # planar's largest levels need ~6 GB
 ```
 
 The lists of levels, primes and weights are at the top of the script, and it stops if one of

@@ -8,7 +8,8 @@ Writes assets/data/limits/:
   quadratic.json T_2 on S_2(N, (./N)) for primes N = 5 (mod 8), where (2/N) = -1 and the
                  eigenvalues are purely imaginary: histograms of Im(lambda)/sqrt 2.
   planar.json    T_2 on all of S_2(Gamma_1(N)) for growing primes N: the normalised
-                 eigenvalues lambda/sqrt 2 as points of the complex plane.
+                 eigenvalues lambda/sqrt 2 as points of the complex plane (a fixed random
+                 sample of 3000 of them when there are more), with statistics of all.
   diagonal.json  T_l on S_2(Gamma_0(p)) with l growing with p (l the largest prime
                  <= (log p)^2), from the Brandt matrix of G_p(l): histograms of lambda/sqrt l.
   weight.json    T_l on S_k(SL_2(Z)) for l = 2, 3, 5 and growing weight k: histograms of
@@ -18,12 +19,16 @@ Needs Python 3, numpy and cypari2 (pip install cypari2). Run from the repository
 
     python3 _scripts/limit_laws.py              # everything (under an hour on one core)
     python3 _scripts/limit_laws.py planar       # only some of the files
+    PARI_STACK=6000000000 python3 _scripts/limit_laws.py planar   # planar needs ~6 GB
 
 Method.
   * Spaces with character (gamma1, quadratic, planar): PARI's mfinit([N, 2, chi], 1) and
     mfheckemat, embedded into C by mfembed. For the Conrey label a, PARI's chi is the
     character chareval(znstar(N, 1), a, .) and the embedding is the one with those values;
     the check lambda = chi(2) * conj(lambda) below confirms that the two agree.
+    For planar.json, one Galois orbit of characters at a time (gamma1_by_orbits): T_2 over
+    Q(chi) = Q[t]/Phi(t), with t replaced by each complex root of Phi; checked against the
+    one-character-at-a-time method at N = 101.
   * Brandt matrices (diagonal): the supersingular j-invariants in F_{p^2}, found by a
     breadth-first search with the modular polynomial Phi_2 from one CM j-invariant, and
     B(l)_{ij} = the multiplicity of j_j as a root of Phi_l(j_i, Y) (PARI's polmodular),
@@ -49,6 +54,7 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import sys
 import time
 from pathlib import Path
@@ -60,7 +66,12 @@ OUT = Path(__file__).resolve().parent.parent / "assets" / "data" / "limits"
 GAMMA1_N = 101
 QUADRATIC_NS = [101, 149, 173, 197, 269, 317, 389, 461, 557, 653, 773, 941, 1109,
                 1301, 1549, 1861, 2213, 2621, 3109, 3701]
-PLANAR_NS = [29, 37, 53, 61, 73, 89, 101, 113, 131, 151, 173, 197, 223, 251]
+# Beyond 251: primes N for which (N - 1)/2 has no large prime factor, so that the fields
+# Q(chi) stay small enough for PARI. N = 503 ((N - 1)/2 = 251 is prime) does not finish;
+# N = 769 (Q(chi) of degree 128, dim S_2(769, chi) = 64) needs more than 6.5 GB. N = 661
+# needs about 6 GB: run with PARI_STACK=6000000000.
+PLANAR_NS = [29, 37, 53, 61, 73, 89, 101, 113, 131, 151, 173, 197, 223, 251,
+             337, 421, 433, 577, 661]
 DIAGONAL_PS = None       # filled in by diagonal_primes()
 WEIGHT_KS = list(range(24, 961, 24))
 WEIGHT_ELLS = (2, 3, 5)
@@ -73,7 +84,9 @@ def start_pari():
     global pari
     import cypari2
     pari = cypari2.Pari()
-    pari.allocatemem(3 * 10 ** 9)
+    # PARI's stack: 3 GB by default; the largest planar levels need more, e.g.
+    # PARI_STACK=6000000000 python3 _scripts/limit_laws.py planar
+    pari.allocatemem(int(os.environ.get("PARI_STACK", 3 * 10 ** 9)))
     import tempfile
     with tempfile.NamedTemporaryFile("w", suffix=".gp", delete=False) as f:
         f.write(BRANDT_GP + LEVEL1_GP)
@@ -207,14 +220,68 @@ def make_quadratic():
     return {"ell": 2, "bins": BINS, "rows": rows}
 
 
+def gamma1_by_orbits(N, ell=2):
+    """The eigenvalues of T_l on S_2(Gamma_1(N)), N prime, one Galois orbit of characters
+    at a time: [(o, c, eigenvalues)] over the even characters chi, o the order of chi and
+    c = chi(l).
+
+    The even characters of order o (o | (N-1)/2) form one Galois orbit. PARI computes T_l
+    on S_2(N, chi) once, for one chi of order o, as a matrix over Q(chi) = Q[t]/Phi(t);
+    substituting each complex root of Phi for t gives T_l on S_2(N, chi') for every chi'
+    in the orbit. This is much faster than one mfinit per character (N = 251: seconds
+    instead of minutes). chi(l) is read off the spectrum: lambda = chi(l) conj(lambda)
+    for every eigenvalue lambda, and it must be an o-th root of unity.
+    """
+    h = (N - 1) // 2
+    out = []
+    for o in [d for d in range(1, h + 1) if h % d == 0]:
+        # znstar(N, 1) is cyclic of order N - 1; exponent (N - 1)/o gives order o, and the
+        # character is even because o divides h.
+        mf = pari.mfinit([N, 2, pari(f"[znstar({N},1), [{(N - 1) // o}]]")], 1)
+        d = int(pari.mfdim(mf))
+        P = pari.mfparams(mf)[4]
+        deg = int(pari.poldegree(P))
+        roots = [complex(r) for r in pari.polroots(P)] if deg > 1 else [1.0]
+        check(len(roots) == int(pari.eulerphi(o)), f"orbit of order {o} at N = {N}")
+        if d == 0:
+            continue
+        M = pari.liftall(pari.mfheckemat(mf, ell))
+        C = np.zeros((max(deg, 1), d, d))
+        for i in range(d):
+            for j in range(d):
+                e = M[j][i]                      # cypari2: M[j] is column j
+                if deg <= 1:
+                    C[0, i, j] = float(e)
+                else:
+                    for k, c in enumerate(pari.Vecrev(e)):
+                        C[k, i, j] = float(c)
+        for z in roots:
+            lam = np.linalg.eigvals(np.tensordot(z ** np.arange(C.shape[0]), C, axes=1))
+            check(np.max(np.abs(lam)) <= 2 * ell ** 0.5 + 1e-6, f"|lambda| > 2 sqrt l at N={N}, o={o}")
+            # The matrices have large rational entries, so the eigenvalues are only good to
+            # about 1e-6 here (they are stored to 1e-3); hence the tolerance 1e-4.
+            big = lam[np.argmax(np.abs(lam))]
+            c = big / np.conj(big)
+            check(np.max(np.abs(lam - c * np.conj(lam))) < 1e-4, f"lambda != c conj(lambda) at N={N}, o={o}")
+            check(abs(c ** o - 1) < 1e-4, f"chi(l) is not an o-th root of unity at N={N}, o={o}")
+            out.append((o, c, lam))
+    total = sum(len(l) for _, _, l in out)
+    check(total == (N - 5) * (N - 7) // 24, f"dim S_2(Gamma_1({N})) = {total}")
+    return out
+
+
+PLANAR_SAMPLE = 3000     # points drawn per N; the statistics use all of them
+
+
 def make_planar():
+    # The orbit method agrees with the one-character-at-a-time method of gamma1_spectrum.
+    a = np.concatenate([lam for _, _, lam in gamma1_spectrum(GAMMA1_N)])
+    b = np.concatenate([lam for _, _, lam in gamma1_by_orbits(GAMMA1_N)])
+    check(same_multiset(a, b, 1e-8), f"the two methods disagree at N = {GAMMA1_N}")
     rows = []
     for N in PLANAR_NS:
         t = time.time()
-        pts = []
-        for a, c, lam in gamma1_spectrum(N):
-            pts.extend(lam / 2 ** 0.5)
-        z = np.array(pts)
+        z = np.concatenate([lam for _, _, lam in gamma1_by_orbits(N)]) / 2 ** 0.5
         r = np.abs(z)
         # the limit: |z| distributed as |X|, X ~ mu_2; the CDF of |X| at r is 2 F(r) - 1
         rs = np.sort(r)
@@ -224,13 +291,17 @@ def make_planar():
         ks_r = float(max(np.max(np.abs((i + 1) / m - F)), np.max(np.abs(i / m - F))))
         mom = {f"{p}{q}": round(abs(complex(np.mean(z ** p * np.conj(z) ** q))), 4)
                for p, q in ((2, 0), (4, 0), (3, 1), (6, 0), (1, 1), (2, 2))}
+        rhist, _ = np.histogram(np.minimum(r, 2), bins=20, range=(0, 2))
         order = int(pari(f"znorder(Mod(2,{N}))"))
+        shown = z
+        if m > PLANAR_SAMPLE:   # a fixed random sample, the same on every run
+            shown = z[np.sort(np.random.default_rng(N).choice(m, PLANAR_SAMPLE, replace=False))]
         rows.append({"N": N, "dim": m, "lines": order if order % 2 else order // 2,
-                     "ksr": round(ks_r, 4), "mom": mom,
-                     "pts": [v for w in z for v in (round(w.real, 3), round(w.imag, 3))]})
+                     "ksr": round(ks_r, 4), "mom": mom, "rhist": [int(c) for c in rhist],
+                     "pts": [v for w in shown for v in (round(w.real, 3), round(w.imag, 3))]})
         print(f"  planar N={N}: {m} points, radial KS {ks_r:.4f}, |m20| {mom['20']}, "
               f"m11 {mom['11']}, {time.time() - t:.0f}s", flush=True)
-    return {"ell": 2, "rows": rows}
+    return {"ell": 2, "sample": PLANAR_SAMPLE, "rows": rows}
 
 
 # ---- Brandt matrices ---------------------------------------------------------------
