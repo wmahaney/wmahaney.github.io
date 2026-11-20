@@ -1,0 +1,17 @@
+---
+title: "Limit laws"
+description-meta: "Limits of spectra of Hecke operators: Kesten–McKay to Sato–Tate, characters, the planar limit of Gamma_1(N), the diagonal limit, and the weight aspect."
+---
+
+<!-- The description of each picture is in the box at the top of the widget. Its text is
+     in _partials/limits-widget.qmd, one block per entry of the menu. -->
+
+::: {data-limit="kmst"}
+{{< include /_partials/limits-widget.qmd >}}
+:::
+
+```{=html}
+<script type="module" src="../assets/js/limits.js"></script>
+```
+
+Statements, proofs and sources: [Limit laws](about.qmd#limits). The planar and diagonal limits are proved there with a sketch of my own; the other limits are theorems of the papers cited.

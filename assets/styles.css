@@ -1106,7 +1106,7 @@ body.quarto-dark .quarto-color-scheme-toggle .bi::before,
 .wm-graph[data-mode="spectral"] .wm-graph-history,
 .wm-graph[data-mode="spectral"] .wm-graph-field,
 .wm-graph[data-mode="spectral"] .wm-graph-hint,
-.wm-graph[data-mode="spectral"] .wm-graph-legend > span:not(.wm-graph-legend-spec),
+.wm-graph[data-mode="spectral"] .wm-graph-legend > span:not(.wm-graph-legend-spec):not(.wm-graph-legend-specinf),
 .wm-graph:not([data-mode="spectral"]) .wm-graph-ell,
 .wm-graph:not([data-mode="spectral"]) .wm-graph-legend-spec { display: none; }
 .wm-graph[data-mode="spectral"] .wm-graph-controls { min-height: 0; }
@@ -1309,3 +1309,33 @@ div[data-mode] > .wm-graph .wm-anim-title { display: none; }
   border-right: 2px solid var(--wm-accent);
   transform: rotate(45deg);
 }
+
+/* ---- Limit laws (animations/limits.qmd, assets/js/limits.js) ---------------- */
+.wm-lim-area { fill: var(--wm-accent); opacity: 0.22; }
+.wm-lim-line { fill: none; stroke: var(--wm-accent); stroke-width: 2.2; stroke-linejoin: round; }
+.wm-lim-second { fill: none; stroke: var(--wm-muted); stroke-width: 1.6; stroke-dasharray: 5 4; }
+.wm-lim-guide { fill: none; stroke: var(--wm-muted); stroke-width: 1.2; stroke-dasharray: 3 3; }
+.wm-lim-disk { fill: var(--wm-tint); stroke: var(--wm-line); stroke-width: 1.5; transition: opacity 0.2s; }
+.wm-lim-lines line { stroke: var(--wm-muted); stroke-width: 0.6; opacity: 0.35; }
+.wm-lim-pt { fill: var(--wm-accent); opacity: 0.85; }
+.wm-lim-pt-triv { fill: var(--wm-red); opacity: 1; }
+.wm-limits .wm-graph-walk { gap: 0.4rem 0.9rem; }
+.wm-limits .wm-lim-mode { max-width: 19rem; }
+.wm-lim-ell select {
+  font: 600 0.8rem/1.2 var(--wm-sans);
+  color: var(--wm-ink);
+  background: var(--wm-surface);
+  border: 1.5px solid var(--wm-line);
+  border-radius: 999px;
+  padding: 0.25rem 0.6rem;
+  margin-left: 0.25rem;
+}
+.wm-lim-slider { flex: 1 1 8rem; display: flex; align-items: center; }
+.wm-lim-slider input { width: 100%; accent-color: var(--wm-accent); }
+.wm-limits:not([data-mode="weight"]) .wm-lim-ell,
+.wm-limits[data-mode="star"] .wm-lim-slider { display: none; }
+/* The spectral law's "ℓ → ∞" entry has its own legend. */
+.wm-graph:not([data-mode="spectral"]) .wm-graph-legend-specinf,
+.wm-graph[data-mode="spectral"]:not([data-ell="inf"]) .wm-graph-legend-specinf,
+.wm-graph[data-mode="spectral"][data-ell="inf"] .wm-graph-legend-spec { display: none; }
+.wm-ovl { text-decoration: overline; }

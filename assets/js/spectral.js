@@ -17,6 +17,12 @@
 // mu_2 * mu_3 (* mu_5), which is the limit law drawn for "2, 3" and "2, 3, 5". For
 // "2, 3" a small grid also shows the joint histogram of (lambda_2, lambda_3).
 
+//
+// "ℓ → ∞" (value "inf"): no eigenvalues, but the Kesten-McKay laws themselves, rescaled
+// to [-2, 2], tending to the Sato-Tate law as l runs through the primes up to 1009. That
+// picture is drawn by createKmSt in limits.js, which the Limit laws page uses too.
+import { createKmSt } from "./limits.js";
+
 const SVG_NS = "http://www.w3.org/2000/svg";
 const el = (name, attrs = {}, parent) => {
   const node = document.createElementNS(SVG_NS, name);
@@ -86,6 +92,18 @@ export function createSpectral({ svg, base, W, H, onStatus, still }) {
   let data = null, ell = 2, idx = 0, t0 = 0, holdUntil = 0, active = false;
   let bars = [], shown = [], from = [], to = [], tweenStart = 0, tweenMs = 1;
   let label = {}, inset = null, law = null, ells = [2], grid = null;
+  // l -> infinity: the Kesten-McKay laws against Sato-Tate (createKmSt), with its own clock
+  let kmst = null, kIdx = 0, kLast = 0, kHold = 0;
+  const isInf = () => ell === "inf";
+  function kmstGo(i, now, ms) {
+    kIdx = i; kLast = now;
+    kmst.go(i, now, ms, still());
+  }
+  function kmstStart(now) {
+    kmst = createKmSt(g, { onStatus });
+    kHold = 0;
+    kmstGo(still() ? kmst.count - 1 : 0, now, 600);
+  }
 
   async function ensure() {
     if (!data) {
@@ -236,8 +254,13 @@ export function createSpectral({ svg, base, W, H, onStatus, still }) {
 
   return {
     async show(l) {
-      ell = Number(l);
+      ell = l === "inf" ? "inf" : Number(l);
       active = true;
+      if (isInf()) {
+        g.style.display = "";
+        kmstStart(performance.now());
+        return;
+      }
       try { await ensure(); } catch {
         onStatus("Could not load the eigenvalues. Please try again.");
         return;
@@ -251,6 +274,7 @@ export function createSpectral({ svg, base, W, H, onStatus, still }) {
     },
     // Play pressed: run through the primes from the first one.
     restart() {
+      if (active && isInf() && kmst) { kmst.reset(); kHold = 0; kmstGo(0, performance.now(), 600); return; }
       if (!active || !data) return;
       shown = new Array(DISPLAY_BINS).fill(0);
       t0 = performance.now(); holdUntil = 0;
@@ -258,7 +282,9 @@ export function createSpectral({ svg, base, W, H, onStatus, still }) {
     },
     hide() { active = false; g.style.display = "none"; },
     setEll(l) {
-      ell = Number(l);
+      ell = l === "inf" ? "inf" : Number(l);
+      if (active && isInf()) { kmstStart(performance.now()); return; }
+      if (active && !data) { this.show(l); return; }
       if (active && data) {
         scaffold();
         goTo(idx, performance.now(), 600);
@@ -266,7 +292,19 @@ export function createSpectral({ svg, base, W, H, onStatus, still }) {
       }
     },
     step(now, ms) {
-      if (!active || !data || still()) return;
+      if (active && isInf() && kmst && !still()) {
+        kmst.glide(now);
+        if (kHold) {
+          if (now >= kHold) { kHold = 0; kmst.reset(); kmstGo(0, now, ms); }
+        } else if (now - kLast >= ms / 3) {   // 169 primes: three per period of the histograms
+          if (kIdx < kmst.count - 1) {
+            kmstGo(kIdx + 1, now, ms / 3);
+            if (kIdx === kmst.count - 1) kHold = now + 8 * ms;
+          }
+        }
+        return;
+      }
+      if (!active || !data || still() || isInf()) return;
       // the glide between two histograms
       const t = Math.min(1, (now - tweenStart) / tweenMs), e = t * t * (3 - 2 * t);
       shown = from.map((f, k) => f + (to[k] - f) * e);
