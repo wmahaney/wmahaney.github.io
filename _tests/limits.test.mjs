@@ -88,9 +88,20 @@ test("quadratic.json, diagonal.json, weight.json: histograms count every eigenva
   }
 });
 
-test("planar.json: every eigenvalue of T_2 on S_2(Gamma_1(N)), in the disc of radius 2", () => {
-  for (const r of data("planar").rows) {
-    assert.equal(r.pts.length / 2, (r.N - 5) * (r.N - 7) / 24, `genus of X_1(${r.N})`);
+test("planar.json: the eigenvalues of T_2 on S_2(Gamma_1(N)), in the disc of radius 2", () => {
+  const d = data("planar");
+  let prev = 0;
+  for (const r of d.rows) {
+    assert.ok(r.N > prev, "N increases");
+    prev = r.N;
+    assert.equal(r.dim, (r.N - 5) * (r.N - 7) / 24, `genus of X_1(${r.N})`);
+    // all of them, or a sample of d.sample when there are more
+    assert.equal(r.pts.length / 2, Math.min(r.dim, d.sample), `points drawn at N = ${r.N}`);
+    assert.equal(sum(r.rhist), r.dim, `radial histogram at N = ${r.N}`);
     for (let i = 0; i < r.pts.length; i += 2) assert.ok(Math.hypot(r.pts[i], r.pts[i + 1]) <= 2.001);
   }
+  // the moments head for those of the limit: mean |z|^2 -> 3/2, mean z^2 -> 0
+  const last = d.rows.at(-1);
+  assert.ok(Math.abs(last.mom["11"] - 1.5) < 0.02);
+  assert.ok(last.mom["20"] < 0.02);
 });

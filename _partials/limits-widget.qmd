@@ -21,7 +21,7 @@
       <p class="wm-anim-params"><span>Parameters</span> speed</p>
     </section>
     <section data-anim="planar" hidden>
-      <p>All the eigenvalues of T<sub>2</sub> on S<sub>2</sub>(Γ<sub>1</sub>(N)), divided by √2, as points of the disc of radius 2, for primes N from 29 to 251. The number of lines is the order of 2 in (ℤ/N)<sup>×</sup>/{±1}. The points tend to the rotation-invariant law whose radius is distributed as |X|, X ~ μ<sub>2</sub> (right, red); a proof is sketched under the eye icon.</p>
+      <p>All the eigenvalues of T<sub>2</sub> on S<sub>2</sub>(Γ<sub>1</sub>(N)), divided by √2, as points of the disc of radius 2, for 19 primes N from 29 to 661, and then N → ∞. The number of lines is the order of 2 in (ℤ/N)<sup>×</sup>/{±1}. Beyond 3000 eigenvalues a fixed random sample of 3000 is drawn; the histogram on the right counts all of them. The limit is the rotation-invariant law whose radius is distributed as |X|, X ~ μ<sub>2</sub> (right, red), shown in the last frame shaded by its density; a proof is sketched under the eye icon.</p>
       <p class="wm-anim-params"><span>Parameters</span> N (slider) · speed</p>
     </section>
     <section data-anim="diagonal" hidden>

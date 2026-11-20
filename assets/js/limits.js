@@ -346,6 +346,18 @@ function createPlanar(g, data, { onStatus }) {
   g.replaceChildren();
   const cx = 170, cy = 300, rad = 135;
   el("circle", { class: "wm-lim-disk", cx, cy, r: rad }, g);
+  // The last frame, N -> infinity: the limit law nu shaded by its density per unit area,
+  // 2 f(r) / (2 pi r) with f that of mu_2, relative to its value at r = 1/2 (it is
+  // unbounded at 0, so the centre saturates).
+  const area = (r) => (2 * kmDensity(2, r)) / (2 * Math.PI * r);
+  const defs = el("defs", {}, g);
+  const grad = el("radialGradient", { id: "wm-lim-nu", cx: 0.5, cy: 0.5, r: 0.5 }, defs);
+  for (let k = 0; k <= 40; k++) {
+    const r = Math.max(0.01, (2 * k) / 40);
+    const op = k === 40 ? 0 : 0.85 * Math.min(1, area(r) / area(0.5));
+    el("stop", { offset: (k / 40).toFixed(3), style: `stop-color: var(--wm-accent); stop-opacity: ${op.toFixed(3)}` }, grad);
+  }
+  const nuDisk = el("circle", { cx, cy, r: rad, fill: "url(#wm-lim-nu)", opacity: 0 }, g);
   el("line", { class: "wm-spec-tick", x1: cx - rad, x2: cx + rad, y1: cy, y2: cy }, g);
   el("line", { class: "wm-spec-tick", x1: cx, x2: cx, y1: cy - rad, y2: cy + rad }, g);
   text(g, cx + rad + 4, cy + 4, "2", { class: "wm-spec-small" });
@@ -372,6 +384,13 @@ function createPlanar(g, data, { onStatus }) {
   const lab = headLabels(g);
   const rows = data.rows;
   const ins = makeInset(g, rows.map((r) => r.N), rows.map((r) => r.ksr), { title: "radial distance", xname: "N" });
+  // the limit's bars: the mass of each bin of |X|, by the midpoint rule
+  const limitBars = [];
+  for (let k = 0; k < nb; k++) {
+    let m = 0;
+    for (let j = 0; j < 50; j++) m += radial(k * bw + ((j + 0.5) * bw) / 50) / 50;
+    limitBars.push(m);
+  }
   let shown = new Array(nb).fill(0), from = shown, to = shown, t0 = 0, tw = 1;
   const paintBars = (hs) => hs.forEach((h, k) => {
     const y = PY(h);
@@ -379,8 +398,23 @@ function createPlanar(g, data, { onStatus }) {
     bars[k].setAttribute("height", (pBot - y).toFixed(1));
   });
   return {
-    count: rows.length,
+    count: rows.length + 1,
     go(i, now, ms, still) {
+      if (i === rows.length) {   // N -> infinity
+        dots.replaceChildren();
+        nuDisk.setAttribute("opacity", "1");
+        lab.big.textContent = "N → ∞";
+        lab.a.textContent = "the limit law ν: invariant under rotation,";
+        lab.b.textContent = "with |z| distributed as |X|, X ~ μ₂";
+        lab.c.textContent = "mean |z|² = 3/2,  mean z² = 0";
+        ins.upTo(rows.length - 1);
+        from = shown.slice(); to = limitBars.slice(); t0 = now; tw = Math.max(1, ms * 0.85);
+        if (still) { shown = to.slice(); paintBars(shown); }
+        onStatus("The limit as N → ∞ (proved in Read more): the rotation-invariant law ν on the disc of radius 2, " +
+          "shaded by its density, with |z| distributed as |X| for X ~ μ₂; it starts again.");
+        return;
+      }
+      nuDisk.setAttribute("opacity", "0");
       const row = rows[i], P = row.pts, n = P.length / 2;
       const frag = document.createDocumentFragment();
       const counts = new Array(nb).fill(0);
@@ -392,15 +426,19 @@ function createPlanar(g, data, { onStatus }) {
         counts[Math.min(nb - 1, Math.floor(Math.hypot(zr, zi) / bw))]++;
       }
       dots.replaceChildren(frag);
+      // Large N: a fixed sample of the points is drawn; the bars count all of them.
+      const all = row.rhist || counts, total = row.dim;
       lab.big.textContent = `N = ${row.N}`;
-      lab.a.textContent = `${n} eigenvalues of T₂ on S₂(Γ₁(${row.N}))`;
+      lab.a.textContent = n < total
+        ? `${total} eigenvalues of T₂ on S₂(Γ₁(${row.N})); ${n} drawn`
+        : `${n} eigenvalues of T₂ on S₂(Γ₁(${row.N}))`;
       lab.b.textContent = `on ${row.lines} lines through 0;  |mean z²| = ${row.mom["20"].toFixed(3)}`;
       lab.c.textContent = `mean |z|² = ${row.mom["11"].toFixed(3)}  (limit 3/2)`;
       ins.upTo(i);
-      from = shown.slice(); to = counts.map((c) => c / (n * bw)); t0 = now; tw = Math.max(1, ms * 0.85);
+      from = shown.slice(); to = all.map((c) => c / (total * bw)); t0 = now; tw = Math.max(1, ms * 0.85);
       if (still) { shown = to.slice(); paintBars(shown); }
-      onStatus(`T₂ on S₂(Γ₁(${row.N})): ${n} eigenvalues z = λ/√2 on ${row.lines} lines through 0. ` +
-        `Radial Kolmogorov distance ${row.ksr.toFixed(3)}` + (i === rows.length - 1 ? " (the largest N shown; it starts again)." : "."));
+      onStatus(`T₂ on S₂(Γ₁(${row.N})): ${total} eigenvalues z = λ/√2 on ${row.lines} lines through 0` +
+        (n < total ? ` (${n} of them drawn)` : "") + `. Radial Kolmogorov distance ${row.ksr.toFixed(3)}.`);
     },
     glide(now) {
       const e = ease(Math.min(1, (now - t0) / tw));
@@ -551,6 +589,7 @@ function init(root, base) {
         goTo(idx + 1);
         if (idx === player.count - 1 && player.count > 2) holdUntil = now + 8 * ms();
       } else if (player.count === 2) goTo(0);
+      else { player.reset(); goTo(0); }   // played from the last frame (slider, or paused there)
     }
     raf = requestAnimationFrame(frame);
   }
