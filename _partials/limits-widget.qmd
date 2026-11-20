@@ -1,0 +1,77 @@
+<!-- The Limit laws widget, on animations/limits.qmd, followed by a <script type="module">
+     tag loading assets/js/limits.js. To start in another picture, change data-limit on the
+     page (kmst, star, quadratic, planar, diagonal, weight). The data (assets/data/limits/)
+     is made by _scripts/limit_laws.py. Statements and proofs: animations/about.qmd#limits. -->
+
+```{=html}
+<figure class="wm-graph wm-limits" id="wm-limits">
+  <!-- THE INFO PANEL. One block per entry of the menu (data-anim is the entry's value);
+       the script shows the block of the picture on screen. -->
+  <div class="wm-anim-info">
+    <section data-anim="kmst" hidden>
+      <p>The Kesten–McKay law μ<sub>ℓ</sub> of the (ℓ+1)-regular tree, rescaled by 1/√ℓ to [−2, 2] (blue), for the primes ℓ up to 1009, against the Sato–Tate law (red), its limit as ℓ → ∞. The distances decay like 1/ℓ; the corner compares the total variation distance with 3√3/(4πℓ) (dashed).</p>
+      <p class="wm-anim-params"><span>Parameters</span> ℓ (slider) · speed</p>
+    </section>
+    <section data-anim="star" hidden>
+      <p>S<sub>2</sub>(Γ<sub>1</sub>(101)) splits into the spaces S<sub>2</sub>(101, χ) over the 50 even characters χ mod 101. On S<sub>2</sub>(101, χ) every eigenvalue λ of T<sub>2</sub> satisfies λ = χ(2)·<span class="wm-ovl">λ</span>, so it lies on the line through 0 at angle arg χ(2)/2. Rotating by χ(2)<sup>−1/2</sup> makes every eigenvalue real, and after rotation the character no longer shows: all 376 values follow the same law μ<sub>2</sub>.</p>
+      <p class="wm-anim-params"><span>Parameters</span> speed</p>
+    </section>
+    <section data-anim="quadratic" hidden>
+      <p>For a prime N ≡ 5 (mod 8) the character χ = (·/N) is even and χ(2) = −1, so every eigenvalue of T<sub>2</sub> on S<sub>2</sub>(N, χ) is purely imaginary. As N → ∞, λ/(i√2) is distributed according to μ<sub>2</sub> (red), as for the trivial character (Serre).</p>
+      <p class="wm-anim-params"><span>Parameters</span> speed</p>
+    </section>
+    <section data-anim="planar" hidden>
+      <p>All the eigenvalues of T<sub>2</sub> on S<sub>2</sub>(Γ<sub>1</sub>(N)), divided by √2, as points of the disc of radius 2, for primes N from 29 to 251. The number of lines is the order of 2 in (ℤ/N)<sup>×</sup>/{±1}. The points tend to the rotation-invariant law whose radius is distributed as |X|, X ~ μ<sub>2</sub> (right, red); a proof is sketched under the eye icon.</p>
+      <p class="wm-anim-params"><span>Parameters</span> N (slider) · speed</p>
+    </section>
+    <section data-anim="diagonal" hidden>
+      <p>The eigenvalues of T<sub>ℓ</sub>/√ℓ on S<sub>2</sub>(Γ<sub>0</sub>(p)) with ℓ growing along with p: ℓ is the largest prime ≤ (log p)². In this regime the limit is the Sato–Tate law (red) rather than a Kesten–McKay law; μ<sub>ℓ</sub> is dashed. The eigenvalues come from the Brandt matrix of G<sub>p</sub>(ℓ).</p>
+      <p class="wm-anim-params"><span>Parameters</span> p (slider) · speed</p>
+    </section>
+    <section data-anim="weight" hidden>
+      <p>The eigenvalues of T<sub>ℓ</sub>/ℓ<sup>(k−1)/2</sup> on S<sub>k</sub>(SL<sub>2</sub>(ℤ)), level one, as the weight k grows, against μ<sub>ℓ</sub> (red), their limit (Conrey–Duke–Farmer; Serre). Here dim S<sub>k</sub> is about k/12, so the histograms are coarse.</p>
+      <p class="wm-anim-params"><span>Parameters</span> ℓ · k (slider) · speed</p>
+    </section>
+  </div>
+  <div class="wm-graph-stage">
+    <svg class="wm-graph-svg wm-spec-mode" role="img" aria-labelledby="wm-limits-caption"></svg>
+    <a class="wm-graph-eye" href="/animations/about.html#limits" data-base="/animations/about.html" data-tip="Statements and proofs" aria-label="Statements and proofs">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M1.5 12S5.5 4.5 12 4.5 22.5 12 22.5 12 18.5 19.5 12 19.5 1.5 12 1.5 12Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.4" fill="currentColor"/></svg>
+    </a>
+  </div>
+  <div class="wm-graph-walk">
+    <label class="wm-graph-walk-label">picture
+      <select class="wm-lim-mode" aria-label="Which limit to show">
+        <option value="kmst" selected>ℓ → ∞: Kesten–McKay to Sato–Tate</option>
+        <option value="star">character: S₂(Γ₁(101)) by χ</option>
+        <option value="quadratic">character: the quadratic family</option>
+        <option value="planar">planar limit: Γ₁(N), N → ∞</option>
+        <option value="diagonal">diagonal limit: ℓ and p together</option>
+        <option value="weight">weight aspect: k → ∞</option>
+      </select>
+    </label>
+    <label class="wm-lim-ell">ℓ =
+      <select aria-label="Which Hecke operator T_ℓ">
+        <option value="2" selected>2</option>
+        <option value="3">3</option>
+        <option value="5">5</option>
+      </select>
+    </label>
+    <button type="button" class="wm-graph-play" aria-label="Pause the animation">Pause</button>
+    <label class="wm-graph-speed-label">speed
+      <select class="wm-graph-speed" aria-label="Speed of the animation">
+        <option value="calm">calm</option>
+        <option value="fast" selected>fast</option>
+        <option value="frantic">frantic</option>
+      </select>
+    </label>
+    <label class="wm-lim-slider"><span class="visually-hidden">Step</span>
+      <input type="range" min="0" max="0" value="0" step="1" aria-label="Choose the step of the sequence">
+    </label>
+  </div>
+  <figcaption>
+    <span class="wm-graph-caption" id="wm-limits-caption">Limits of spectra of Hecke operators.</span>
+    <span class="wm-graph-stats" aria-live="polite"></span>
+  </figcaption>
+</figure>
+```

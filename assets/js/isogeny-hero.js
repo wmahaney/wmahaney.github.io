@@ -380,6 +380,16 @@ function init(root, index, base) {
     document.title = mode === ownMode ? ownDocTitle : ownDocTitle.replace(ownTitle, title);
   }
 
+  // The caption of the spectral law; "ℓ → ∞" shows the laws themselves (see spectral.js).
+  function specCaption() {
+    const inf = ellSelect.value === "inf";
+    root.dataset.ell = inf ? "inf" : "";
+    caption.textContent = inf
+      ? "The Kesten–McKay laws, rescaled to [−2, 2], against their limit as ℓ → ∞, the Sato–Tate law (red)."
+      : "Eigenvalues of the Hecke operator T_ℓ on weight-2 cusp forms " +
+        "S₂(Γ₀(p)), for growing p, against the Kesten–McKay law (red).";
+  }
+
   let buildId = 0;
   async function build() {
     const id = ++buildId;
@@ -390,8 +400,7 @@ function init(root, index, base) {
     if (mode === "spectral") {        // the spectral law: no graph is drawn
       hideTip(); showEmpty(null);
       ballStatus.hidden = true;
-      caption.textContent = "Eigenvalues of the Hecke operator T_ℓ on weight-2 cusp forms " +
-        "S₂(Γ₀(p)), for growing p, against the Kesten–McKay law (red).";
+      specCaption();
       stats.textContent = "";
       if (eye) {
         eye.href = `${eye.dataset.base}#spectral`;
@@ -1404,7 +1413,10 @@ function init(root, index, base) {
     paintTrail();
   });
   viewSelect.addEventListener("change", () => { build().then(startLoop); });
-  ellSelect.addEventListener("change", () => spectral.setEll(ellSelect.value));
+  ellSelect.addEventListener("change", () => {
+    if (mode === "spectral") specCaption();
+    spectral.setEll(ellSelect.value);
+  });
   labelBox.addEventListener("change", () => {
     gLabels.style.display = labelBox.checked && !labelBox.disabled ? "" : "none";
     draw();

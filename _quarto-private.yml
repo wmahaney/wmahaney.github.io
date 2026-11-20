@@ -35,6 +35,8 @@ website:
             text: Blooming
           - href: animations/spectral.qmd
             text: Spectral law
+          - href: animations/limits.qmd
+            text: Limit laws
           - href: animations/about.qmd
             text: Read more
       - text: Statements

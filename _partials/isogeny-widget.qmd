@@ -34,7 +34,7 @@
     </section>
     <section data-anim="spectral" data-title="Spectral law" hidden>
       <p class="wm-anim-title">Spectral law (Kesten–McKay)</p>
-      <p>The eigenvalues of the Hecke operator T<sub>ℓ</sub> on S<sub>2</sub>(Γ<sub>0</sub>(p)), which are the eigenvalues of G<sub>p</sub>(ℓ) other than ℓ + 1, for 129 primes p from 101 to 49991, against the Kesten–McKay density (red), their limit as p → ∞ (Serre). The corner shows the Kolmogorov distance. With ℓ = 2, 3 or 2, 3, 5: the eigenvalues of T<sub>2</sub> + T<sub>3</sub> (+ T<sub>5</sub>) against the convolution of the Kesten–McKay laws.</p>
+      <p>The eigenvalues of the Hecke operator T<sub>ℓ</sub> on S<sub>2</sub>(Γ<sub>0</sub>(p)), which are the eigenvalues of G<sub>p</sub>(ℓ) other than ℓ + 1, for 129 primes p from 101 to 49991, against the Kesten–McKay density (red), their limit as p → ∞ (Serre). The corner shows the Kolmogorov distance. With ℓ = 2, 3 or 2, 3, 5: the eigenvalues of T<sub>2</sub> + T<sub>3</sub> (+ T<sub>5</sub>) against the convolution of the Kesten–McKay laws. With ℓ → ∞: the Kesten–McKay laws themselves, rescaled by 1/√ℓ, against their limit, the Sato–Tate law; more on the <a href="/animations/limits.html">Limit laws</a> page.</p>
       <p class="wm-anim-params"><span>Parameters</span> ℓ · speed</p>
     </section>
   </div>
@@ -92,6 +92,7 @@
         <option value="5">5</option>
         <option value="23">2, 3</option>
         <option value="235">2, 3, 5</option>
+        <option value="inf">→ ∞</option>
       </select>
     </label>
     <button type="button" class="wm-q" data-terms="viewer walk cycle ball until spectral km sums" aria-label="What do the animations show?" aria-expanded="false">?</button>
@@ -134,6 +135,7 @@
       <span class="wm-graph-legend-frob" hidden><i class="wm-key wm-key-frob"></i>Frobenius</span>
       <span class="wm-graph-legend-5" hidden><i class="wm-key wm-key-5"></i>5-isogeny</span>
       <span class="wm-graph-legend-spec"><i class="wm-key wm-key-bar"></i>eigenvalues (histogram) <i class="wm-key wm-key-3"></i>Kesten–McKay density</span>
+      <span class="wm-graph-legend-specinf"><i class="wm-key wm-key-bar"></i>Kesten–McKay law, rescaled <i class="wm-key wm-key-3"></i>Sato–Tate density</span>
       <span class="wm-graph-legend-ball"><i class="wm-key wm-key-ball"></i>ball <i class="wm-key wm-key-hit"></i>shortest paths to the conjugate pair (red)</span>
       <span class="wm-graph-legend-walk"><i class="wm-key wm-key-walk"></i><i class="wm-key wm-key-trail"></i>laser walker; trail of the last <span class="wm-trail-n">10</span> steps</span>
       <button type="button" class="wm-q" data-terms="supersingular fp pair directed lambda" aria-label="What do the colours and numbers mean?" aria-expanded="false">?</button>

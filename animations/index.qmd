@@ -14,5 +14,8 @@ The supersingular isogeny graphs $G_p(2)$, $G_p(\{2,3\})$ and $G_p(\{2,3,5\})$ f
 [Spectral law](spectral.qmd)
 : The eigenvalues of $T_\ell$ on $S_2(\Gamma_0(p))$ against the Kesten–McKay law, and those of $T_2 + T_3$ and $T_2 + T_3 + T_5$ against its convolutions.
 
+[Limit laws](limits.qmd)
+: Kesten–McKay to Sato–Tate as $\ell \to \infty$; $T_2$ with a character; the eigenvalues of $T_2$ on $S_2(\Gamma_1(N))$ in the plane; $\ell$ and $p$ growing together; the weight aspect.
+
 [Read more](about.qmd)
 : Definitions, proofs and sources.

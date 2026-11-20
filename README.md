@@ -292,6 +292,32 @@ node --test _tests/*.test.mjs
 **The static figures** on the Animations pages are made by `python3 _scripts/spine_diagrams.py`
 (needs `pip install networkx`) and `python3 _scripts/ball_diagrams.py`.
 
+### The Limit laws page
+
+`animations/limits.qmd` has its own widget, separate from the isogeny graph:
+
+| Part | File |
+|---|---|
+| Markup: the menu, the info panel (one block per picture) | `_partials/limits-widget.qmd` |
+| Drawing and animation | `assets/js/limits.js` |
+| Tests (the laws, the distances, the data files) | `_tests/limits.test.mjs` |
+| Data | `assets/data/limits/`, written by `_scripts/limit_laws.py` |
+| Statements and proofs | `animations/about.qmd#limits` |
+
+The "ℓ → ∞" entry of the spectral law's ℓ menu draws the first picture of that page inside
+the isogeny widget (`createKmSt` in `assets/js/limits.js`, called from `assets/js/spectral.js`).
+
+**Remake the data.** `pip install cypari2 numpy`, then
+
+```
+python3 _scripts/limit_laws.py                      # everything, about an hour on one core
+python3 _scripts/limit_laws.py planar diagonal      # only some files
+```
+
+The lists of levels, primes and weights are at the top of the script, and it stops if one of
+its checks fails (they are listed at the top of the script). The first picture, Kesten–McKay to
+Sato–Tate, needs no data.
+
 ## Look: colours, fonts, layout
 
 - Colours: `assets/theme-light.scss` and `assets/theme-dark.scss` (the `--wm-*` values near the

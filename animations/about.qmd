@@ -1,6 +1,6 @@
 ---
 title: "Read more"
-description-meta: "Definitions behind the animations: the isogeny graphs and their level structures, Frobenius, the F_p-subgraph, the quotient by Frobenius, growing balls, and the Kesten–McKay law."
+description-meta: "Definitions behind the animations: the isogeny graphs and their level structures, Frobenius, the F_p-subgraph, the quotient by Frobenius, growing balls, the Kesten–McKay law, and limit laws of Hecke spectra."
 toc: true
 aliases:
   - /graphs/index.html
@@ -151,6 +151,78 @@ the convolution of the Kesten–McKay laws, supported on $\big[-\sum_\ell 2\sqrt
 
 The second moment of $\mu_\ell$ is $\ell + 1$ (the number of closed walks of length 2 at a vertex of the tree) and $\mu_\ell$ is symmetric, so the convolution has second moment $\sum_\ell (\ell+1)$: $7$ for $\{2,3\}$ and $13$ for $\{2,3,5\}$. At $p = 49991$ the eigenvalues give $7.001$ and $13.003$, the pairwise correlations of $\lambda_2, \lambda_3, \lambda_5$ are below $0.001$ in absolute value, and the Kolmogorov distances to the convolutions are about $0.005$ (the numbers are in `spectra.json`).
 
+## Limit laws {#limits}
+
+The pictures on the [Limit laws](limits.qmd) page. Their data is computed by `_scripts/limit_laws.py` with PARI/GP, and a statement marked *checked* is verified by that script on all of its data. Throughout, eigenvalues are rescaled to $[-2, 2]$: for $T_\ell$ in weight $k$, $x = \lambda/\ell^{(k-1)/2}$, so $x = \lambda/\sqrt\ell$ in weight 2. On $[-2, 2]$ the Sato–Tate law and the rescaled Kesten–McKay law are
+$$\mu_{\mathrm{ST}} = \frac{\sqrt{4 - x^2}}{2\pi}\,dx, \qquad \mu_\ell = \frac{\ell(\ell+1)}{(\ell+1)^2 - \ell x^2}\,\mu_{\mathrm{ST}} ,$$
+the image of the law in [the spectral law](#spectral) under $x \mapsto x/\sqrt\ell$. With the Chebyshev polynomials $X_m(2\cos\theta) = \sin((m+1)\theta)/\sin\theta$, Serre (1997) characterises $\mu_\ell$ by
+$$\int X_m \, d\mu_\ell = \begin{cases} \ell^{-m/2} & m \text{ even},\\ 0 & m \text{ odd},\end{cases} \qquad \int X_m \, d\mu_{\mathrm{ST}} = \begin{cases} 1 & m = 0,\\ 0 & m \geq 1.\end{cases}$$
+These are the facts used below; the $X_m$ span the polynomials, and all the measures involved live on $[-2, 2]$, so convergence of every $\int X_m$ is weak convergence.
+
+### Kesten–McKay to Sato–Tate {#kmst}
+
+**Proposition.** As $\ell \to \infty$, $\mu_\ell \to \mu_{\mathrm{ST}}$ in total variation, and
+$$d_{\mathrm{TV}}(\mu_\ell, \mu_{\mathrm{ST}}) = \frac{3\sqrt3}{4\pi\ell} + O(\ell^{-2}), \qquad \sup_x \lvert F_\ell(x) - F_{\mathrm{ST}}(x)\rvert = \frac{3\sqrt3}{8\pi\ell} + O(\ell^{-2}),$$
+where $d_{\mathrm{TV}} = \tfrac12 \int \lvert f_\ell - f_{\mathrm{ST}}\rvert$ and $F$ denotes a distribution function.
+
+*Proof.* On $[-2, 2]$ the denominator $(\ell+1)^2 - \ell x^2$ is at least $(\ell - 1)^2$, and
+$$\frac{\ell(\ell+1)}{(\ell+1)^2 - \ell x^2} = 1 + \frac{x^2 - 1}{\ell} + O(\ell^{-2})$$
+uniformly in $x$. So $f_\ell - f_{\mathrm{ST}} = f_{\mathrm{ST}}(x)(x^2 - 1)/\ell + O(\ell^{-2})$. With $x = 2\cos\theta$, and $\sin^2\theta\,(1 + 2\cos 2\theta) = \tfrac12(\cos 2\theta - \cos 4\theta)$, whose primitive $\tfrac14\sin 2\theta - \tfrac18 \sin 4\theta$ takes the values $0, \tfrac{3\sqrt3}{16}, -\tfrac{3\sqrt3}{16}, 0$ at $\theta = 0, \pi/3, 2\pi/3, \pi$,
+$$\int_{-2}^{2} f_{\mathrm{ST}}(x)\,\lvert x^2 - 1\rvert\,dx = \frac{2}{\pi}\int_0^\pi \sin^2\theta\,\lvert 1 + 2\cos 2\theta\rvert\,d\theta = \frac{2}{\pi}\cdot\frac{3\sqrt3}{4} = \frac{3\sqrt3}{2\pi},$$
+which gives $d_{\mathrm{TV}}$. For the distribution functions, $G(x) = \int_{-2}^x f_{\mathrm{ST}}(t)(t^2-1)\,dt$ vanishes at $\pm 2$, increases on $[-2,-1]$ and $[1,2]$ and decreases on $[-1,1]$; so $\sup \lvert G\rvert = G(-1) = -G(1)$, which is half the positive part of the integral above, $3\sqrt3/(8\pi)$. $\square$
+
+The picture shows $\mu_\ell$ for the 169 primes $\ell \leq 1009$, with the two distances computed numerically. At $\ell = 101$ they are $0.004081$ and $0.002040$, against $3\sqrt3/(4\pi\ell) = 0.004094$ and $3\sqrt3/(8\pi\ell) = 0.002047$; at $\ell = 1009$ both agree with the first-order terms to the six decimals shown, $0.000410$ and $0.000205$ (*tested* in `_tests/limits.test.mjs`). The same picture is the "ℓ → ∞" entry of [the spectral law](spectral.qmd).
+
+### Hecke operators with a character {#star}
+
+[]{#quadratic}Let $N$ be prime and $\chi$ a Dirichlet character mod $N$. The space $S_2(N, \chi)$ of weight-2 cusp forms for $\Gamma_0(N)$ with character $\chi$ is $0$ unless $\chi(-1) = 1$, and
+$$S_2(\Gamma_1(N)) = \bigoplus_{\chi \text{ even}} S_2(N, \chi).$$
+For $\ell \nmid N$ the adjoint of $T_\ell$ for the Petersson product is $\langle\ell\rangle^{-1} T_\ell$ (Diamond–Shurman, Chapter 5), which is $\overline{\chi(\ell)}\, T_\ell$ on $S_2(N,\chi)$. So every eigenvalue satisfies $\bar\lambda = \overline{\chi(\ell)}\,\lambda$, that is $\lambda = \chi(\ell)\bar\lambda$ (*checked*), and $\lambda$ lies on the line $\omega\mathbb{R}$ for either square root $\omega$ of $\chi(\ell)$: the line through 0 at angle $\arg\chi(\ell)/2$.
+
+**$S_2(\Gamma_1(101))$.** The even characters mod 101 are the characters of $(\mathbb{Z}/101)^\times/\{\pm1\}$, a cyclic group of order 50 generated by the image of 2 (2 is a primitive root mod 101). So $\chi(2)$ runs over all 50th roots of unity, one character each, and the 376 eigenvalues of $T_2$ (the genus of $X_1(101)$, *checked*) lie on 50 distinct lines. The lines at angles $\theta$ and $\pi - \theta$ carry complex-conjugate spectra, since $\bar\chi$ has the conjugate eigenvalues (*checked*).
+
+**Theorem (Serre, 1997, Théorème 4).** Fix a prime $\ell$. Let $N + k \to \infty$ with $\ell \nmid N$, and let $\chi$ be a character mod $N$ with $\chi(-1) = (-1)^k$. Then the eigenvalues of $\chi(\ell)^{-1/2}\ell^{-(k-1)/2}T_\ell$ on $S_k(N, \chi)$ become equidistributed for $\mu_\ell$.
+
+Serre states this extension of his theorem to the full spaces $S_k(N,\chi)$ without details, by the same method; Ross (2025) recalls it and treats the newspaces $S_k^{\mathrm{new}}(N,\chi)$. For prime $N$ every form in $S_2(N,\chi)$ is new, as $S_2(\mathrm{SL}_2(\mathbb{Z})) = 0$. The choice of square root does not matter, since $\mu_\ell$ is symmetric. So the character changes the line on which the eigenvalues lie, and after rotation it leaves no trace in the limit; the picture shows all 376 rotated eigenvalues against $\mu_2$.
+
+**The quadratic family.** For a prime $N \equiv 5 \pmod 8$ the Legendre symbol $\chi = (\cdot/N)$ is even, as $N \equiv 1 \pmod 4$, and $\chi(2) = (2/N) = -1$. So the eigenvalues of $T_2$ on $S_2(N, \chi)$ are purely imaginary (*checked*), and by the theorem $\lambda/(i\sqrt2)$ is distributed according to $\mu_2$ as $N \to \infty$. The spectrum is symmetric under $\lambda \mapsto -\lambda$ (*checked*): $\chi$ is real, so $f \mapsto \overline{f(-\bar z)}$ preserves $S_2(N,\chi)$ and sends an eigenform with eigenvalue $\lambda$ to one with eigenvalue $\bar\lambda = -\lambda$. The picture uses 20 primes from 101 to 3701.
+
+### The planar limit {#planar}
+
+Without rotating, the eigenvalues of $T_\ell$ on all of $S_2(\Gamma_1(N))$ are points of the plane. The statement below is not taken from the sources on this page; the proof is a sketch.
+
+**Proposition.** Fix a prime $\ell$. For primes $N \to \infty$, let $\nu_N$ be the uniform probability measure on the eigenvalues of $\ell^{-1/2} T_\ell$ on $S_2(\Gamma_1(N))$, counted with multiplicity, a measure on the disc $\lvert z\rvert \leq 2$. Then $\nu_N$ converges weakly to the rotation-invariant measure $\nu$ on the disc for which $\lvert z \rvert$ is distributed as $\lvert X\rvert$ with $X \sim \mu_\ell$: in polar coordinates, $d\nu = 2 f_\ell(r)\,dr\,\tfrac{d\theta}{2\pi}$ for $0 \leq r \leq 2$.
+
+*Proof sketch.* Write $d_\chi = \dim S_2(N, \chi)$ and $D = \sum_\chi d_\chi$, the genus of $X_1(N)$. By the dimension formula (Cohen–Oesterlé), $d_\chi = N/12 + O(1)$ uniformly in the even $\chi$.
+
+1. *Each character, uniformly.* Let $\omega_\chi^2 = \chi(\ell)$ and $x_f = \omega_\chi^{-1}\lambda_f/\sqrt\ell$, a real number. The Hecke relations give $X_m(\omega^{-1}\ell^{-1/2}T_\ell) = \omega^{-m}\ell^{-m/2}T_{\ell^m}$ on $S_2(N,\chi)$. In the Eichler–Selberg trace formula for $T_{\ell^m}$ on $S_2(N, \chi)$ the identity term is $\chi(\ell^{m/2})(N+1)/12$ for $m$ even and $0$ for $m$ odd. Once $N^2 > 4\ell^m$, every other term involves $\chi$ only through a bounded number of its values (in the elliptic terms, at the at most two roots mod $N$ of $x^2 - tx + \ell^m$), each of absolute value 1, and is bounded independently of $N$ and $\chi$. As $\omega^{-m}\chi(\ell^{m/2}) = 1$ for even $m$,
+$$\frac{1}{d_\chi}\sum_f X_m(x_f) = \int X_m\,d\mu_\ell + O_{\ell, m}(1/N) \quad\text{uniformly in } \chi ,$$
+and so $\frac{1}{d_\chi}\sum_f x_f^m = M_m + O_{\ell,m}(1/N)$ with $M_m = \int x^m\,d\mu_\ell$. This is Serre's argument with the error term kept uniform in $\chi$.
+2. *Averaging over the characters.* Let $z_f = \omega_\chi x_f$, so $\bar z_f = \omega_\chi^{-1} x_f$. For $a, b \geq 0$ and $m = a + b$,
+$$\int z^a\bar z^b\,d\nu_N = \sum_\chi \frac{d_\chi}{D}\,\omega_\chi^{a-b}\big(M_m + O(1/N)\big).$$
+If $m$ is odd, $M_m = 0$. If $m$ is even, so is $a - b = 2j$, and $\omega_\chi^{a-b} = \chi(\ell^j)$. Now $\sum_{\chi \text{ even}} \chi(\ell^j)$ is $(N-1)/2$ if $\ell^j \equiv \pm 1 \pmod N$ and $0$ otherwise; for $j \neq 0$ and $N > \ell^{\lvert j\rvert} + 1$ it is $0$, so with $d_\chi = N/12 + O(1)$ the sum is $O(N)$ against $D \asymp N^2/24$. Hence $\int z^a \bar z^b\,d\nu_N \to \delta_{ab} M_{2a}$.
+3. *The limit.* $\int z^a \bar z^b\,d\nu = \int r^{a+b} e^{i(a-b)\theta}\,d\nu = \delta_{ab}\,\mathbb{E}\lvert X\rvert^{2a} = \delta_{ab} M_{2a}$. All the measures live on the disc of radius 2 (Eichler–Shimura and Weil), and polynomials in $z$ and $\bar z$ are dense in its continuous functions (Stone–Weierstrass), so $\nu_N \to \nu$. $\square$
+
+For $\ell = 2$, $M_2 = 3/2$. The number of lines is the order of $\ell$ in $(\mathbb{Z}/N)^\times/\{\pm1\}$, which tends to infinity with $N$ but not monotonically: 50 lines for $N = 101$, 9 for $N = 73$. The picture shows 14 primes $N$ from 29 to 251. At $N = 251$ (2501 eigenvalues on 25 lines, as 2 has order 50 mod 251) the mean of $\lvert z\rvert^2$ is $1.476$, the absolute value of the mean of $z^2$ is $0.023$ (limit 0), and the Kolmogorov distance between the law of $\lvert z\rvert$ and that of $\lvert X\rvert$ is $0.017$.
+
+### The diagonal limit {#diagonal}
+
+In the [spectral law](#spectral) $\ell$ is fixed and the limit is $\mu_\ell$; letting $\ell \to \infty$ afterwards gives $\mu_{\mathrm{ST}}$ ([above](#kmst)). The two limits can also be taken together. As for the planar limit, this statement is not taken from the sources below, and the proof is a sketch.
+
+**Proposition.** Let $p \to \infty$ through the primes, and let $\ell = \ell(p) \neq p$ be primes with $\ell \to \infty$ and $\log \ell / \log p \to 0$. Then the eigenvalues of $\ell^{-1/2}T_\ell$ on $S_2(\Gamma_0(p))$ become equidistributed for $\mu_{\mathrm{ST}}$.
+
+*Proof sketch.* As above, $\sum_f X_m(\lambda_f/\sqrt\ell) = \ell^{-m/2}\,\mathrm{Tr}\,T_{\ell^m}$. In the Eichler–Selberg formula for $n = \ell^m$ on $S_2(\Gamma_0(p))$ the identity term is $(p+1)/12$ for $m$ even. Once $p^2 > 4n$, $p$ divides none of the conductors $f$ in the elliptic terms, which are then bounded by $\sum_{t^2 < 4n} H(4n - t^2) \leq 2\sigma(n)$ (the Kronecker–Hurwitz class number relation); the hyperbolic and Eisenstein terms are at most $2\sigma(n)$ and $\sigma(n)$. All of this is $O(\ell^m)$. Dividing by $\dim S_2(\Gamma_0(p)) = p/12 + O(1)$,
+$$\frac{1}{\dim}\sum_f X_m(\lambda_f/\sqrt\ell) = \begin{cases}\ell^{-m/2}\big(1 + O(1/p)\big) & m\text{ even}\\ 0 & m \text{ odd}\end{cases} \;+\; O\Big(\frac{\ell^{m/2}}{p}\Big).$$
+For fixed $m \geq 1$ both terms tend to 0, because $\ell \to \infty$ and $\ell^{m/2}/p = p^{\,m\log\ell/(2\log p) - 1} \to 0$. $\square$
+
+Murty and Sinha (2009) work out explicit bounds for each term of the trace formula. The picture takes $\ell$ to be the largest prime $\leq (\log p)^2$, which satisfies the hypothesis, for 28 primes $p$ from 101 to 20011 (so $\ell$ from 19 to 97), and computes the eigenvalues from the Brandt matrix $B(\ell)$, the adjacency matrix of $G_p(\ell)$: $B(\ell)_{ij}$ is the multiplicity of $j_j$ as a root of $\Phi_\ell(j_i, Y)$ over $\mathbb{F}_{p^2}$. The script checks that the rows of $B(\ell)$ sum to $\ell + 1$, that $B(\ell)\,\mathrm{diag}(\lvert\mathrm{Aut}(E_j)\rvert)$ is symmetric, that $B(\ell)$ commutes with $B(2)$, and the Ramanujan bound. At $p = 20011$, $\ell = 97$, the Kolmogorov distance to $\mu_{\mathrm{ST}}$ is $0.017$ (to $\mu_{97}$: $0.016$); at that size $\mu_{97}$ and $\mu_{\mathrm{ST}}$ differ by about $3\sqrt3/(8\pi\cdot 97) = 0.002$, less than the distance of either to the data.
+
+### The weight aspect {#weight}
+
+**Theorem (Conrey–Duke–Farmer, 1997; Serre, 1997).** Fix a prime $\ell$. As $k \to \infty$ through the even integers, the eigenvalues of $\ell^{-(k-1)/2}T_\ell$ on $S_k(\mathrm{SL}_2(\mathbb{Z}))$ become equidistributed for $\mu_\ell$.
+
+The picture uses $k = 24, 48, \dots, 960$, where $\dim S_k = k/12$, and $\ell = 2, 3, 5$. The matrix of $T_\ell$ is computed exactly on the basis $\Delta^i E_4^a E_6^b$ ($1 \leq i \leq \dim S_k$, $4a + 6b = k - 12i$) from $q$-expansions, and its characteristic polynomial is solved numerically with enough digits; the script checks it against PARI's `mfheckemat` for $k \leq 120$, and that $T_2 \Delta = -24\Delta$. All the rescaled eigenvalues lie in $[-2, 2]$ (Deligne; *checked*). With at most 80 eigenvalues the histograms are coarse: at $k = 960$ the Kolmogorov distance to $\mu_2$ is $0.044$.
+
 ## When the $\mathbb{F}_p$-subgraph is empty {#fixed-level}
 
 Without level structure the $\mathbb{F}_p$-subgraph is never empty. With level structure it can be, for the following reason.
@@ -212,6 +284,11 @@ Computed by the script. Edges are directed. "Spine" means the $\mathbb{F}_p$-sub
 - Benedict Gross, *Heights and the special values of L-series*, CMS Conf. Proc. 7 (1987): Brandt matrices and $T_\ell$.
 - David Kohel, [Endomorphism rings of elliptic curves over finite fields](https://www.i2m.univ-amu.fr/perso/david.kohel/pub/thesis.pdf), PhD thesis, Berkeley (1996), Chapter 7: the pairing $\langle E_i, E_j\rangle = w_i\,\delta_{ij}$ on the supersingular curves, for which $T_\ell$ is self-adjoint.
 - Giulio Codogni and Guido Lido, [Spectral theory of isogeny graphs](https://arxiv.org/abs/2308.13913), J. Number Theory 286 (2026): level structures $H \subset \mathrm{GL}_2(\mathbb{Z}/N)$, the Hermitian form weighted by $\lvert\mathrm{Aut}(E, \varphi)\rvert$, and $A^* = \langle \ell^{-1}\rangle A$.
-- Jean-Pierre Serre, *Répartition asymptotique des valeurs propres de l'opérateur de Hecke $T_p$*, J. AMS 10 (1997).
+- Jean-Pierre Serre, *Répartition asymptotique des valeurs propres de l'opérateur de Hecke $T_p$*, J. AMS 10 (1997): the Kesten–McKay limit, its Chebyshev moments, and (Théorème 4) the extension to characters.
+- Erick Ross, [Hecke eigenvalue equidistribution over the newspaces with nebentypus](https://arxiv.org/abs/2511.13966), arXiv:2511.13966 (2025): recalls Serre's Théorème 4 and treats the newspaces $S_k^{\mathrm{new}}(N,\chi)$.
+- J. Brian Conrey, William Duke and David Farmer, [The distribution of the eigenvalues of Hecke operators](https://arxiv.org/abs/math/9609214), Acta Arith. 78 (1997): the weight aspect in level one.
+- M. Ram Murty and Kaneenika Sinha, *Effective equidistribution of eigenvalues of Hecke operators*, J. Number Theory 129 (2009): explicit bounds for the terms of the Eichler–Selberg trace formula.
+- Fred Diamond and Jerry Shurman, *A First Course in Modular Forms*, GTM 228: $S_k(\Gamma_1(N)) = \bigoplus_\chi S_k(N,\chi)$ and the adjoints of the Hecke operators (Chapter 5).
+- Henri Cohen and Joseph Oesterlé, *Dimensions des espaces de formes modulaires*, Lecture Notes in Math. 627 (1977): the dimension of $S_k(N,\chi)$.
 - Harry Kesten, *Symmetric random walks on groups*, Trans. AMS 92 (1959); Brendan McKay, *The expected eigenvalue distribution of a large regular graph*, Linear Algebra Appl. 40 (1981).
 - Joseph Silverman, *The Arithmetic of Elliptic Curves*: the Hasse bound (Ch. V) and twists (Ch. X).
