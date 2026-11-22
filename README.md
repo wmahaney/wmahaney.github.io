@@ -319,6 +319,38 @@ The lists of levels, primes and weights are at the top of the script, and it sto
 its checks fails (they are listed at the top of the script). The first picture, Kesten–McKay to
 Sato–Tate, needs no data.
 
+### Larger data with Magma
+
+`_scripts/magma/harvest.m` computes the raw spectra with Magma (modular symbols with character,
+level-one modular symbols, and Brandt matrices from `SupersingularModule`), and
+`_scripts/magma_import.py` checks them and merges them into the JSON files. The importer builds
+each row with the same functions as the PARI scripts, so the pages need no change.
+
+| Store | Magma `store:=` | Default new range |
+|---|---|---|
+| `limits/planar.json` | `planar` | N = 701 … 2003 (`planarN:=`) |
+| `limits/quadratic.json` | `quadratic` | 12 primes N ≡ 5 (mod 8), 4000 … 20000 (`quadN:=`) |
+| `limits/weight.json` | `weight` | k = 984 … 2400, ℓ = 2, 3, 5 (`weightK:=`, `weightL:=`) |
+| `limits/diagonal.json` | `diagonal` | 16 primes p, 20000 … 100000 (`diagonalP:=`) |
+| `isogeny/spectra.json` | `spectra` | 12 primes p, 50000 … 100000 (`spectraP:=`) |
+
+```
+magma -b store:=planar planarN:=769,1009 out:=harvest.txt _scripts/magma/harvest.m
+python3 _scripts/magma_import.py --dry-run harvest.txt     # check only
+python3 _scripts/magma_import.py harvest.txt               # check and write
+```
+
+`harvest.m` appends to its output file and prints a timing per item, so it can be run in
+pieces. The importer stops before writing anything if a check fails; where a new row has the
+same key as a stored one (same N, p or k) it must agree with it, which compares Magma's numbers
+with PARI's. Rows from Brandt matrices with p near 100000 need a few GB of memory in Python
+(dense matrices of size about p/12). After an import, update the numbers quoted in
+`animations/about.qmd` (the largest N or p shown, and the statistics there).
+
+`python3 _scripts/magma_import.py --selftest` (needs cypari2) writes records in harvest.m's
+format from PARI for small cases and checks that they import to the stored rows. It tests the
+importer; `harvest.m` itself has to be run with Magma.
+
 ## Look: colours, fonts, layout
 
 - Colours: `assets/theme-light.scss` and `assets/theme-dark.scss` (the `--wm-*` values near the

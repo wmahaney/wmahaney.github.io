@@ -203,6 +203,14 @@ def make_gamma1():
     return {"N": N, "ell": 2, "lines": lines, "chars": rows}
 
 
+def quadratic_row(N, y):
+    """The row of quadratic.json for N from y = lambda/(i sqrt 2) over the eigenvalues
+    lambda of T_2 on S_2(N, (./N)). Also used by magma_import.py."""
+    y = np.asarray(y, dtype=float)
+    check(np.allclose(np.sort(y), np.sort(-y), atol=1e-6), f"spectrum not symmetric at N = {N}")
+    return {"N": N, "dim": len(y), "hist": hist(y), "ks": round(ks(y, 2), 4)}
+
+
 def make_quadratic():
     rows = []
     for N in QUADRATIC_NS:
@@ -213,10 +221,8 @@ def make_quadratic():
         lam = eigen_chi(N, chi)
         check(np.max(np.abs(lam.real)) < 1e-6, f"a real part at N = {N}")
         check(np.max(np.abs(lam)) <= 2 * 2 ** 0.5 + 1e-6, f"|lambda| > 2 sqrt 2 at N = {N}")
-        y = lam.imag / 2 ** 0.5
-        check(np.allclose(np.sort(y), np.sort(-y), atol=1e-6), f"spectrum not symmetric at N = {N}")
-        rows.append({"N": N, "dim": len(y), "hist": hist(y), "ks": round(ks(y, 2), 4)})
-        print(f"  quadratic N={N}: dim {len(y)}, KS {rows[-1]['ks']}", flush=True)
+        rows.append(quadratic_row(N, lam.imag / 2 ** 0.5))
+        print(f"  quadratic N={N}: dim {rows[-1]['dim']}, KS {rows[-1]['ks']}", flush=True)
     return {"ell": 2, "bins": BINS, "rows": rows}
 
 
@@ -282,26 +288,33 @@ def make_planar():
     for N in PLANAR_NS:
         t = time.time()
         z = np.concatenate([lam for _, _, lam in gamma1_by_orbits(N)]) / 2 ** 0.5
-        r = np.abs(z)
-        # the limit: |z| distributed as |X|, X ~ mu_2; the CDF of |X| at r is 2 F(r) - 1
-        rs = np.sort(r)
-        m = len(rs)
-        F = 2 * np.interp(rs, _GRID, cdf(2)) - 1
-        i = np.arange(m)
-        ks_r = float(max(np.max(np.abs((i + 1) / m - F)), np.max(np.abs(i / m - F))))
-        mom = {f"{p}{q}": round(abs(complex(np.mean(z ** p * np.conj(z) ** q))), 4)
-               for p, q in ((2, 0), (4, 0), (3, 1), (6, 0), (1, 1), (2, 2))}
-        rhist, _ = np.histogram(np.minimum(r, 2), bins=20, range=(0, 2))
-        order = int(pari(f"znorder(Mod(2,{N}))"))
-        shown = z
-        if m > PLANAR_SAMPLE:   # a fixed random sample, the same on every run
-            shown = z[np.sort(np.random.default_rng(N).choice(m, PLANAR_SAMPLE, replace=False))]
-        rows.append({"N": N, "dim": m, "lines": order if order % 2 else order // 2,
-                     "ksr": round(ks_r, 4), "mom": mom, "rhist": [int(c) for c in rhist],
-                     "pts": [v for w in shown for v in (round(w.real, 3), round(w.imag, 3))]})
-        print(f"  planar N={N}: {m} points, radial KS {ks_r:.4f}, |m20| {mom['20']}, "
-              f"m11 {mom['11']}, {time.time() - t:.0f}s", flush=True)
+        rows.append(planar_row(N, z))
+        print(f"  planar N={N}: {rows[-1]['dim']} points, radial KS {rows[-1]['ksr']:.4f}, "
+              f"|m20| {rows[-1]['mom']['20']}, m11 {rows[-1]['mom']['11']}, {time.time() - t:.0f}s", flush=True)
     return {"ell": 2, "sample": PLANAR_SAMPLE, "rows": rows}
+
+
+def planar_row(N, z):
+    """The row of planar.json for N from z = lambda/sqrt 2 over all the eigenvalues lambda
+    of T_2 on S_2(Gamma_1(N)). Also used by magma_import.py."""
+    z = np.asarray(z, dtype=complex)
+    r = np.abs(z)
+    # the limit: |z| distributed as |X|, X ~ mu_2; the CDF of |X| at r is 2 F(r) - 1
+    rs = np.sort(r)
+    m = len(rs)
+    F = 2 * np.interp(rs, _GRID, cdf(2)) - 1
+    i = np.arange(m)
+    ks_r = float(max(np.max(np.abs((i + 1) / m - F)), np.max(np.abs(i / m - F))))
+    mom = {f"{p}{q}": round(abs(complex(np.mean(z ** p * np.conj(z) ** q))), 4)
+           for p, q in ((2, 0), (4, 0), (3, 1), (6, 0), (1, 1), (2, 2))}
+    rhist, _ = np.histogram(np.minimum(r, 2), bins=20, range=(0, 2))
+    order = next(k for k in range(1, N) if pow(2, k, N) == 1)
+    shown = z
+    if m > PLANAR_SAMPLE:   # a fixed random sample, the same on every run
+        shown = z[np.sort(np.random.default_rng(N).choice(m, PLANAR_SAMPLE, replace=False))]
+    return {"N": N, "dim": m, "lines": order if order % 2 else order // 2,
+            "ksr": round(ks_r, 4), "mom": mom, "rhist": [int(c) for c in rhist],
+            "pts": [v for w in shown for v in (round(w.real, 3), round(w.imag, 3))]}
 
 
 # ---- Brandt matrices ---------------------------------------------------------------
@@ -350,6 +363,18 @@ def brandt_eigenvalues(p, ell):
         check(np.all(A.sum(axis=1) == l + 1), f"row sums of B({l}) at p = {p}")
         check(np.array_equal(A * w[None, :], (A * w[None, :]).T), f"B({l}) D not symmetric at p = {p}")
         mats[l] = A
+    return brandt_spectrum(p, ell, mats, w)
+
+
+def brandt_spectrum(p, ell, mats, w):
+    """The eigenvalues of T_l on S_2(Gamma_0(p)) from the Brandt matrices mats = {2: B(2),
+    l: B(l)} (rows sum to l + 1) and the weights w_i = |Aut(E_i)|/2, after the checks.
+    Also used by magma_import.py."""
+    n = len(w)
+    check(n == n_supersingular(p), f"number of supersingular j at p = {p}")
+    for l, A in mats.items():
+        check(np.all(A.sum(axis=1) == l + 1), f"row sums of B({l}) at p = {p}")
+        check(np.array_equal(A * w[None, :], (A * w[None, :]).T), f"B({l}) D not symmetric at p = {p}")
     check(np.array_equal(mats[2] @ mats[ell], mats[ell] @ mats[2]), f"B(2), B({ell}) do not commute at p = {p}")
     s = np.sqrt(w)
     S = mats[ell] * w[None, :] / s[:, None] / s[None, :]
@@ -371,7 +396,19 @@ def diagonal_primes(count=28, lo=101, hi=20011):
 
 def ell_for(p):
     """The largest prime <= (log p)^2."""
-    return int(pari(f"precprime({int(math.log(p) ** 2)})"))
+    n = int(math.log(p) ** 2)
+    while n > 2 and not all(n % d for d in range(2, int(n ** 0.5) + 1)):
+        n -= 1
+    return n
+
+
+def diagonal_row(p, ell, lam):
+    """The row of diagonal.json from the eigenvalues lam of T_l on S_2(Gamma_0(p)).
+    Also used by magma_import.py."""
+    check(ell == ell_for(p), f"l = {ell} is not the largest prime <= (log {p})^2")
+    x = np.asarray(lam, dtype=float) / ell ** 0.5
+    return {"p": p, "ell": ell, "dim": len(x), "hist": hist(x),
+            "ks": round(ks(x, math.inf), 4), "ksl": round(ks(x, ell), 4)}
 
 
 def make_diagonal():
@@ -379,10 +416,8 @@ def make_diagonal():
     for p in DIAGONAL_PS or diagonal_primes():
         t = time.time()
         ell = ell_for(p)
-        x = brandt_eigenvalues(p, ell) / ell ** 0.5
-        rows.append({"p": p, "ell": ell, "dim": len(x), "hist": hist(x),
-                     "ks": round(ks(x, math.inf), 4), "ksl": round(ks(x, ell), 4)})
-        print(f"  diagonal p={p} l={ell}: dim {len(x)}, KS to ST {rows[-1]['ks']}, "
+        rows.append(diagonal_row(p, ell, brandt_eigenvalues(p, ell)))
+        print(f"  diagonal p={p} l={ell}: dim {rows[-1]['dim']}, KS to ST {rows[-1]['ks']}, "
               f"to mu_l {rows[-1]['ksl']}, {time.time() - t:.0f}s", flush=True)
     return {"bins": BINS, "rows": rows}
 
@@ -415,6 +450,19 @@ level1eig(k, l) = {
 """
 
 
+def level1_dim(k):
+    return 0 if k % 2 or k < 12 else k // 12 - (k % 12 == 2)
+
+
+def weight_row(k, l, x):
+    """The row of weight.json from x = lambda / l^((k-1)/2) over the eigenvalues lambda of
+    T_l on S_k(SL_2(Z)). Also used by magma_import.py."""
+    x = np.asarray(x, dtype=float)
+    check(len(x) == level1_dim(k), f"dim S_{k}(SL_2(Z)) = {len(x)}")
+    check(np.max(np.abs(x)) <= 2 + 1e-9, f"Deligne bound at k = {k}, l = {l}")
+    return {"k": k, "dim": len(x), "hist": hist(x), "ks": round(ks(x, l), 4)}
+
+
 def make_weight():
     check(int(pari("level1hecke(12,2)[1,1]")) == -24, "T_2 on S_12 is not tau(2) = -24")
     for k in range(12, 121, 2):
@@ -426,9 +474,7 @@ def make_weight():
     for l in WEIGHT_ELLS:
         rows = []
         for k in WEIGHT_KS:
-            x = np.array([float(v) for v in pari(f"level1eig({k},{l})")])
-            check(np.max(np.abs(x)) <= 2 + 1e-9, f"Deligne bound at k = {k}, l = {l}")
-            rows.append({"k": k, "dim": len(x), "hist": hist(x), "ks": round(ks(x, l), 4)})
+            rows.append(weight_row(k, l, [float(v) for v in pari(f"level1eig({k},{l})")]))
         print(f"  weight l={l}: k up to {WEIGHT_KS[-1]}, dim {rows[-1]['dim']}, KS {rows[-1]['ks']}", flush=True)
         out["ells"][str(l)] = rows
     return out
